@@ -1,10 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7C3AED"/>
-      <stop offset="1" stop-color="#06B6D4"/>
+    <linearGradient id="chrome" x1="0" y1="10" x2="0" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f0feff"/>
+      <stop offset="0.25" stop-color="#67f3ff"/>
+      <stop offset="0.47" stop-color="#1d4ed8"/>
+      <stop offset="0.5" stop-color="#fdf4ff"/>
+      <stop offset="0.62" stop-color="#e879f9"/>
+      <stop offset="1" stop-color="#a21caf"/>
     </linearGradient>
+    <radialGradient id="halo" cx="50%" cy="50%" r="55%">
+      <stop offset="0" stop-color="#6d28d9" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#080b12" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="g-shape"><path d="M47 10H19l-8 8v28l8 8h28l6-6V30H31v9h12v6H22l-2-2V21l2-2h31z"/></clipPath>
   </defs>
-  <rect width="64" height="64" rx="14" fill="#0B0D12"/>
-  <path d="M46 22a16 16 0 1 0 2 14H33v-7h22a23 23 0 1 1-4-13z" fill="url(#g)"/>
+  <rect width="64" height="64" rx="14" fill="#080b12"/>
+  <rect width="64" height="64" rx="14" fill="url(#halo)"/>
+  <g transform="skewX(-8) translate(5 0)">
+    <path d="M47 10H19l-8 8v28l8 8h28l6-6V30H31v9h12v6H22l-2-2V21l2-2h31z" fill="#2e0a5c" transform="translate(1.5 2)"/>
+    <path d="M47 10H19l-8 8v28l8 8h28l6-6V30H31v9h12v6H22l-2-2V21l2-2h31z" fill="url(#chrome)" stroke="#e0f7ff" stroke-width="0.8"/>
+    <g fill="#12062e" opacity="0.5" clip-path="url(#g-shape)">
+      <rect x="8" y="38" width="48" height="1"/>
+      <rect x="8" y="43" width="48" height="1.6"/>
+      <rect x="8" y="48.5" width="48" height="2.2"/>
+    </g>
+  </g>
 </svg>

@@ -15,7 +15,7 @@ export function SiteFooter() {
     <footer className="mt-auto border-t bg-surface">
       <Container className="grid gap-10 py-12 sm:grid-cols-[2fr_1fr_1fr]">
         <div className="space-y-3">
-          <Logo />
+          <Logo id="logo-footer" size="footer" />
           <p className="type-small font-medium">{siteConfig.tagline}</p>
           <p className="type-muted max-w-xs">
             Free games, online tools and useful apps, right in your browser.

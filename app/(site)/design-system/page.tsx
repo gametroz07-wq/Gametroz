@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ToolSummary } from "@/types/content";
 import { notFound } from "next/navigation";
 import { AdSlot } from "@/components/ads/ad-slot";
+import { GametrozLogo } from "@/components/brand/gametroz-logo";
 import { AppCard, AppCardSkeleton } from "@/components/apps/app-card";
 import { GameCard, GameCardSkeleton } from "@/components/games/game-card";
 import { Container } from "@/components/layout/container";
@@ -85,6 +86,19 @@ export default async function DesignSystemPage() {
           <ThemeToggle />
         </div>
       </header>
+
+      <Section id="ds-brand" title="Brand">
+        <div id="ds-brand-logo" className="flex items-center justify-center rounded-2xl bg-[#05070d] px-6 py-14">
+          <GametrozLogo id="logo-ds" halo className="w-full max-w-3xl" />
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          {["w-36", "w-52", "w-72"].map((width) => (
+            <div key={width} className="flex items-center justify-center rounded-xl bg-[#05070d] p-6">
+              <GametrozLogo id={`logo-ds-${width}`} className={width} />
+            </div>
+          ))}
+        </div>
+      </Section>
 
       <Section id="ds-colors" title="Colors">
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
