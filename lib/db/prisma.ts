@@ -1,16 +1,13 @@
 import "server-only";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { resolvePoolMax, resolveRuntimeDatabaseUrl } from "@/lib/db/database-url";
 import { PrismaClient } from "@/lib/generated/prisma/client";
 
 function createPrismaClient() {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) {
-    // Fail loudly: there is no silent fallback to mock data.
-    throw new Error(
-      "DATABASE_URL is not set. Add it to .env (see .env.example and STATUS.md), then run `npm run db:migrate` and `npm run db:seed`.",
-    );
-  }
-  return new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+  // Fails loudly when missing (no silent fallback to mock data) or when it points to localhost on Render.
+  const connectionString = resolveRuntimeDatabaseUrl();
+  // Bounded pool: build workers and the server share the pooler client limit.
+  return new PrismaClient({ adapter: new PrismaPg({ connectionString, max: resolvePoolMax() }) });
 }
 
 // Reuse one client across hot reloads in development to avoid exhausting connections.

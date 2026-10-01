@@ -46,7 +46,7 @@ Why: Prisma 7 recommends routing app traffic through Neon's pooler and running m
 | Variable | Value | Secret |
 |---|---|---|
 | `DATABASE_URL` | Neon pooled string (`-pooler`) | yes |
-| `DIRECT_URL` | Neon direct string | yes |
+| `DIRECT_URL` | **Optional.** Only when `DATABASE_URL` is a transaction-mode pooler: a direct/session URL for migrations. Leave it unset otherwise. Never localhost (the build fails fast if it is). | yes |
 | `NEXT_PUBLIC_SITE_URL` | `https://gametroz.online` | no |
 | `NEXT_PUBLIC_INDEXING_ENABLED` | `false` | no |
 | `GAMEMONETIZE_FEED_ENABLED` | `false` | no |
@@ -57,8 +57,11 @@ Why: Prisma 7 recommends routing app traffic through Neon's pooler and running m
 | `GAMEDISTRIBUTION_API_KEY` | empty | yes |
 | `NEXT_PUBLIC_GA_ID` | empty | no |
 | `NODE_VERSION` | `22` | no |
+| `DATABASE_POOL_MAX` | **Optional.** Connections per process. Default: 2 during `next build` (4 workers), 5 at runtime; this keeps the total under a session-mode pooler limit (Supabase: 15 clients). | no |
 
 Never put a secret in a `NEXT_PUBLIC_*` variable: those are inlined into browser JavaScript.
+
+URL resolution lives in `lib/db/database-url.ts`: the Prisma CLI uses `DIRECT_URL` when it is non-empty, otherwise `DATABASE_URL`; the app uses `DATABASE_URL` only. On Render (`RENDER=true`) or CI, any URL pointing to localhost is refused with an error that names the variable, never its value. Do not ship a `.env` secret file to Render: dotenv would load it for any variable the service does not define.
 
 # 3. Cloudflare (DNS, TLS, proxy)
 

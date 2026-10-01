@@ -43,6 +43,11 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  experimental: {
+    // Each build worker opens its own database pool; 4 workers × 2 connections stays well under
+    // a session-mode pooler limit (Supabase: 15). See resolvePoolMax in lib/db/database-url.ts.
+    cpus: 4,
+  },
   images: {
     // Must mirror the provider image allowlist (lib/providers/*/config.ts).
     remotePatterns: [{ protocol: "https", hostname: "img.gamemonetize.com" }],

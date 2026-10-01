@@ -1,10 +1,10 @@
-# Render Blueprint for the Gametroz preview (Cloudflare → Render → Neon). See docs/13_DEPLOYMENT.md.
+# Render Blueprint for the Gametroz preview. See docs/13_DEPLOYMENT.md.
 # Secrets are declared with `sync: false`: Render asks for their values and they never live in Git.
 services:
   - type: web
     name: gametroz
     runtime: node
-    # Choose the region closest to the Neon database region (set both before the first deploy).
+    # Choose the region closest to the managed PostgreSQL region.
     buildCommand: npm ci && npm run db:deploy && npm run db:seed:deploy && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
@@ -14,10 +14,11 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "22"
-      # Neon "-pooler" connection string, used by the app at runtime.
+      # Managed PostgreSQL connection string, used by the app and (unless DIRECT_URL is set) by migrations.
       - key: DATABASE_URL
         sync: false
-      # Neon direct (unpooled) connection string, used only by `prisma migrate deploy`.
+      # OPTIONAL. Only when DATABASE_URL is a transaction-mode pooler: an unpooled/session URL for
+      # `prisma migrate deploy`. Must never point to localhost (the build fails fast if it does).
       - key: DIRECT_URL
         sync: false
       # Set to "true" for the first deploy only (initial catalog), then delete it.

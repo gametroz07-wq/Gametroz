@@ -6,14 +6,14 @@
  */
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { resolveRuntimeDatabaseUrl } from "../lib/db/database-url";
 import { type Prisma, PrismaClient } from "../lib/generated/prisma/client";
 import { appCategories, apps, platforms } from "./seed-data/apps";
 import { gameCategories, games } from "./seed-data/games";
 import { guides } from "./seed-data/guides";
 import { toolCategories, tools } from "./seed-data/tools";
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) throw new Error("DATABASE_URL is not set. Add it to .env before seeding.");
+const connectionString = resolveRuntimeDatabaseUrl();
 
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
 

@@ -1,7 +1,9 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
+import { resolveCliDatabaseUrl } from "./lib/db/database-url";
 
-// Prisma 7 does not load .env files by itself; dotenv reads DATABASE_URL from `.env`.
+// Prisma 7 does not load .env files by itself: dotenv loads `.env` locally and never overrides
+// variables already set by the host (Render). See lib/db/database-url.ts for the resolution rules.
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
@@ -9,9 +11,7 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    // CLI (migrate deploy, seed) needs a direct connection. In production (Neon) DIRECT_URL is the
-    // unpooled string and DATABASE_URL the "-pooler" one used by the app; locally both can be the same.
-    // Not env(): that throws when unset, and `prisma generate` (postinstall, CI) must work without a database.
-    url: process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? "",
+    // DIRECT_URL (optional, unpooled) → DATABASE_URL. Refuses localhost on Render/CI.
+    url: resolveCliDatabaseUrl(),
   },
 });
