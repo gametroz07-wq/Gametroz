@@ -28,6 +28,8 @@ export const GAMEMONETIZE_CATEGORY_MAP: Record<string, string> = {
   boys: "casual",
   "baby hazel": "casual",
   puzzle: "puzzle",
+  // The live feed sends "Puzzles" (plural) although the RSS builder lists "Puzzle" (observed 2026-10-01).
+  puzzles: "puzzle",
   bejeweled: "puzzle",
   racing: "racing",
   sports: "sports",

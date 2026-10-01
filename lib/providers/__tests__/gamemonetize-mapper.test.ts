@@ -40,6 +40,10 @@ describe("GameMonetize mapper", () => {
     assert.equal(normalizeGameMonetizeGame(portraitGame).orientation, "PORTRAIT");
   });
 
+  it("maps the plural \"Puzzles\" category used by the live feed", () => {
+    assert.equal(normalizeGameMonetizeGame({ ...validGame, category: "Puzzles" }).category, "puzzle");
+  });
+
   it("returns null for unmapped categories", () => {
     assert.equal(normalizeGameMonetizeGame(gameWithUnmappedCategory).category, null);
   });

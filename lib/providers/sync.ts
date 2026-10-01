@@ -90,7 +90,7 @@ export async function syncProviderGames<TRaw>(
     const [existing, slugOwners, categories] = await Promise.all([
       prisma.game.findMany({
         where: { providerId: providerRow.id, providerGameId: { in: ids } },
-        select: { id: true, providerGameId: true },
+        select: { id: true, providerGameId: true, status: true },
       }),
       prisma.game.findMany({
         where: { slug: { in: slugs } },
@@ -98,7 +98,7 @@ export async function syncProviderGames<TRaw>(
       }),
       prisma.gameCategory.findMany({ select: { id: true, slug: true } }),
     ]);
-    const existingById = new Map(existing.map((row) => [row.providerGameId!, row.id]));
+    const existingById = new Map(existing.map((row) => [row.providerGameId!, { id: row.id, status: row.status }]));
     const ownerBySlug = new Map(slugOwners.map((row) => [row.slug, row]));
     const categoryIdBySlug = new Map(categories.map((row) => [row.slug, row.id]));
     const batchSlugs = new Map<string, string>();
@@ -132,7 +132,7 @@ export async function syncProviderGames<TRaw>(
 
       if (!dryRun) {
         try {
-          await writeGame({ prisma, providerId: providerRow.id, data, validation, existingId, categoryIdBySlug });
+          await writeGame({ prisma, providerId: providerRow.id, data, validation, existing: existingId, categoryIdBySlug });
         } catch (error) {
           report.outcome = "fail";
           report.issues = [
@@ -191,14 +191,14 @@ async function writeGame({
   providerId,
   data,
   validation,
-  existingId,
+  existing,
   categoryIdBySlug,
 }: {
   prisma: PrismaClient;
   providerId: string;
   data: NormalizedGame;
   validation: ValidationResult;
-  existingId: string | undefined;
+  existing: { id: string; status: string } | undefined;
   categoryIdBySlug: Map<string, string>;
 }) {
   const validationFields = {
@@ -207,22 +207,35 @@ async function writeGame({
     lastSyncedAt: new Date(),
   };
 
-  if (existingId) {
+  if (existing) {
     // A rejected refresh only records the problem; the stored game is left untouched.
-    await prisma.game.update({
-      where: { id: existingId },
-      data:
-        validation.status === "REJECTED"
-          ? validationFields
-          : {
-              ...validationFields,
-              embedUrl: data.embedUrl,
-              thumbnailUrl: data.thumbnailUrl,
-              width: data.width,
-              height: data.height,
-              orientation: data.orientation,
-            },
-    });
+    if (validation.status === "REJECTED") {
+      await prisma.game.update({ where: { id: existing.id }, data: validationFields });
+      return;
+    }
+    const technical = {
+      embedUrl: data.embedUrl,
+      thumbnailUrl: data.thumbnailUrl,
+      width: data.width,
+      height: data.height,
+      orientation: data.orientation,
+    };
+    // Games still in REVIEW were never edited or published, so they take the full provider data
+    // (except the slug). Published or archived games only get technical fields refreshed.
+    const content =
+      existing.status === "REVIEW"
+        ? {
+            name: data.name,
+            shortDescription: data.shortDescription,
+            description: data.description,
+            instructions: data.instructions,
+            heroImageUrl: data.heroImageUrl,
+            language: data.language,
+            category: { connect: { id: categoryIdBySlug.get(data.category!)! } },
+            tags: { set: [], ...tagsInput(data.tags) },
+          }
+        : {};
+    await prisma.game.update({ where: { id: existing.id }, data: { ...validationFields, ...technical, ...content } });
     return;
   }
 

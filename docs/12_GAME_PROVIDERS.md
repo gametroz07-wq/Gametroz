@@ -41,6 +41,8 @@ lib/providers/
 - Item fields (observed 2026-10-01): `id, title, description, instructions, url, category, tags, thumb, width, height`. All are strings, and `tags` is comma-separated.
 - The live feed is **off** unless `GAMEMONETIZE_FEED_ENABLED=true`. By default the adapter uses `fixtures.ts`: clearly marked mock data whose ids start with `fixture-`.
 - Category mapping lives in `gamemonetize/config.ts`. Unmapped categories (3D, AI, 2 Player, Multiplayer…) are rejected until a mapping is added.
+- **2026-10-01, first live test:** the live feed sends `Puzzles` (plural) while the RSS builder lists `Puzzle`; `puzzles → puzzle` was added. Other live categories seen (Arcade, Adventure, Shooting, Girls, Racing) were already mapped.
+- Feed text quirks: double-encoded entities (`&amp;mdash;`) and bare words left by the provider sanitizer (`mdash`, `ndash`). `toPlainText` decodes entities in two passes and repairs those words. Missing line breaks (e.g. "playPlayer") are left as-is for manual editing.
 
 # 3. Normalization
 
@@ -110,7 +112,9 @@ img-src 'self' data: https://img.gamemonetize.com;
 4. Validates and normalizes, then checks slug collisions against the database and the current batch.
 5. Upserts by `(providerId, providerGameId)`:
    - **New** games are created in `REVIEW`.
-   - **Existing** games only get provider-owned fields refreshed (embed, thumbnail, size, orientation, validation). Name, slug, description and status are never overwritten. A rejected refresh only records the problem.
+   - **Existing** games still in `REVIEW` take the full provider data again (texts, tags, category, technical fields), never the slug.
+   - **Existing** published or archived games only get provider-owned technical fields refreshed (embed, thumbnail, size, orientation, validation). Name, slug, description and status are never overwritten.
+   - A rejected refresh only records the problem.
 6. Closes the `ImportRecord` with received, created, updated, ignored, rejected, needsReview, failed and per-item logs.
 
 **Dry run** (`dryRun: true`): same pipeline and report, and an `ImportRecord` flagged `dryRun`, but no game is written. It is mandatory before any larger import.
