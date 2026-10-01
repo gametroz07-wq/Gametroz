@@ -1,0 +1,344 @@
+// Gametroz data model. Based on docs/05_DATA_MODEL.md and types/content.ts.
+// Only PUBLISHED content is ever read by public pages (see lib/catalog.ts).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ContentStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+/// Result of validating a provider record during sync.
+enum ValidationStatus {
+  VALID
+  NEEDS_REVIEW
+  REJECTED
+}
+
+enum Orientation {
+  LANDSCAPE
+  PORTRAIT
+}
+
+enum GuideSection {
+  GAMES
+  TOOLS
+  APPS
+}
+
+enum RedirectType {
+  PERMANENT
+  TEMPORARY
+}
+
+enum SearchTargetType {
+  GAME
+  TOOL
+  APP
+  GUIDE
+}
+
+// ---------- Games ----------
+
+model Provider {
+  id         String         @id @default(cuid())
+  name       String
+  slug       String         @unique
+  baseUrl    String?
+  termsUrl   String?
+  enabled    Boolean        @default(false)
+  lastSyncAt DateTime?
+  games      Game[]
+  imports    ImportRecord[]
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+}
+
+model GameCategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  iconKey     String
+  image       String?
+  featured    Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  games       Game[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Game {
+  id               String        @id @default(cuid())
+  slug             String        @unique
+  name             String
+  shortDescription String
+  description      String
+  instructions     String
+  /// Array of { input, action } objects.
+  controls         Json          @default("[]")
+  thumbnailUrl     String
+  heroImageUrl     String?
+  /// Provider embed URL. Empty until a provider adapter is connected (Phase 4).
+  embedUrl         String?
+  orientation      Orientation   @default(LANDSCAPE)
+  width            Int?
+  height           Int?
+  language         String        @default("en")
+  status           ContentStatus @default(DRAFT)
+  featured         Boolean       @default(false)
+  trending         Boolean       @default(false)
+  popularity       Int           @default(0)
+  /// Editorial order used when no other sort applies.
+  sortOrder        Int           @default(0)
+  publishedAt      DateTime?
+
+  categoryId       String
+  category         GameCategory      @relation(fields: [categoryId], references: [id])
+  providerId       String?
+  provider         Provider?         @relation(fields: [providerId], references: [id])
+  providerGameId   String?
+  /// Set by provider sync; editorial games keep these empty.
+  validationStatus ValidationStatus?
+  validationIssues Json?
+  lastSyncedAt     DateTime?
+
+  tags   Tag[]
+  guides Guide[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([providerId, providerGameId])
+  @@index([status, publishedAt])
+  @@index([status, popularity])
+  @@index([status, featured])
+  @@index([status, trending])
+  @@index([categoryId, status])
+  @@index([providerId])
+}
+
+// Shared tags. Linked to every content type so search can match them.
+model Tag {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  games     Game[]
+  tools     Tool[]
+  apps      App[]
+  guides    Guide[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ---------- Tools ----------
+
+model ToolCategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  iconKey     String
+  sortOrder   Int      @default(0)
+  tools       Tool[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Tool {
+  id               String        @id @default(cuid())
+  slug             String        @unique
+  name             String
+  shortDescription String
+  description      String
+  howTo            String[]
+  iconKey          String
+  /// Which UI implementation renders the tool (docs/05).
+  componentKey     String?
+  status           ContentStatus @default(DRAFT)
+  featured         Boolean       @default(false)
+  popularity       Int           @default(0)
+  sortOrder        Int           @default(0)
+  publishedAt      DateTime?
+
+  categoryId String
+  category   ToolCategory @relation(fields: [categoryId], references: [id])
+
+  tags   Tag[]
+  guides Guide[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, popularity])
+  @@index([status, featured])
+  @@index([categoryId, status])
+}
+
+// ---------- Apps ----------
+
+model Platform {
+  id          String        @id @default(cuid())
+  name        String
+  slug        String        @unique
+  description String
+  iconKey     String
+  sortOrder   Int           @default(0)
+  apps        AppPlatform[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model AppCategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  iconKey     String
+  sortOrder   Int      @default(0)
+  apps        App[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model App {
+  id                  String        @id @default(cuid())
+  slug                String        @unique
+  name                String
+  publisher           String
+  shortDescription    String
+  description         String
+  version             String?
+  license             String?
+  officialWebsite     String
+  /// Verified official download page (Phase 8). Gametroz never hosts binaries.
+  officialDownloadUrl String?
+  iconUrl             String?
+  features            String[]
+  requirements        String[]
+  status              ContentStatus @default(DRAFT)
+  featured            Boolean       @default(false)
+  sortOrder           Int           @default(0)
+  lastVerifiedAt      DateTime?
+  publishedAt         DateTime?
+
+  categoryId String
+  category   AppCategory @relation(fields: [categoryId], references: [id])
+
+  platforms     AppPlatform[]
+  alternatives  AppAlternative[] @relation("AppAlternatives")
+  alternativeOf AppAlternative[] @relation("AlternativeOf")
+  tags          Tag[]
+  guides        Guide[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, sortOrder])
+  @@index([status, featured])
+  @@index([categoryId, status])
+}
+
+model AppPlatform {
+  appId      String
+  app        App      @relation(fields: [appId], references: [id], onDelete: Cascade)
+  platformId String
+  platform   Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)
+
+  @@id([appId, platformId])
+  @@index([platformId])
+}
+
+// Ordered, editorially chosen alternatives ("VLC → HandBrake, OBS Studio").
+model AppAlternative {
+  appId         String
+  app           App    @relation("AppAlternatives", fields: [appId], references: [id], onDelete: Cascade)
+  alternativeId String
+  alternative   App    @relation("AlternativeOf", fields: [alternativeId], references: [id], onDelete: Cascade)
+  position      Int    @default(0)
+
+  @@id([appId, alternativeId])
+  @@index([alternativeId])
+}
+
+// ---------- Guides ----------
+
+model Guide {
+  id             String        @id @default(cuid())
+  slug           String        @unique
+  title          String
+  excerpt        String
+  section        GuideSection
+  /// Structured blocks ({ type: "h2" | "p" | "ul" | "ol", ... }). Never raw HTML.
+  body           Json
+  readingMinutes Int           @default(1)
+  status         ContentStatus @default(DRAFT)
+  featured       Boolean       @default(false)
+  sortOrder      Int           @default(0)
+  publishedAt    DateTime?
+
+  games Game[]
+  tools Tool[]
+  apps  App[]
+  tags  Tag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, publishedAt])
+  @@index([status, featured])
+  @@index([section, status])
+}
+
+// ---------- Operations ----------
+
+model ImportRecord {
+  id             String    @id @default(cuid())
+  providerId     String
+  provider       Provider  @relation(fields: [providerId], references: [id])
+  startedAt      DateTime  @default(now())
+  completedAt    DateTime?
+  totalReceived  Int       @default(0)
+  created        Int       @default(0)
+  updated        Int       @default(0)
+  ignored        Int       @default(0)
+  rejected       Int       @default(0)
+  needsReview    Int       @default(0)
+  failed         Int       @default(0)
+  dryRun         Boolean   @default(false)
+  requestedLimit Int?
+  logs           Json?
+
+  @@index([providerId, startedAt])
+}
+
+model Redirect {
+  id        String       @id @default(cuid())
+  oldPath   String       @unique
+  newPath   String
+  type      RedirectType @default(PERMANENT)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+// Lets "gta", "car games" or "juegos carros" find related content.
+model SearchAlias {
+  id         String           @id @default(cuid())
+  query      String
+  targetType SearchTargetType
+  targetId   String
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@unique([query, targetType, targetId])
+  @@index([query])
+}

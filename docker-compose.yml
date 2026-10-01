@@ -1,0 +1,23 @@
+# Local development database only. These credentials are not used in any shared environment.
+# DATABASE_URL=postgresql://gametroz:gametroz_dev@localhost:5436/gametroz?schema=public
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: gametroz-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gametroz
+      POSTGRES_PASSWORD: gametroz_dev
+      POSTGRES_DB: gametroz
+    ports:
+      - "5436:5432"
+    volumes:
+      - gametroz-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gametroz -d gametroz"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  gametroz-pgdata:

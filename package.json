@@ -1,0 +1,62 @@
+{
+  "name": "gametroz",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "next typegen && tsc --noEmit",
+    "postinstall": "prisma generate",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "test": "tsx --test \"lib/**/*.test.ts\"",
+    "provider:dryrun:gamemonetize": "tsx scripts/provider-sync.ts --provider gamemonetize --dry-run",
+    "provider:sync:gamemonetize": "tsx scripts/provider-sync.ts --provider gamemonetize",
+    "provider:review": "tsx scripts/provider-review.ts",
+    "provider:publish": "tsx scripts/provider-publish.ts",
+    "db:seed:deploy": "node scripts/deploy-seed.mjs"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "class-variance-authority": "^0.7.1",
+    "cn": "^0.4.0",
+    "lucide-react": "^1.49.0",
+    "next": "16.3.8",
+    "next-themes": "^0.4.6",
+    "pg": "^8.23.1",
+    "radix-ui": "^1.6.7",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "server-only": "^0.0.1",
+    "shadcn": "^4.21.1",
+    "tw-animate-css": "^1.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "dotenv": "^18.0.5",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.8",
+    "prisma": "^7.10.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "allowScripts": {
+    "@prisma/engines@7.10.0": true,
+    "prisma@7.10.0": true,
+    "esbuild@0.28.2": true
+  }
+}

@@ -1,0 +1,41 @@
+# Render Blueprint for the Gametroz preview (Cloudflare → Render → Neon). See docs/13_DEPLOYMENT.md.
+# Secrets are declared with `sync: false`: Render asks for their values and they never live in Git.
+services:
+  - type: web
+    name: gametroz
+    runtime: node
+    # Choose the region closest to the Neon database region (set both before the first deploy).
+    buildCommand: npm ci && npm run db:deploy && npm run db:seed:deploy && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    domains:
+      - gametroz.online
+      - www.gametroz.online
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # Neon "-pooler" connection string, used by the app at runtime.
+      - key: DATABASE_URL
+        sync: false
+      # Neon direct (unpooled) connection string, used only by `prisma migrate deploy`.
+      - key: DIRECT_URL
+        sync: false
+      # Set to "true" for the first deploy only (initial catalog), then delete it.
+      - key: SEED_ON_DEPLOY
+        value: "false"
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://gametroz.online
+      - key: NEXT_PUBLIC_INDEXING_ENABLED
+        value: "false"
+      - key: GAMEMONETIZE_FEED_ENABLED
+        value: "false"
+      - key: GAME_EMBEDS_ENABLED
+        value: "false"
+      - key: ADSTERRA_ENABLED
+        value: "false"
+      - key: GAMEMONETIZE_API_KEY
+        sync: false
+      - key: GAMEDISTRIBUTION_API_KEY
+        sync: false
+      - key: NEXT_PUBLIC_GA_ID
+        value: ""

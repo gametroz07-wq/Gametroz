@@ -1,0 +1,5 @@
+# Normalize line endings in the repository (deploys run on Linux).
+* text=auto eol=lf
+*.svg text eol=lf
+*.png binary
+*.ico binary
