@@ -3,16 +3,10 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/layout/container";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { CardGrid } from "@/components/shared/card-grid";
-import { CategoryCard } from "@/components/shared/category-card";
 import { PageHeader } from "@/components/shared/page-header";
-import { PageSection } from "@/components/shared/page-section";
 import { ToolCard } from "@/components/tools/tool-card";
-import {
-  getToolCategories,
-  getToolCategory,
-  getToolCategorySummaries,
-  getToolsByCategory,
-} from "@/lib/catalog";
+import { ToolCategoryTile } from "@/components/tools/tool-category-tile";
+import { getToolCategories, getToolCategory, getToolCategorySummaries, getToolsByCategory } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
 
 export const dynamicParams = false;
@@ -36,30 +30,37 @@ export default async function ToolCategoryPage({ params }: PageProps<"/tools/[ca
   const category = await getToolCategory(slug);
   if (!category) notFound();
 
-  const [tools, summaries] = await Promise.all([getToolsByCategory(slug), getToolCategorySummaries()]);
+  const [tools, categories, summaries] = await Promise.all([
+    getToolsByCategory(slug),
+    getToolCategories(),
+    getToolCategorySummaries(),
+  ]);
 
   return (
-    <Container className="pb-12">
-      <Breadcrumbs items={[{ label: "Tools", href: "/tools" }, { label: category.name }]} className="pt-6" />
+    <Container className="pb-10">
+      <Breadcrumbs items={[{ label: "Tools", href: "/tools" }, { label: category.name }]} className="pt-3" />
       <PageHeader title={`${category.name} tools`} description={category.description} />
 
-      <section aria-label={`${category.name} tools`} className="py-6">
+      <nav aria-label="Tool categories" className="grid grid-cols-2 gap-2 pt-3 sm:grid-cols-4 lg:grid-cols-7">
+        {categories.map((item) => (
+          <ToolCategoryTile
+            key={item.slug}
+            slug={item.slug}
+            name={item.name}
+            iconKey={item.iconKey}
+            count={summaries.find((summary) => summary.href === `/tools/${item.slug}`)?.itemCount ?? 0}
+            active={item.slug === slug}
+          />
+        ))}
+      </nav>
+
+      <section aria-label={`${category.name} tools`} className="py-5">
         <CardGrid variant="cards">
           {tools.map((tool) => (
             <ToolCard key={tool.slug} tool={tool} />
           ))}
         </CardGrid>
       </section>
-
-      <PageSection id="related-categories" title="More tool categories">
-        <CardGrid variant="categories">
-          {summaries
-            .filter((summary) => summary.href !== `/tools/${slug}`)
-            .map((summary) => (
-              <CategoryCard key={summary.href} category={summary} />
-            ))}
-        </CardGrid>
-      </PageSection>
     </Container>
   );
 }

@@ -1,6 +1,5 @@
 import { AdSlot } from "@/components/ads/ad-slot";
 import { AppCard } from "@/components/apps/app-card";
-import { AppIcon } from "@/components/apps/app-icon";
 import { Container } from "@/components/layout/container";
 import { SearchInput } from "@/components/search/search-input";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
@@ -8,8 +7,7 @@ import { CardGrid } from "@/components/shared/card-grid";
 import { ChipNav } from "@/components/shared/chip-nav";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageSection } from "@/components/shared/page-section";
-import Link from "next/link";
-import { getAppCategories, getAppsByPlatform, getFeaturedApps, getPlatforms } from "@/lib/catalog";
+import { getAppCategories, getApps, getAppsByPlatform, getFeaturedApps, getPlatforms } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = pageMetadata({
@@ -19,58 +17,47 @@ export const metadata = pageMetadata({
 });
 
 export default async function AppsPage() {
-  const [featured, platforms, categories] = await Promise.all([
+  const [featured, platforms, categories, allApps] = await Promise.all([
     getFeaturedApps(4),
     getPlatforms(),
     getAppCategories(),
+    getApps(),
   ]);
   const sections = await Promise.all(
     platforms.map(async (platform) => ({ platform, apps: await getAppsByPlatform(platform.slug, 4) })),
   );
 
   return (
-    <Container className="pb-12">
-      <Breadcrumbs items={[{ label: "Apps" }]} className="pt-6" />
+    <Container className="pb-10">
+      <Breadcrumbs items={[{ label: "Apps" }]} className="pt-3" />
       <PageHeader
-        title="Free apps and software"
-        description="Useful software from trusted publishers. Every download button takes you to the official site."
-      >
-        <SearchInput placeholder="Search apps..." className="max-w-xl pt-2" />
-      </PageHeader>
-
-      <ChipNav
-        label="App categories"
-        className="pt-4"
-        items={categories.map((category) => ({
-          label: category.name,
-          href: `/search?q=${encodeURIComponent(category.name)}&type=apps`,
-          iconKey: category.iconKey,
-        }))}
+        title="Apps & software"
+        description={`${allApps.length} trusted apps. Every download button goes to the official publisher.`}
+        aside={<SearchInput placeholder="Search apps..." />}
       />
 
-      <PageSection id="featured" title="Featured apps">
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <ChipNav
+        label="Platforms and categories"
+        className="pt-3"
+        items={[
+          ...platforms.map((platform) => ({ label: platform.name, href: `/apps/${platform.slug}`, iconKey: platform.iconKey })),
+          ...categories.map((category) => ({
+            label: category.name,
+            href: `/search?q=${encodeURIComponent(category.name)}&type=apps`,
+            iconKey: category.iconKey,
+          })),
+        ]}
+      />
+
+      <PageSection id="featured" title="Featured apps" className="pt-5">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {featured.map((app) => (
-            <li key={app.slug}>
-              <Link
-                href={`/app/${app.slug}`}
-                className="flex h-full flex-col gap-4 rounded-3xl bg-surface p-5 transition-colors hover:bg-surface-2 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
-              >
-                <AppIcon app={app} size={56} />
-                <span>
-                  <span className="block text-lg font-semibold">{app.name}</span>
-                  <span className="type-muted mt-1 line-clamp-2 block">{app.shortDescription}</span>
-                </span>
-                <span className="mt-auto text-xs font-medium text-muted-foreground">
-                  {app.category.name} · {app.publisher}
-                </span>
-              </Link>
-            </li>
+            <AppCard key={app.slug} app={app} variant="featured" />
           ))}
-        </ul>
+        </div>
       </PageSection>
 
-      <div className="py-4">
+      <div className="py-2">
         <AdSlot placement="home-feed" />
       </div>
 

@@ -8,10 +8,12 @@ import { CardGrid } from "@/components/shared/card-grid";
 import { PageSection } from "@/components/shared/page-section";
 import { TagList } from "@/components/shared/tag-list";
 import { ToolCard } from "@/components/tools/tool-card";
+import { toolAccent } from "@/components/tools/tool-category-style";
 import { ToolWorkspace } from "@/components/tools/tool-workspace";
 import { getGuidesFor, getRelatedTools, getToolBySlug, getTools } from "@/lib/catalog";
 import { contentIcons } from "@/lib/icons";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { cn } from "@/lib/utils";
 
 export const dynamicParams = false;
 
@@ -35,6 +37,7 @@ export default async function ToolPage({ params }: PageProps<"/tool/[slug]">) {
 
   const [related, guides] = await Promise.all([getRelatedTools(tool, 4), getGuidesFor({ tools: tool.slug })]);
   const Icon = contentIcons[tool.iconKey];
+  const accent = toolAccent(tool.category.slug);
 
   return (
     <Container className="pb-12">
@@ -44,17 +47,17 @@ export default async function ToolPage({ params }: PageProps<"/tool/[slug]">) {
           { label: tool.category.name, href: `/tools/${tool.category.slug}` },
           { label: tool.name },
         ]}
-        className="pt-4 sm:pt-6"
+        className="pt-3"
       />
 
       {/* The working tool comes first; explanatory content stays below it. */}
-      <section aria-labelledby="tool-heading" className="mt-4 overflow-hidden rounded-3xl bg-surface">
-        <header className="flex items-center gap-4 border-b border-border/60 p-5 sm:p-6">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary dark:text-violet-300">
+      <section aria-labelledby="tool-heading" className="mt-3 overflow-hidden rounded-2xl bg-surface ring-1 ring-white/5">
+        <header className="flex items-center gap-3 border-b border-border/60 p-4 sm:px-6">
+          <span className={cn("flex size-12 shrink-0 items-center justify-center rounded-xl", accent.icon)}>
             <Icon className="size-6" aria-hidden="true" />
           </span>
           <div className="min-w-0">
-            <h1 id="tool-heading" className="type-h3">
+            <h1 id="tool-heading" className="text-xl font-extrabold tracking-tight sm:text-2xl">
               {tool.name}
             </h1>
             <p className="type-muted">{tool.shortDescription}</p>
@@ -65,7 +68,7 @@ export default async function ToolPage({ params }: PageProps<"/tool/[slug]">) {
         </div>
       </section>
 
-      <div className="grid gap-8 py-8 lg:grid-cols-2">
+      <div className="grid gap-6 py-6 lg:grid-cols-2">
         <section aria-labelledby="about-tool-heading" className="space-y-3">
           <h2 id="about-tool-heading" className="type-h3">
             About {tool.name}

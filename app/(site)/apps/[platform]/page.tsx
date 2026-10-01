@@ -4,10 +4,9 @@ import { AppCard } from "@/components/apps/app-card";
 import { Container } from "@/components/layout/container";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { CardGrid } from "@/components/shared/card-grid";
-import { CategoryCard } from "@/components/shared/category-card";
+import { ChipNav } from "@/components/shared/chip-nav";
 import { PageHeader } from "@/components/shared/page-header";
-import { PageSection } from "@/components/shared/page-section";
-import { getAppsByPlatform, getPlatform, getPlatforms, getPlatformSummaries } from "@/lib/catalog";
+import { getAppsByPlatform, getPlatform, getPlatforms } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
 
 export const dynamicParams = false;
@@ -30,31 +29,32 @@ export default async function PlatformPage({ params }: PageProps<"/apps/[platfor
   const platform = await getPlatform((await params).platform);
   if (!platform) notFound();
 
-  const [apps, summaries] = await Promise.all([getAppsByPlatform(platform.slug), getPlatformSummaries()]);
+  const [apps, platforms] = await Promise.all([getAppsByPlatform(platform.slug), getPlatforms()]);
   const title = platform.slug === "browser" ? "Browser apps" : `${platform.name} apps`;
 
   return (
-    <Container className="pb-12">
-      <Breadcrumbs items={[{ label: "Apps", href: "/apps" }, { label: platform.name }]} className="pt-6" />
+    <Container className="pb-10">
+      <Breadcrumbs items={[{ label: "Apps", href: "/apps" }, { label: platform.name }]} className="pt-3" />
       <PageHeader title={title} description={platform.description} />
 
-      <section aria-label={title} className="py-6">
+      <ChipNav
+        label="Platforms"
+        className="pt-3"
+        items={platforms.map((item) => ({
+          label: item.name,
+          href: `/apps/${item.slug}`,
+          iconKey: item.iconKey,
+          active: item.slug === platform.slug,
+        }))}
+      />
+
+      <section aria-label={title} className="py-5">
         <CardGrid variant="cards">
           {apps.map((app) => (
             <AppCard key={app.slug} app={app} />
           ))}
         </CardGrid>
       </section>
-
-      <PageSection id="other-platforms" title="Other platforms">
-        <CardGrid variant="categories">
-          {summaries
-            .filter((summary) => summary.href !== `/apps/${platform.slug}`)
-            .map((summary) => (
-              <CategoryCard key={summary.href} category={summary} />
-            ))}
-        </CardGrid>
-      </PageSection>
     </Container>
   );
 }

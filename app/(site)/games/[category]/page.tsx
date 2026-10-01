@@ -5,15 +5,10 @@ import { GameCard } from "@/components/games/game-card";
 import { Container } from "@/components/layout/container";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { CardGrid } from "@/components/shared/card-grid";
-import { CategoryCard } from "@/components/shared/category-card";
+import { ChipNav } from "@/components/shared/chip-nav";
 import { PageHeader } from "@/components/shared/page-header";
-import { PageSection } from "@/components/shared/page-section";
-import {
-  getGameCategories,
-  getGameCategory,
-  getGameCategorySummaries,
-  getGamesByCategory,
-} from "@/lib/catalog";
+import { getGameCategories, getGameCategory, getGamesByCategory } from "@/lib/catalog";
+import { contentIcons } from "@/lib/icons";
 import { pageMetadata } from "@/lib/seo/metadata";
 
 export const dynamicParams = false;
@@ -37,34 +32,43 @@ export default async function GameCategoryPage({ params }: PageProps<"/games/[ca
   const category = await getGameCategory(slug);
   if (!category) notFound();
 
-  const [games, summaries] = await Promise.all([getGamesByCategory(slug), getGameCategorySummaries()]);
-  const otherCategories = summaries.filter((summary) => summary.href !== `/games/${slug}`);
+  const [games, categories] = await Promise.all([getGamesByCategory(slug), getGameCategories()]);
+  const Icon = contentIcons[category.iconKey];
 
   return (
-    <Container className="pb-12">
-      <Breadcrumbs items={[{ label: "Games", href: "/games" }, { label: category.name }]} className="pt-6" />
-      <PageHeader title={`${category.name} games`} description={category.description} />
+    <Container className="pb-10">
+      <Breadcrumbs items={[{ label: "Games", href: "/games" }, { label: category.name }]} className="pt-3" />
+      <PageHeader
+        title={`${category.name} games`}
+        description={category.description}
+        eyebrow={
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+            <Icon className="size-4" aria-hidden="true" />
+            {games.length} games
+          </span>
+        }
+      />
 
-      <section aria-label={`${category.name} games`} className="py-6">
-        <p className="type-muted mb-4">{games.length} games</p>
+      <ChipNav
+        label="Game categories"
+        className="pt-3"
+        items={categories.map((item) => ({
+          label: item.name,
+          href: `/games/${item.slug}`,
+          iconKey: item.iconKey,
+          active: item.slug === slug,
+        }))}
+      />
+
+      <section aria-label={`${category.name} games`} className="py-4">
         <CardGrid variant="games">
           {games.map((game, index) => (
-            <GameCard key={game.slug} game={game} priority={index < 4} />
+            <GameCard key={game.slug} game={game} priority={index < 5} />
           ))}
         </CardGrid>
       </section>
 
-      <div className="py-4">
-        <AdSlot placement="home-feed" />
-      </div>
-
-      <PageSection id="related-categories" title="More categories">
-        <CardGrid variant="categories">
-          {otherCategories.map((summary) => (
-            <CategoryCard key={summary.href} category={summary} />
-          ))}
-        </CardGrid>
-      </PageSection>
+      <AdSlot placement="home-feed" />
     </Container>
   );
 }

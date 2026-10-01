@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check, Cpu } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -7,12 +7,13 @@ import { AppCard, platformLabels } from "@/components/apps/app-card";
 import { AppIcon } from "@/components/apps/app-icon";
 import { AppScreenshots } from "@/components/apps/app-screenshots";
 import { OfficialDownloadButton } from "@/components/apps/official-download-button";
+import { OpenSourceBadge } from "@/components/apps/platform-badges";
 import { GuideCard } from "@/components/guides/guide-card";
 import { Container } from "@/components/layout/container";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { CardGrid } from "@/components/shared/card-grid";
 import { PageSection } from "@/components/shared/page-section";
-import { Badge } from "@/components/ui/badge";
+import { isOpenSourceLicense } from "@/lib/app-license";
 import { getAlternatives, getAppBySlug, getApps, getGuidesFor } from "@/lib/catalog";
 import { formatDate } from "@/lib/format";
 import { pageMetadata } from "@/lib/seo/metadata";
@@ -40,9 +41,8 @@ export default async function AppPage({ params }: PageProps<"/app/[slug]">) {
 
   const [alternatives, guides] = await Promise.all([getAlternatives(app, 4), getGuidesFor({ apps: app.slug })]);
   const facts = [
-    { label: "Version", value: app.version },
-    { label: "Publisher", value: app.publisher },
-    { label: "License", value: app.license },
+    { label: "Version", value: app.version || "—" },
+    { label: "License", value: app.license || "—" },
     {
       label: "Platforms",
       value: app.platforms.map((platform, index) => (
@@ -58,29 +58,31 @@ export default async function AppPage({ params }: PageProps<"/app/[slug]">) {
   ];
 
   return (
-    <Container className="pb-12">
-      <Breadcrumbs items={[{ label: "Apps", href: "/apps" }, { label: app.name }]} className="pt-4 sm:pt-6" />
+    <Container className="pb-10">
+      <Breadcrumbs items={[{ label: "Apps", href: "/apps" }, { label: app.name }]} className="pt-3" />
 
-      <section aria-labelledby="app-heading" className="mt-4 rounded-3xl bg-surface p-5 sm:p-8">
-        <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-          <div className="flex items-start gap-4 sm:gap-5">
-            <AppIcon app={app} size={72} />
-            <div className="min-w-0 space-y-2">
-              <h1 id="app-heading" className="type-h2">
+      <section aria-labelledby="app-heading" className="mt-3 overflow-hidden rounded-2xl bg-surface ring-1 ring-white/5">
+        <div className="flex flex-col gap-5 p-4 sm:p-6 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-start gap-4">
+            <AppIcon app={app} size={84} className="shadow-lg shadow-black/40" />
+            <div className="min-w-0 space-y-1.5">
+              <h1 id="app-heading" className="text-2xl font-extrabold tracking-tight sm:text-3xl">
                 {app.name}
               </h1>
-              <p className="type-body text-muted-foreground">{app.shortDescription}</p>
-              <Badge variant="secondary">{app.category.name}</Badge>
+              <p className="text-sm text-muted-foreground">
+                by <span className="font-medium text-foreground">{app.publisher}</span> · {app.category.name}
+              </p>
+              <p className="type-body max-w-xl text-foreground/85">{app.shortDescription}</p>
+              {isOpenSourceLicense(app.license) && <OpenSourceBadge />}
             </div>
           </div>
           <OfficialDownloadButton url={app.officialWebsite} appName={app.name} />
         </div>
-
-        <dl className="mt-8 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-border/60 pt-6 sm:grid-cols-3 lg:grid-cols-5">
+        <dl className="grid grid-cols-2 border-t border-border/60 bg-surface-2/50 md:grid-cols-4">
           {facts.map((fact) => (
-            <div key={fact.label} className="min-w-0">
-              <dt className="type-muted text-xs">{fact.label}</dt>
-              <dd className="mt-1 text-sm font-medium break-words">{fact.value}</dd>
+            <div key={fact.label} className="min-w-0 px-4 py-3 sm:px-6">
+              <dt className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">{fact.label}</dt>
+              <dd className="mt-0.5 text-sm font-semibold break-words">{fact.value}</dd>
             </div>
           ))}
         </dl>
@@ -90,41 +92,37 @@ export default async function AppPage({ params }: PageProps<"/app/[slug]">) {
         <AppScreenshots appName={app.name} />
       </PageSection>
 
-      <div className="grid gap-8 py-6 lg:grid-cols-3">
-        <section aria-labelledby="about-app-heading" className="space-y-3 lg:col-span-1">
-          <h2 id="about-app-heading" className="type-h3">
-            About
+      <div className="grid gap-3 py-3 lg:grid-cols-[1.2fr_1fr]">
+        <section aria-labelledby="features-heading" className="space-y-3 rounded-2xl bg-surface p-4 ring-1 ring-white/5 sm:p-5">
+          <h2 id="features-heading" className="text-base font-bold">
+            About & features
           </h2>
-          <p className="type-body text-foreground/90">{app.description}</p>
-        </section>
-        <section aria-labelledby="features-heading" className="space-y-3">
-          <h2 id="features-heading" className="type-h3">
-            Features
-          </h2>
-          <ul className="space-y-2">
+          <p className="type-body text-foreground/85">{app.description}</p>
+          <ul className="grid gap-2 sm:grid-cols-2">
             {app.features.map((feature) => (
-              <li key={feature} className="flex items-start gap-2">
-                <Check className="mt-0.5 size-5 shrink-0 text-emerald-500" aria-hidden="true" />
-                <span className="type-body">{feature}</span>
+              <li key={feature} className="flex items-start gap-2 text-sm">
+                <Check className="mt-0.5 size-4 shrink-0 text-emerald-500" aria-hidden="true" />
+                {feature}
               </li>
             ))}
           </ul>
         </section>
-        <section aria-labelledby="requirements-heading" className="space-y-3">
-          <h2 id="requirements-heading" className="type-h3">
-            Requirements
+        <section aria-labelledby="requirements-heading" className="space-y-3 rounded-2xl bg-surface p-4 ring-1 ring-white/5 sm:p-5">
+          <h2 id="requirements-heading" className="flex items-center gap-2 text-base font-bold">
+            <Cpu className="size-4 text-muted-foreground" aria-hidden="true" />
+            System requirements
           </h2>
-          <ul className="type-body list-disc space-y-2 pl-5 text-foreground/90">
+          <ul className="space-y-2">
             {app.requirements.map((requirement) => (
-              <li key={requirement}>{requirement}</li>
+              <li key={requirement} className="rounded-lg bg-surface-2 px-3 py-2 text-sm text-foreground/85">
+                {requirement}
+              </li>
             ))}
           </ul>
         </section>
       </div>
 
-      <div className="py-4">
-        <AdSlot placement="home-feed" />
-      </div>
+      <AdSlot placement="home-feed" className="my-2" />
 
       {alternatives.length > 0 && (
         <PageSection id="alternatives" title={`Alternatives to ${app.name}`}>
