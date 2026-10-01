@@ -1,8 +1,27 @@
 # Current phase
 
-**Phase 4 — Game Provider Layer** (complete, awaiting approval)
+**Phase 4.5 — Preview Deployment** (in progress: local preparation done, remote steps pending)
 
-Phases 0–3 approved. Phase 5 (catalog import) has not started. Full design: `docs/12_GAME_PROVIDERS.md`.
+Phases 0–4 approved. Phase 5 has not started. Deployment runbook: `docs/13_DEPLOYMENT.md`. Provider design: `docs/12_GAME_PROVIDERS.md`.
+
+## Phase 4.5 — done locally
+- Architecture: Cloudflare (DNS, TLS, proxy) → Render Web Service (Next.js, Node 22) → Neon PostgreSQL. Local Docker PostgreSQL unchanged.
+- Neon: pooled `DATABASE_URL` for the app, direct `DIRECT_URL` for `prisma migrate deploy`.
+- `render.yaml`: build `npm ci && npm run db:deploy && npm run db:seed:deploy && npm run build`, start `npm start`, health `/api/health`, domains apex + www. Seed only when `SEED_ON_DEPLOY=true`.
+- `/api/health`: `{"status":"ok","database":"ok"}` (200) or `degraded`/`error` (503), no secrets.
+- Security headers: CSP (no nonces, `frame-src none`, `frame-ancestors none`), nosniff, Referrer-Policy, Permissions-Policy, X-Frame-Options, X-Robots-Tag noindex.
+- www → apex: Cloudflare redirect rule (documented) plus an origin fallback (308).
+- Validation: tests 27/27, prisma validate, lint, typecheck and build all PASS. Local production checks passed (headers, health 200/503/recovery, redirect, clean console under CSP, 0 broken links, parity 17/17).
+- Git: repository initialized, initial commit `e111e14`. `.env.example` is left uncommitted for the user to review.
+
+## Phase 4.5 — pending (user dashboards, then verification)
+- Re-authenticate `gh` (the current session fails) and create an empty private GitHub repository → push.
+- Create Neon, then the Render Blueprint (secrets in Render, `SEED_ON_DEPLOY=true` on the first deploy), then Cloudflare (see the runbook).
+- Production verification by the assistant.
+
+# Previous phase
+
+**Phase 4 — Game Provider Layer** (approved)
 
 ## Completed
 
