@@ -15,7 +15,7 @@
 - [x] T6 Runbook `docs/13_DEPLOYMENT.md` (Neon, Render, Cloudflare, variables, cache, TLS, verification)
 - [x] T7 Local validation: tests 27/27, prisma validate, lint, typecheck, build; local prod: headers, health ok/503/recovery, www 308, CSP with clean console, crawl 0 broken, parity 17/17
 - [x] T8 Git: `git init`, `.gitattributes` (LF), initial commit `e111e14` (`.env.example` excluded: the assistant cannot read it, so it cannot verify it holds no secrets)
-- [ ] T9 Push to GitHub — **blocked**: the local `gh` session fails to authenticate (account `preoperacionaseguridadvial-crypto`)
+- [x] T9 Push to GitHub: `main` pushed to https://github.com/gametroz07-wq/Gametroz (private), authenticated by the user through Git Credential Manager
 - [ ] T10 Neon project + connection strings (user, dashboard)
 - [ ] T11 Render Blueprint deploy with secrets and `SEED_ON_DEPLOY=true` on the first deploy (user, dashboard)
 - [ ] T12 Cloudflare zone, DNS only → verify in Render → proxied, Full (strict), redirect rule (user, dashboard)
@@ -23,4 +23,4 @@
 
 ## Next step
 
-The user re-authenticates `gh` with the intended GitHub account and creates an empty private repository; then the assistant pushes `main`.
+The user creates Neon, the Render Blueprint (from this repository) and the Cloudflare zone following docs/13_DEPLOYMENT.md; then the assistant verifies production.

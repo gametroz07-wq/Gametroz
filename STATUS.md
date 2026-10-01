@@ -15,7 +15,7 @@ Phases 0–4 approved. Phase 5 has not started. Deployment runbook: `docs/13_DEP
 - Git: repository initialized, initial commit `e111e14`. `.env.example` is left uncommitted for the user to review.
 
 ## Phase 4.5 — pending (user dashboards, then verification)
-- Re-authenticate `gh` (the current session fails) and create an empty private GitHub repository → push.
+- Repository: https://github.com/gametroz07-wq/Gametroz (`main` pushed).
 - Create Neon, then the Render Blueprint (secrets in Render, `SEED_ON_DEPLOY=true` on the first deploy), then Cloudflare (see the runbook).
 - Production verification by the assistant.
 
