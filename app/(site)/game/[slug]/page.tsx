@@ -17,8 +17,8 @@ import { TagList } from "@/components/shared/tag-list";
 import { Badge } from "@/components/ui/badge";
 import {
   getGameBySlug,
-  getGames,
   getGuidesFor,
+  getPopularGames,
   getRelatedGames,
   getSameCategoryGames,
   getTrendingGames,
@@ -29,8 +29,12 @@ import { pageMetadata } from "@/lib/seo/metadata";
 // pages refresh hourly and immediately through POST /api/revalidate when a game is published.
 export const revalidate = 3600;
 
+// With hundreds of published games, prerendering every page at build time would hit the database for
+// each one. Only the most popular are built ahead; the rest render on first request and are then cached.
+const PRERENDERED_GAMES = 60;
+
 export async function generateStaticParams() {
-  return (await getGames()).map((game) => ({ slug: game.slug }));
+  return (await getPopularGames(PRERENDERED_GAMES)).map((game) => ({ slug: game.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/game/[slug]">): Promise<Metadata> {

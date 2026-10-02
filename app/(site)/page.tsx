@@ -1,4 +1,4 @@
-import { Car, Flame, Puzzle, Sparkles, Trophy } from "lucide-react";
+import { Car, Flame, Puzzle, Sparkles, Swords, Trophy } from "lucide-react";
 import { AdSlot } from "@/components/ads/ad-slot";
 import { AppCard } from "@/components/apps/app-card";
 import { GameCard } from "@/components/games/game-card";
@@ -44,12 +44,13 @@ const sectionIcon = (Icon: typeof Flame, tint: string) => (
 
 // Home weights games first (~70%), then tools (~20%) and apps (~10%).
 export default async function HomePage() {
-  const [featured, trending, popular, racing, puzzle, newGames, categories, tools, apps, guides] = await Promise.all([
+  const [featured, trending, popular, racing, puzzle, action, newGames, categories, tools, apps, guides] = await Promise.all([
     getFeaturedGames(3),
     getTrendingGames(12),
     getPopularGames(10),
     getGamesByCategory("racing"),
     getGamesByCategory("puzzle"),
+    getGamesByCategory("action"),
     getNewGames(10),
     getGameCategories(),
     getPopularTools(8),
@@ -140,6 +141,20 @@ export default async function HomePage() {
             ))}
           </div>
         </PageSection>
+        {action.length > 0 && (
+          <PageSection
+            id="action-games"
+            title="Action games"
+            icon={sectionIcon(Swords, "bg-red-500/15 text-red-600 dark:text-red-300")}
+            action={{ label: "View all", href: "/games/action" }}
+          >
+            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:grid-cols-2">
+              {action.slice(0, 4).map((game) => (
+                <GameCard key={game.slug} game={game} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 25vw, 50vw" />
+              ))}
+            </div>
+          </PageSection>
+        )}
       </div>
 
       <div className="py-2">
