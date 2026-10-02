@@ -25,8 +25,8 @@ Indexing stays OFF, no Search Console, no Adsterra, no deploy.
       sitemap for all published content, robots.ts (gated), llms.txt, /about + /editorial-policy, decorative logo text.
 - [x] A2 (delegated, done 2026-10-02, uncommitted) Game page template: quick facts (category, controls derived from instructions, orientation,
       browser/no download), content order, empty sections hidden, similar games, feed entity repair, category intros.
-- [ ] A3 Core Web Vitals lab audit (local production build) and obvious fixes.
-- [ ] A4 Internal crawl of the branch build + validations; docs/SEO-GEO-AEO-AUDIT.md.
+- [x] A3 Core Web Vitals lab audit (local production build) and obvious fixes.
+- [x] A4 Internal crawl of the branch build + validations; docs/SEO-GEO-AEO-AUDIT.md.
 
 ## A1 evidence and decisions
 - RED: new tests for structured-data (breadcrumbTrail, webSite, organization, softwareApplication, article, videoGame),
@@ -73,3 +73,11 @@ Indexing stays OFF, no Search Console, no Adsterra, no deploy.
 ## Progress
 - Branch: feat/seo-geo-aeo-audit (stacked on feat/tools-section 221deac).
 - Engram mirror: pending (Engram MCP unavailable this session).
+
+## A3/A4 evidence (2026-10-02)
+- AdSlot hidden while ads are off (c3024ef, TDD on lib/ads/config.ts). Category pages preload 2 cards (was 5); unused getRelatedGames/getPlayNextGames removed.
+- Branch build (production data, read-only) + crawl: 936 URLs all 200, 0 duplicate titles/descriptions, 0 titles > 60, 5 guide descriptions < 70 (seed), 0 pages without og:image, JSON-LD on every template (0 invalid), 0 empty alt, no orphans, max depth 3.
+- Lighthouse: simulated throttling over-reports render delay on localhost; DevTools throttling: branch LCP 2.1–2.6 s, CLS 0, TBT 360–480 ms. Production game page LCP 11.9 s (ISR miss TTFB + iframe).
+- robots.txt (off) = allow all; /llms.txt 200 text/plain; /og/default 200 image/png; sitemap 0 URLs while indexing is off.
+- npm test 531/531, prisma validate, lint, typecheck, build OK.
+- Report: docs/SEO-GEO-AEO-AUDIT.md. Nothing deployed; indexing/Search Console/Adsterra untouched.
