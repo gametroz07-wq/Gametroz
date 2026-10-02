@@ -17,6 +17,15 @@ import { RemoveExtraSpacesWorkspace } from "./workspaces/remove-extra-spaces";
 import { SlugGeneratorWorkspace } from "./workspaces/slug-generator";
 import { TextSorterWorkspace } from "./workspaces/text-sorter";
 import { WordCounterWorkspace } from "./workspaces/word-counter";
+import { AgeWorkspace } from "./workspaces/age-calculator";
+import { BmiWorkspace } from "./workspaces/bmi-calculator";
+import { DataStorageWorkspace } from "./workspaces/data-storage-converter";
+import { DateDifferenceWorkspace } from "./workspaces/date-difference-calculator";
+import { DiscountWorkspace } from "./workspaces/discount-calculator";
+import { LengthWorkspace } from "./workspaces/length-converter";
+import { TemperatureWorkspace } from "./workspaces/temperature-converter";
+import { TipWorkspace } from "./workspaces/tip-calculator";
+import { WeightWorkspace } from "./workspaces/weight-converter";
 
 /**
  * Maps a tool's componentKey (its slug) to the element that renders it. The type forces an entry
@@ -41,6 +50,15 @@ export const toolWorkspaces: Record<ImplementedToolSlug, ReactElement> = {
   "random-number-generator": <RandomNumberWorkspace />,
   "qr-code-generator": <QrCodeWorkspace />,
   "percentage-calculator": <PercentageCalculatorWorkspace />,
+  "discount-calculator": <DiscountWorkspace />,
+  "age-calculator": <AgeWorkspace />,
+  "date-difference-calculator": <DateDifferenceWorkspace />,
+  "bmi-calculator": <BmiWorkspace />,
+  "tip-calculator": <TipWorkspace />,
+  "length-converter": <LengthWorkspace />,
+  "weight-converter": <WeightWorkspace />,
+  "temperature-converter": <TemperatureWorkspace />,
+  "data-storage-converter": <DataStorageWorkspace />,
 };
 
 export function getToolWorkspace(key: string | undefined): ReactElement | undefined {

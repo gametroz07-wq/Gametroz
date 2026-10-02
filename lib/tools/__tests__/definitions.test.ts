@@ -99,6 +99,29 @@ describe("tool definitions", () => {
     assert.deepEqual(inCategory("generators"), ["uuid-generator", "password-generator", "random-number-generator", "qr-code-generator"]);
   });
 
+  it("defines the calculators and converters", () => {
+    const inCategory = (category: string) => toolDefinitions.filter((tool) => tool.categorySlug === category).map((tool) => tool.slug);
+    assert.deepEqual(inCategory("calculators"), [
+      "percentage-calculator",
+      "discount-calculator",
+      "age-calculator",
+      "date-difference-calculator",
+      "bmi-calculator",
+      "tip-calculator",
+    ]);
+    assert.deepEqual(inCategory("converters"), ["length-converter", "weight-converter", "temperature-converter", "data-storage-converter"]);
+  });
+
+  it("frames the BMI calculator as a screening measure for adults, not a diagnosis", () => {
+    const copy = JSON.stringify(getToolDefinition("bmi-calculator")).toLowerCase();
+    for (const phrase of ["screening", "not a diagnosis", "who", "cdc", "20"]) assert.ok(copy.includes(phrase), phrase);
+  });
+
+  it("states the business-day and Feb 29 rules", () => {
+    assert.match(JSON.stringify(getToolDefinition("date-difference-calculator")).toLowerCase(), /holiday/);
+    assert.match(JSON.stringify(getToolDefinition("age-calculator")), /February 28/);
+  });
+
   it("keeps sort orders unique and the featured set small", () => {
     assert.deepEqual(duplicates(toolDefinitions.map((tool) => String(tool.sortOrder))), []);
     assert.ok(toolDefinitions.filter((tool) => tool.featured).length <= 4, "the /tools explorer shows at most four featured tools");

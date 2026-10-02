@@ -21,6 +21,15 @@ export const implementedToolSlugs = [
   "random-number-generator",
   "qr-code-generator",
   "percentage-calculator",
+  "discount-calculator",
+  "age-calculator",
+  "date-difference-calculator",
+  "bmi-calculator",
+  "tip-calculator",
+  "length-converter",
+  "weight-converter",
+  "temperature-converter",
+  "data-storage-converter",
 ] as const;
 
 export type ImplementedToolSlug = (typeof implementedToolSlugs)[number];

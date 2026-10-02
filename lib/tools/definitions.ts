@@ -990,6 +990,465 @@ export const toolDefinitions: ToolDefinition[] = [
     ],
     localOnly: true,
   },
+  {
+    slug: "discount-calculator",
+    name: "Discount Calculator",
+    categorySlug: "calculators",
+    shortDescription: "Find the sale price and your savings from a percent or dollar discount, with a second discount and sales tax.",
+    description:
+      "Enter the original price and a percent or dollar amount off to see the sale price and how much you save. Optionally stack a second discount and add sales tax to estimate the total at checkout.",
+    howTo: [
+      "Enter the original price in dollars.",
+      "Choose whether the discount is a percentage or a dollar amount, and enter it.",
+      "Add a second discount for sales that stack, such as an extra 10% off clearance, and a sales tax rate if you want the checkout total.",
+      "Read the sale price, what you save and the total, then copy the summary.",
+    ],
+    iconKey: "percent",
+    featured: false,
+    sortOrder: 17,
+    tags: ["discount", "sale-price", "sales-tax", "savings"],
+    metaTitle: "Discount Calculator: Sale Price & Savings",
+    metaDescription:
+      "Calculate the sale price and savings from a percent or dollar discount, stack a second discount and add sales tax to see your checkout total. Free.",
+    intro: [
+      "Seeing 30% off a $64.99 jacket is easy; seeing what you actually pay after an extra coupon and tax is not. Enter the price and the discount and the sale price, the savings and your effective percentage saved appear right away.",
+      "A second discount is applied to the already reduced price, the way stores take stacked offers, and sales tax is added last, like at a US checkout. Amounts are rounded to the cent only at the end of each step, and nothing is stored or sent anywhere.",
+    ],
+    examples: [
+      {
+        input: "$80.00 item, 25% off",
+        output: "Sale price $60.00, you save $20.00 (25%)",
+      },
+      {
+        input: "$80.00 item, 25% off, then an extra 10% off",
+        output: "Sale price $54.00, you save $26.00 (32.5%)",
+        note: "The second discount applies to the reduced price, so 25% and 10% do not add up to 35%.",
+      },
+      {
+        input: "$59.99 item, $10 off, 8.25% sales tax",
+        output: "Sale price $49.99, tax $4.12, total $54.11",
+        note: "Tax is charged on the discounted price.",
+      },
+    ],
+    faq: [
+      {
+        question: "Why is 20% off and then another 20% off not 40% off?",
+        answer:
+          "The second discount is taken from the price after the first one, not from the original. A $100 item becomes $80 and then $64, so the total saving is 36%, not 40%.",
+      },
+      {
+        question: "Is sales tax charged before or after the discount?",
+        answer:
+          "In most US states tax is figured on the price after a store discount, which is how this calculator works. Manufacturer coupons, rates and exemptions vary by state and city, so check your receipt for the exact figure.",
+      },
+      {
+        question: "Does it work for currencies other than dollars?",
+        answer:
+          "The arithmetic is the same in any currency. Amounts are shown with a $ sign and nothing is converted, because the tool uses no exchange rates.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "age-calculator",
+    name: "Age Calculator",
+    categorySlug: "calculators",
+    shortDescription: "Find your exact age in years, months and days, plus your next birthday and how many days away it is.",
+    description:
+      "Enter a birth date to see your exact age in years, months and days, the total months, weeks and days you have lived, and a countdown to your next birthday and the weekday it falls on.",
+    howTo: [
+      "Pick a birth date with the date picker or type it in.",
+      "Leave the as-of date on today, or choose another date to see the age on that day.",
+      "Read the exact age, the totals and the next birthday countdown.",
+      "Copy the summary, or reset to start again.",
+    ],
+    iconKey: "calculator",
+    featured: false,
+    sortOrder: 18,
+    tags: ["age", "birthday", "date", "countdown"],
+    metaTitle: "Age Calculator: Exact Age in Years & Days",
+    metaDescription:
+      "Enter a birth date to see your exact age in years, months and days, total days lived and a countdown to your next birthday. Free and private.",
+    intro: [
+      "Forms ask for an age in whole years, but sometimes you need more: the months a child has turned, the days until a milestone, or what age someone was on a given date. This calculator gives all of it from a single birth date.",
+      "The as-of date defaults to today and can be changed to any date, past or future. The next birthday shows the date, the weekday and the days left. Your dates are read in your browser and are never stored or sent.",
+    ],
+    examples: [
+      {
+        input: "Born March 15, 1990, as of October 1, 2026",
+        output: "36 years, 6 months, 16 days (13,349 days old)",
+      },
+      {
+        input: "Next birthday for someone born March 15, 1990 (as of October 1, 2026)",
+        output: "Monday, March 15, 2027 (in 165 days, turning 37)",
+      },
+      {
+        input: "Born February 29, 2000, as of February 28, 2025",
+        output: "25 years, 0 months, 0 days. A February 29 birthday is counted on February 28 in years without a leap day.",
+        note: "So the 25th birthday arrives on February 28, 2025.",
+      },
+    ],
+    faq: [
+      {
+        question: "How is a February 29 birthday counted?",
+        answer:
+          "In years that have no February 29, the birthday is counted on February 28. Someone born on February 29, 2000 turns 25 on February 28, 2025. Some legal systems use March 1 instead, which shifts the result by one day in those years.",
+      },
+      {
+        question: "How are the months and days worked out?",
+        answer:
+          "Whole months are counted forward from the birth date and the days are what is left over. If a month is too short for the birth day, for example the 31st, it counts to the last day of that month.",
+      },
+      {
+        question: "Is my birth date saved anywhere?",
+        answer: "No. The age is calculated in your browser and nothing is stored or uploaded, so it is gone when you close or reload the tab.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "date-difference-calculator",
+    name: "Date Difference Calculator",
+    categorySlug: "calculators",
+    shortDescription: "Count the years, months, days and business days between two dates, or add and subtract days from a date.",
+    description:
+      "Find the time between two dates in years, months, days, total days and weeks, and the number of business days from Monday to Friday. A second panel adds or subtracts days from any date.",
+    howTo: [
+      "Pick a start date and an end date; either one can be the earlier date.",
+      "Turn on Include end date if the last day should count as a full day, as for a hotel stay or a deadline.",
+      "Read the breakdown, the total days and weeks, and the business days.",
+      "To find a deadline, enter a date and a number of days in the second panel; use a negative number to go back.",
+    ],
+    iconKey: "calculator",
+    featured: false,
+    sortOrder: 19,
+    tags: ["date-difference", "days-between-dates", "business-days", "add-days"],
+    metaTitle: "Date Difference Calculator & Add Days",
+    metaDescription:
+      "Find the time between two dates in years, months, days and business days, optionally including the end date, or add or subtract days from a date.",
+    intro: [
+      "How long until a deadline, how many days are left on a lease, how far apart are two events? Pick two dates and get the gap as years, months and days, as total days and weeks, and as business days.",
+      "Business days are Monday to Friday; public holidays are not removed because they differ by country, state and employer. The end date is not counted unless you turn on Include end date. The second panel adds or subtracts days from a date and tells you the weekday it lands on.",
+    ],
+    examples: [
+      {
+        input: "October 1, 2026 to December 25, 2026",
+        output: "2 months, 24 days (85 days in total)",
+      },
+      {
+        input: "Thursday, October 1, 2026 to Friday, October 9, 2026",
+        output: "6 business days (Monday to Friday, end date not counted)",
+        note: "Thursday, Friday, Monday, Tuesday, Wednesday and Thursday; no holidays are removed.",
+      },
+      {
+        input: "Add 90 days to October 1, 2026",
+        output: "Wednesday, December 30, 2026",
+      },
+    ],
+    faq: [
+      {
+        question: "Does the calculation include the start and end dates?",
+        answer:
+          "By default the start date counts and the end date does not, so October 1 to October 2 is 1 day. Turn on Include end date to count both, which makes it 2 days.",
+      },
+      {
+        question: "Are holidays excluded from business days?",
+        answer:
+          "No. Business days are simply Monday to Friday. Holidays differ by country, state and employer, so subtract any that apply from the result yourself.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "bmi-calculator",
+    name: "BMI Calculator",
+    categorySlug: "calculators",
+    shortDescription: "Calculate body mass index from feet, inches and pounds or from centimeters and kilograms, with the adult category.",
+    description:
+      "Enter your height and weight in US units or metric to get your BMI to one decimal, the standard adult category, and the weight range that falls in the healthy BMI range for your height. For adults age 20 and older.",
+    howTo: [
+      "Choose US units (feet, inches, pounds) or metric (centimeters, kilograms).",
+      "Enter your height and weight.",
+      "Read your BMI, its category and the healthy weight range for your height in both pounds and kilograms.",
+      "Remember that BMI is a screening measure, not a diagnosis, and talk to a health professional about your own health.",
+    ],
+    iconKey: "calculator",
+    featured: false,
+    sortOrder: 20,
+    tags: ["bmi", "body-mass-index", "weight", "health"],
+    metaTitle: "BMI Calculator: US & Metric Units",
+    metaDescription:
+      "Calculate BMI from feet, inches and pounds or from centimeters and kilograms, see the adult category and a healthy weight range for your height. Free.",
+    intro: [
+      "Body mass index (BMI) compares your weight with your height: weight in kilograms divided by height in meters squared. It is a quick screening number, not a measure of health on its own, and it is not a diagnosis.",
+      "The categories used here are the standard adult ranges from the WHO and the CDC for people age 20 and older: underweight below 18.5, healthy weight 18.5 to 24.9, overweight 25 to 29.9 and obesity 30 or higher. The tool also shows the weights that fall in the healthy range for your height. Nothing you enter is stored or sent.",
+    ],
+    examples: [
+      { input: "5 ft 9 in, 160 lb", output: "BMI 23.6: Healthy weight" },
+      { input: "175 cm, 70 kg", output: "BMI 22.9: Healthy weight" },
+      {
+        input: "Healthy weight range at 5 ft 9 in",
+        output: "125.3 to 168.6 lb (56.8 to 76.5 kg)",
+        note: "The weights that give a BMI from 18.5 to 24.9.",
+      },
+    ],
+    faq: [
+      {
+        question: "What do the BMI categories mean?",
+        answer:
+          "Below 18.5 is underweight, 18.5 to 24.9 healthy weight, 25 to 29.9 overweight and 30 or higher obesity. These are the standard adult ranges used by the WHO and CDC to screen for possible weight-related health risks; they are not a diagnosis.",
+      },
+      {
+        question: "Can I use this for children or teens?",
+        answer:
+          "No. For ages 2 to 19 the CDC compares BMI with growth charts for the child's age and sex, not with these adult cut-offs. This calculator is for adults age 20 and older.",
+      },
+      {
+        question: "Why can BMI be misleading?",
+        answer:
+          "It uses only height and weight, so it does not tell muscle from fat or show where fat is carried. A muscular athlete can land in the overweight range. Treat it as a starting point for a conversation with a doctor, not a verdict.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "tip-calculator",
+    name: "Tip Calculator",
+    categorySlug: "calculators",
+    shortDescription: "Work out the tip, the total and each person's share of a bill, with 15 to 25 percent presets and round-up.",
+    description:
+      "Enter the bill and pick a tip percentage to see the tip and total, then split it between any number of people. Optionally round each person's share up to the next whole dollar.",
+    howTo: [
+      "Enter the bill amount in dollars.",
+      "Tap a tip preset (15, 18, 20, 22 or 25 percent) or type your own percentage.",
+      "Set how many people are splitting the bill.",
+      "Read the tip, total and amount per person, and turn on Round up each share if you want whole dollars.",
+    ],
+    iconKey: "calculator",
+    featured: false,
+    sortOrder: 21,
+    tags: ["tip", "bill-splitter", "restaurant", "gratuity"],
+    metaTitle: "Tip Calculator: Tip, Total & Bill Splitter",
+    metaDescription:
+      "Calculate the tip and total on a restaurant bill, split it between any number of people and optionally round each share up to the dollar. Free.",
+    intro: [
+      "At a US sit-down restaurant many diners leave 15 to 20 percent, and more for outstanding service. Enter the bill and a percentage and the tip, the total and each person's share update immediately.",
+      "Shares are rounded up to the next cent so the group always covers the total, and you can round up to whole dollars for easy cash. The tool then shows exactly what the table pays and the tip you effectively left. Nothing is stored or sent.",
+    ],
+    examples: [
+      {
+        input: "$86.40 bill, 20% tip, 3 people",
+        output: "Tip $17.28, total $103.68, $34.56 per person",
+      },
+      {
+        input: "$64.50 bill, 18% tip, 4 people",
+        output: "Tip $11.61, total $76.11, $19.03 each (rounded up to the next cent)",
+        note: "$76.11 does not divide evenly, so each share is rounded up and the table pays one cent extra.",
+      },
+      {
+        input: "$64.50 bill, 18% tip, 4 people, round up to the dollar",
+        output: "$20.00 each, $80.00 paid, an effective tip of $15.50 (24.03%)",
+      },
+    ],
+    faq: [
+      {
+        question: "Should I tip on the bill before or after tax?",
+        answer:
+          "Etiquette guides commonly suggest tipping on the pre-tax amount, while many people tip on the total for simplicity. Enter whichever amount you want to tip on.",
+      },
+      {
+        question: "Why is the total per person a cent or two over?",
+        answer:
+          "A bill rarely divides evenly. Each share is rounded up to the next cent so that together the group covers the full total. The difference is shown as the rounding amount.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "length-converter",
+    name: "Length Converter",
+    categorySlug: "converters",
+    shortDescription: "Convert between inches, feet, yards, miles, millimeters, centimeters, meters, kilometers and nautical miles.",
+    description:
+      "Convert a length between US customary and metric units and see it in every unit at once. A feet and inches helper reads and shows heights such as 5 ft 9 in.",
+    howTo: [
+      "Enter a value and pick the unit you are converting from.",
+      "Pick the unit you want in the result, or use Swap to flip the two.",
+      "Scan the all-units table to see the same length in every unit.",
+      "For heights, switch to Feet + inches and enter both parts, or read the feet and inches line under the result.",
+    ],
+    iconKey: "arrows",
+    featured: false,
+    sortOrder: 22,
+    tags: ["length", "feet-to-meters", "inches-to-cm", "miles-to-km"],
+    metaTitle: "Length Converter: Feet, Inches, Meters & More",
+    metaDescription:
+      "Convert length between inches, feet, yards, miles, mm, cm, meters, km and nautical miles, with a full table and a feet and inches helper. Free.",
+    intro: [
+      "Recipes, furniture, trail maps and product listings mix US customary and metric lengths. Enter one value and see it in all nine units at the same time, with the unit you care about at the top.",
+      "The conversions use the exact international definitions: 1 inch is 2.54 centimeters, 1 foot is 0.3048 meters, 1 mile is 1,609.344 meters and 1 nautical mile is 1,852 meters. Results show about seven significant digits, so you see 175.26 cm rather than a long tail of decimals.",
+    ],
+    examples: [
+      { input: "1 in", output: "2.54 cm", note: "Exact by definition." },
+      { input: "26.2 mi (a marathon)", output: "42.16481 km" },
+      { input: "5 ft 9 in", output: "175.26 cm", note: "The helper converts feet and inches together." },
+    ],
+    faq: [
+      {
+        question: "How many centimeters are in an inch?",
+        answer:
+          "Exactly 2.54. Since 1959 the inch has been defined as 2.54 centimeters, which makes every inch, foot, yard and mile conversion exact.",
+      },
+      {
+        question: "What is a nautical mile?",
+        answer:
+          "A nautical mile is exactly 1,852 meters, about 1.15 statute miles. It is used at sea and in aviation because it matches one minute of latitude.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "weight-converter",
+    name: "Weight Converter",
+    categorySlug: "converters",
+    shortDescription: "Convert between ounces, pounds, stone, US short tons, milligrams, grams, kilograms and metric tons.",
+    description:
+      "Convert weight and mass between US customary and metric units, see every unit in one table, and read any value in pounds and ounces. Conversions use the exact definitions of the pound and ounce.",
+    howTo: [
+      "Enter a value and choose the unit you are converting from.",
+      "Choose the unit you want in the result, or use Swap to reverse the conversion.",
+      "Check the all-units table for the same weight in every unit.",
+      "Use the pounds and ounces line for baby weights, produce and parcels, then copy the result.",
+    ],
+    iconKey: "arrows",
+    featured: false,
+    sortOrder: 23,
+    tags: ["weight", "pounds-to-kg", "ounces", "mass"],
+    metaTitle: "Weight Converter: Pounds, Kilograms, Ounces",
+    metaDescription:
+      "Convert weight between pounds, ounces, stone, US tons, grams, kilograms and metric tons, with exact factors and a pounds and ounces display. Free.",
+    intro: [
+      "Shipping labels, nutrition facts, gym plates and bathroom scales do not agree on units. Enter a weight once and see it in pounds, ounces, stone, tons, grams and kilograms together.",
+      "The avoirdupois pound is defined as exactly 0.45359237 kilograms, an ounce is one sixteenth of a pound, a stone is 14 pounds and a US short ton is 2,000 pounds. Results show about seven significant digits, and the pounds and ounces line splits a weight the way a postal scale reads it.",
+    ],
+    examples: [
+      { input: "150 lb", output: "68.03886 kg" },
+      { input: "70 kg", output: "154.3236 lb" },
+      {
+        input: "3.5 kg (a typical newborn)",
+        output: "7.716179 lb, or 7 lb 11.5 oz",
+        note: "Pounds and ounces are rounded to one decimal of an ounce.",
+      },
+    ],
+    faq: [
+      {
+        question: "What is the difference between a US ton and a metric ton?",
+        answer:
+          "A US short ton is 2,000 pounds, or about 907.18 kilograms. A metric ton, also called a tonne, is 1,000 kilograms, or about 2,204.6 pounds. The UK long ton of 2,240 pounds is not included.",
+      },
+      {
+        question: "How many pounds are in a stone?",
+        answer:
+          "Exactly 14 pounds, which is about 6.35 kilograms. The stone is used mainly in the UK and Ireland for body weight.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "temperature-converter",
+    name: "Temperature Converter",
+    categorySlug: "converters",
+    shortDescription: "Convert Fahrenheit, Celsius, Kelvin and Rankine, with the formula shown and a check for absolute zero.",
+    description:
+      "Convert a temperature between degrees Fahrenheit, degrees Celsius, kelvin and degrees Rankine, see all four at once, and read the formula used for the pair you picked. Values below absolute zero are rejected.",
+    howTo: [
+      "Enter a temperature; negative values are fine.",
+      "Choose the unit you are converting from and the unit you want.",
+      "Read the result and the formula underneath it, or use Swap to reverse the direction.",
+      "Check the table for the same temperature in all four scales.",
+    ],
+    iconKey: "arrows",
+    featured: false,
+    sortOrder: 24,
+    tags: ["temperature", "fahrenheit-to-celsius", "kelvin", "rankine"],
+    metaTitle: "Temperature Converter: °F, °C & Kelvin",
+    metaDescription:
+      "Convert between Fahrenheit, Celsius, Kelvin and Rankine, see the formula behind each result, and get a clear error below absolute zero. Free.",
+    intro: [
+      "Oven dials, weather apps, lab sheets and science homework use different scales. Enter one temperature and see it in Fahrenheit, Celsius, Kelvin and Rankine at the same time, together with the formula that produced the result.",
+      "Temperatures are converted through kelvin, so every pair is exact and reversible. A value below absolute zero (0 K, which is -273.15 °C or -459.67 °F) cannot exist, so the tool tells you instead of returning a meaningless number.",
+    ],
+    examples: [
+      { input: "98.6 °F", output: "37 °C", note: "Average body temperature." },
+      { input: "350 °F (a common oven setting)", output: "176.6667 °C" },
+      { input: "0 K", output: "-459.67 °F", note: "Absolute zero." },
+    ],
+    faq: [
+      {
+        question: "What are the formulas for Fahrenheit and Celsius?",
+        answer:
+          "To go from Celsius to Fahrenheit, multiply by 9/5 and add 32. To go from Fahrenheit to Celsius, subtract 32 and multiply by 5/9. The tool shows the formula for whichever pair you choose.",
+      },
+      {
+        question: "Why is there a lowest temperature I can enter?",
+        answer:
+          "Absolute zero, 0 K or -459.67 °F, is the lowest possible temperature, so nothing can be colder. Entering a lower value is almost always a typo, and the tool says so.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "data-storage-converter",
+    name: "Data Storage Converter",
+    categorySlug: "converters",
+    shortDescription: "Convert bits, bytes, KB, MB, GB, TB, PB and binary KiB, MiB, GiB, TiB, with a download time estimate.",
+    description:
+      "Convert digital storage between bits, bytes, decimal units (KB, MB, GB, TB, PB) and binary units (KiB, MiB, GiB, TiB), see them all at once, and estimate how long a download takes at a given speed in Mbps.",
+    howTo: [
+      "Enter a size and choose the unit you are converting from.",
+      "Choose the unit you want in the result, or use Swap.",
+      "Compare the decimal and binary rows in the table to see why drive sizes look smaller on some computers.",
+      "To estimate a download, enter your connection speed in Mbps under the table.",
+    ],
+    iconKey: "arrows",
+    featured: false,
+    sortOrder: 25,
+    tags: ["data-storage", "gb-to-gib", "bytes", "download-time"],
+    metaTitle: "Data Storage Converter: GB, GiB, TB & More",
+    metaDescription:
+      "Convert bits, bytes, KB, MB, GB, TB and PB, plus binary KiB, MiB, GiB and TiB, and estimate download time from file size and Mbps. Free.",
+    intro: [
+      "Storage is measured two ways. Decimal units (KB, MB, GB, TB) count in thousands and are used by drive makers and networks; binary units (KiB, MiB, GiB, TiB) count in powers of 1,024 and match how memory works. Both are listed here so you can compare them.",
+      "That is why a drive sold as 1 TB shows about 931 GB in an operating system that reports binary sizes but labels them GB, as Windows does: 1,000,000,000,000 bytes is 931.32 GiB. Add a connection speed in Mbps to estimate how long a file takes to download.",
+    ],
+    examples: [
+      { input: "1 TB (the label on a drive)", output: "931.3226 GiB", note: "Why a 1 TB drive looks smaller on Windows." },
+      { input: "1 GiB", output: "1,073,741,824 bytes", note: "Binary: 1,024 x 1,024 x 1,024 bytes." },
+      {
+        input: "4.7 GB file at 100 Mbps",
+        output: "6 min 16 s",
+        note: "A DVD-sized download on a 100 megabit connection, ignoring overhead.",
+      },
+    ],
+    faq: [
+      {
+        question: "Why does my 1 TB drive show about 931 GB?",
+        answer:
+          "The maker counts 1 TB as 1,000,000,000,000 bytes. Some systems, notably Windows, divide by 1,024 three times and call the result GB, which is really GiB: 931.32. Nothing is missing; the unit is just different.",
+      },
+      {
+        question: "What is the difference between a megabit and a megabyte?",
+        answer:
+          "A byte is 8 bits. Internet speeds are quoted in megabits per second (Mbps) and file sizes in megabytes (MB), so a 100 Mbps connection moves at most 12.5 MB each second.",
+      },
+      {
+        question: "How accurate is the download time?",
+        answer:
+          "It divides the size by the speed, counting 1 Mbps as 1,000,000 bits per second. Network overhead, server limits and Wi-Fi conditions make real downloads somewhat slower, so treat it as a best case.",
+      },
+    ],
+    localOnly: true,
+  },
 ];
 
 const definitionsBySlug = new Map(toolDefinitions.map((tool) => [tool.slug, tool]));
