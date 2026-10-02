@@ -23,7 +23,7 @@ Indexing stays OFF, no Search Console, no Adsterra, no deploy.
 - [x] A1 (delegated, done 2026-10-02, uncommitted) Site-wide SEO infra: JSON-LD (WebSite, Organization, BreadcrumbList everywhere, VideoGame,
       SoftwareApplication, Article only when visible), alt text, default OG image, title/description templates,
       sitemap for all published content, robots.ts (gated), llms.txt, /about + /editorial-policy, decorative logo text.
-- [ ] A2 (delegated) Game page template: quick facts (category, controls derived from instructions, orientation,
+- [x] A2 (delegated, done 2026-10-02, uncommitted) Game page template: quick facts (category, controls derived from instructions, orientation,
       browser/no download), content order, empty sections hidden, similar games, feed entity repair, category intros.
 - [ ] A3 Core Web Vitals lab audit (local production build) and obvious fixes.
 - [ ] A4 Internal crawl of the branch build + validations; docs/SEO-GEO-AEO-AUDIT.md.
@@ -51,6 +51,24 @@ Indexing stays OFF, no Search Console, no Adsterra, no deploy.
   app/robots.ts allows / (no Sitemap) while off; on: Disallow /api/ and /search plus Sitemap. /llms.txt via route handler.
 - Not done: tag links in ChipNav on /apps (category chips to /search?q=...) keep follow; game page JSON-LD, breadcrumb path
   and metadata remain for A2 (pass path to Breadcrumbs there).
+
+## A2 evidence and decisions
+- RED: text.test (arrow words), games/controls.test (module missing), templates.test (gameTitle, gameSummary, orientationFact,
+  gameMetaDescription not exported): 13 failures. GREEN: npm test 531/531, lint and typecheck clean (build not run).
+- Feed repair: toPlainText repairs bare larr/rarr/uarr/darr/harr (and decodes &larr; etc.) next to mdash/ndash. toGame (lib/db/mappers.ts)
+  runs toPlainText over shortDescription, description and instructions, so published rows display correctly with no DB rewrite.
+- lib/games/controls.ts: deriveControls (keyboard with detail: arrow keys, WASD, Space, press-a-letter, Shift, Enter, Ctrl, Esc; Mouse; Touch;
+  empty when nothing is recognized) and instructionLines. "space" alone only counts in a control context ("outer space" is ignored).
+- Metadata: gameTitle (Play X Online for Free -> X - Free Online Game -> X, 60 chars with suffix); gameMetaDescription 120-158 chars
+  (drops a leading sentence that only repeats the name, word-safe cut with an ellipsis only when cut, CTA only if it fits, category
+  sentences for very short text, category sentence when no description). Near-duplicate names still give near-duplicate titles (4 pairs, accepted).
+- Page order: breadcrumbs (path -> BreadcrumbList) + VideoGame JSON-LD, H1, player, actions, Quick facts, About (summary sentence +
+  description), How to play (hidden when empty; derived controls; stored controls only if present), Tags (hidden if none),
+  Similar games (same category + shared tag, new getSimilarGames), More category games, Play next, Guides. No game repeats across lists.
+- preconnect (react-dom) to the embed origin only when resolveEmbedUrl returns a URL. Sidebar column only when adsEnabled(), so no empty gap.
+- LCP: player placeholder image keeps priority; list cards stay lazy. Category pages keep priority on the first row only (index < 5).
+- Not done / decisions left open: click-to-play facade (changes GameMonetize preroll; business decision). getRelatedGames and
+  getPlayNextGames are no longer used by the page. getSimilarGames ranking has no unit test (DB-bound, like getRelatedGames).
 
 ## Progress
 - Branch: feat/seo-geo-aeo-audit (stacked on feat/tools-section 221deac).

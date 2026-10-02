@@ -23,4 +23,18 @@ describe("toPlainText", () => {
   it("still strips tags", () => {
     assert.equal(toPlainText("<p>Race &amp; <b>win</b></p>"), "Race & win");
   });
+
+  it("repairs bare arrow entity words from the feed", () => {
+    assert.equal(toPlainText("Move A D or larr rarr Jump W uarr or Spacebar"), "Move A D or ← → Jump W ↑ or Spacebar");
+    assert.equal(
+      toPlainText("Movement W uarr mdash forward S darr mdash backward"),
+      "Movement W ↑ — forward S ↓ — backward",
+    );
+    assert.equal(toPlainText("swap with harr"), "swap with ↔");
+  });
+
+  it("decodes proper arrow entities and ignores words that only contain the letters", () => {
+    assert.equal(toPlainText("press &larr; or &rarr;"), "press ← or →");
+    assert.equal(toPlainText("quarrel larrikin uarrow"), "quarrel larrikin uarrow");
+  });
 });

@@ -9,6 +9,11 @@ const NAMED_ENTITIES: Record<string, string> = {
   nbsp: " ",
   ndash: "–",
   mdash: "—",
+  larr: "←",
+  uarr: "↑",
+  rarr: "→",
+  darr: "↓",
+  harr: "↔",
   hellip: "…",
   lsquo: "‘",
   rsquo: "’",
@@ -36,7 +41,8 @@ function decodeEntitiesOnce(value: string) {
 
 /**
  * Strips tags and decodes entities (two passes: the live feed double-encodes, e.g. "&amp;mdash;").
- * Also repairs bare "mdash"/"ndash" words that the provider's own sanitizer leaves behind.
+ * Also repairs bare "mdash"/"ndash" and arrow words (larr, rarr, uarr, darr, harr) that the provider's
+ * own sanitizer leaves behind. Idempotent, so it is also applied at render time to stored rows.
  * The result is rendered as text, never as HTML.
  */
 export function toPlainText(value: string | null | undefined) {
@@ -46,6 +52,7 @@ export function toPlainText(value: string | null | undefined) {
     .replace(/<[^>]*>/g, " ")
     .replace(/\bmdash\b/g, "—")
     .replace(/\bndash\b/g, "–")
+    .replace(/\b(?:larr|uarr|rarr|darr|harr)\b/g, (word) => NAMED_ENTITIES[word])
     .replace(/\s+/g, " ")
     .trim();
 }

@@ -111,3 +111,51 @@ export function gameImageAlt(name: string) {
 export function appIconAlt(name: string) {
   return `${name} icon`;
 }
+
+/** "Play {Name} Online for Free", shortening to fit 60 characters with the site suffix. */
+export function gameTitle(name: string) {
+  return fitTitle([`Play ${name} Online for Free`, `${name} - Free Online Game`, name]);
+}
+
+/** One-sentence, answer-style summary. Built only from the game's name and category. */
+export function gameSummary(name: string, category: string) {
+  return `${name} is a free ${category.toLowerCase()} game you can play in your web browser.`;
+}
+
+export function orientationFact(orientation: "landscape" | "portrait") {
+  return orientation === "portrait" ? "Portrait (suits phones and other tall screens)" : "Landscape";
+}
+
+const GAME_DESCRIPTION_MIN = 120;
+const GAME_DESCRIPTION_MAX = 158;
+const GAME_CTA = "Play free in your browser, no download.";
+
+const normalizeName = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+/**
+ * Meta description from the provider text: leading sentences that fit 158 characters (word-safe cut with
+ * an ellipsis only when cut), a sentence that merely repeats the game name is dropped, then the call to
+ * action and category info are added only when room remains. Never invents facts.
+ */
+export function gameMetaDescription({ name, category, description }: { name: string; category: string; description: string }) {
+  const sentences = description.split(/(?<=[.!?])\s+/).filter(Boolean);
+  if (sentences.length > 1 && normalizeName(sentences[0]) === normalizeName(name)) sentences.shift();
+  else if (sentences.length === 1 && normalizeName(sentences[0]) === normalizeName(name)) sentences.length = 0;
+
+  let text = "";
+  for (const sentence of sentences) {
+    const next = text ? `${text} ${sentence}` : sentence;
+    if (next.length > GAME_DESCRIPTION_MAX) break;
+    text = next;
+  }
+  if (!text && sentences.length > 0) return limitDescription(sentences[0], GAME_DESCRIPTION_MAX);
+  if (!text) text = gameSummary(name, category);
+
+  const lower = category.toLowerCase();
+  const tails = [` ${GAME_CTA}`, ` A free ${lower} game on ${siteConfig.name}.`, ` Browse more ${lower} games online.`];
+  for (const [index, tail] of tails.entries()) {
+    if (index > 0 && text.length >= GAME_DESCRIPTION_MIN) break;
+    if (text.length + tail.length <= GAME_DESCRIPTION_MAX) text += tail;
+  }
+  return text;
+}

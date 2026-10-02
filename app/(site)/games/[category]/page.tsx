@@ -73,7 +73,7 @@ export default async function GameCategoryPage({ params }: PageProps<"/games/[ca
       <section aria-label={`${category.name} games`} className="py-4">
         <CardGrid variant="games">
           {games.map((game, index) => (
-            <GameCard key={game.slug} game={game} priority={index < 5} />
+            <GameCard key={game.slug} game={game} priority={index < 2} />
           ))}
         </CardGrid>
       </section>

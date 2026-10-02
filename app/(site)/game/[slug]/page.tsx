@@ -1,36 +1,44 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { preconnect } from "react-dom";
 import { AdSlot } from "@/components/ads/ad-slot";
 import { GameActions } from "@/components/games/game-actions";
 import { GameCard } from "@/components/games/game-card";
 import { GameControls } from "@/components/games/game-controls";
 import { GamePlayer } from "@/components/games/game-player";
 import { GAME_PLAYER_ID } from "@/components/games/game-player-placeholder";
+import { GameQuickFacts } from "@/components/games/game-quick-facts";
 import { GuideCard } from "@/components/guides/guide-card";
 import { Container } from "@/components/layout/container";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { CardGrid } from "@/components/shared/card-grid";
 import { PageSection } from "@/components/shared/page-section";
 import { Rail } from "@/components/shared/rail";
 import { TagList } from "@/components/shared/tag-list";
 import { Badge } from "@/components/ui/badge";
+import { adsEnabled } from "@/lib/ads/config";
 import {
   getGameBySlug,
   getGuidesFor,
   getPopularGames,
-  getRelatedGames,
   getSameCategoryGames,
+  getSimilarGames,
   getTrendingGames,
 } from "@/lib/catalog";
+import { deriveControls, instructionLines } from "@/lib/games/controls";
+import { resolveEmbedUrl } from "@/lib/providers/embed";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { videoGame } from "@/lib/seo/structured-data";
+import { gameMetaDescription, gameSummary, gameTitle } from "@/lib/seo/templates";
 
 // ISR: games published after the build render on first request (dynamicParams defaults to true);
 // pages refresh hourly and immediately through POST /api/revalidate when a game is published.
 export const revalidate = 3600;
 
-// With hundreds of published games, prerendering every page at build time would hit the database for
-// each one. Only the most popular are built ahead; the rest render on first request and are then cached.
+// With hundreds of published games, prerendering every page at build time would hit the database
+// for each one. Only the most popular are built ahead; the rest render on first request and are then cached.
 const PRERENDERED_GAMES = 60;
 
 export async function generateStaticParams() {
@@ -41,8 +49,12 @@ export async function generateMetadata({ params }: PageProps<"/game/[slug]">): P
   const game = await getGameBySlug((await params).slug);
   if (!game) return {};
   return pageMetadata({
-    title: `Play ${game.name} Online Free`,
-    description: `${game.shortDescription} Play ${game.name} free in your browser on Gametroz.`,
+    title: gameTitle(game.name),
+    description: gameMetaDescription({
+      name: game.name,
+      category: game.category.name,
+      description: game.description || game.shortDescription,
+    }),
     path: `/game/${game.slug}`,
     image: { url: game.thumbnailUrl, width: 512, height: 384, alt: `${game.name} artwork` },
   });
@@ -63,19 +75,41 @@ export default async function GamePage({ params }: PageProps<"/game/[slug]">) {
   const game = await getGameBySlug((await params).slug);
   if (!game) notFound();
 
-  const [related, sameCategory, guides, trending] = await Promise.all([
-    getRelatedGames(game, 6),
-    getSameCategoryGames(game, 6),
+  const [similar, sameCategory, guides, trending] = await Promise.all([
+    getSimilarGames(game, 6),
+    getSameCategoryGames(game, 12),
     getGuidesFor({ games: game.slug }),
     getTrendingGames(12),
   ]);
-  // "Play next": trending games not already shown as related, so the rail is always full.
-  const shown = new Set([game.slug, ...related.map((other) => other.slug)]);
+  // Each game appears in at most one list on the page: similar first, then the category rail, then "Play next".
+  const shown = new Set([game.slug, ...similar.map((other) => other.slug)]);
+  const moreInCategory = sameCategory.filter((other) => !shown.has(other.slug)).slice(0, 6);
+  for (const other of moreInCategory) shown.add(other.slug);
   const playNext = trending.filter((other) => !shown.has(other.slug)).slice(0, 6);
+
+  // Warm up the provider connection only when the iframe is actually rendered.
+  const embedUrl = resolveEmbedUrl(game);
+  if (embedUrl) preconnect(new URL(embedUrl).origin);
+
+  const path = `/game/${game.slug}`;
+  const controls = deriveControls(game.instructions);
+  const steps = instructionLines(game.instructions);
+  const showHowTo = steps.length > 0 || controls.length > 0 || game.controls.length > 0;
+  const withSidebar = adsEnabled();
 
   return (
     <Container className="pb-10">
+      <JsonLd
+        data={videoGame({
+          name: game.name,
+          description: game.shortDescription || gameSummary(game.name, game.category.name),
+          path,
+          image: game.thumbnailUrl,
+          categoryName: game.category.name,
+        })}
+      />
       <Breadcrumbs
+        path={path}
         items={[
           { label: "Games", href: "/games" },
           { label: game.category.name, href: `/games/${game.category.slug}` },
@@ -91,57 +125,80 @@ export default async function GamePage({ params }: PageProps<"/game/[slug]">) {
         </Badge>
       </header>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
+      {/* No empty sidebar column while ad slots render nothing: the content takes the full width. */}
+      <div className={withSidebar ? "grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]" : undefined}>
         <div className="min-w-0 space-y-3">
           <GamePlayer game={game} />
           <GameActions playerId={GAME_PLAYER_ID} gameName={game.name} />
+          <GameQuickFacts category={game.category} orientation={game.orientation} controls={controls} />
         </div>
-        <aside aria-label="Sidebar" className="hidden lg:block">
-          <AdSlot placement="sidebar" className="sticky top-20" />
-        </aside>
+        {withSidebar && (
+          <aside aria-label="Sidebar" className="hidden lg:block">
+            <AdSlot placement="sidebar" className="sticky top-20" />
+          </aside>
+        )}
       </div>
-
-      <PageSection id="play-next" title="Play next">
-        <Rail label="Play next">
-          {playNext.map((other) => (
-            <GameCard key={other.slug} game={other} />
-          ))}
-        </Rail>
-      </PageSection>
-
-      <PageSection id="similar-games" title="Related games">
-        <CardGrid variant="games">
-          {related.map((other) => (
-            <GameCard key={other.slug} game={other} />
-          ))}
-        </CardGrid>
-      </PageSection>
-
-      <AdSlot placement="game-below-player" className="my-2" />
 
       <div className="grid gap-3 py-4 lg:grid-cols-2">
         <InfoBlock id="about-heading" title={`About ${game.name}`}>
-          <p className="type-body text-foreground/85">{game.description}</p>
+          <p className="type-body text-foreground/85">{gameSummary(game.name, game.category.name)}</p>
+          {game.description && <p className="type-body text-foreground/85">{game.description}</p>}
         </InfoBlock>
-        <InfoBlock id="how-heading" title="How to play">
-          <p className="type-body text-foreground/85">{game.instructions}</p>
-        </InfoBlock>
-        <InfoBlock id="controls-heading" title="Controls">
-          <GameControls controls={game.controls} />
-        </InfoBlock>
-        <InfoBlock id="tags-heading" title="Tags">
-          <TagList tags={game.tags} label={`${game.name} tags`} />
-        </InfoBlock>
+        {showHowTo && (
+          <InfoBlock id="how-heading" title="How to play">
+            {steps.length === 1 && <p className="type-body text-foreground/85">{steps[0]}</p>}
+            {steps.length > 1 && (
+              <ul className="type-body list-disc space-y-1 pl-5 text-foreground/85">
+                {steps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ul>
+            )}
+            {controls.length > 0 && (
+              <p className="type-body text-foreground/85">
+                <span className="font-medium">Controls:</span> {controls.join(", ")}.
+              </p>
+            )}
+            {game.controls.length > 0 && <GameControls controls={game.controls} />}
+          </InfoBlock>
+        )}
+        {game.tags.length > 0 && (
+          <InfoBlock id="tags-heading" title="Tags">
+            <TagList tags={game.tags} label={`${game.name} tags`} />
+          </InfoBlock>
+        )}
       </div>
 
-      {sameCategory.length > 0 && (
+      <AdSlot placement="game-below-player" className="my-2" />
+
+      {similar.length > 0 && (
+        <PageSection id="similar-games" title="Similar games">
+          <CardGrid variant="games">
+            {similar.map((other) => (
+              <GameCard key={other.slug} game={other} />
+            ))}
+          </CardGrid>
+        </PageSection>
+      )}
+
+      {moreInCategory.length > 0 && (
         <PageSection
           id="same-category"
           title={`More ${game.category.name.toLowerCase()} games`}
           action={{ label: "View all", href: `/games/${game.category.slug}` }}
         >
           <Rail label={`More ${game.category.name} games`}>
-            {sameCategory.map((other) => (
+            {moreInCategory.map((other) => (
+              <GameCard key={other.slug} game={other} />
+            ))}
+          </Rail>
+        </PageSection>
+      )}
+
+      {playNext.length > 0 && (
+        <PageSection id="play-next" title="Play next">
+          <Rail label="Play next">
+            {playNext.map((other) => (
               <GameCard key={other.slug} game={other} />
             ))}
           </Rail>

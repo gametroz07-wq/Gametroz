@@ -134,20 +134,17 @@ export async function getGameCategorySummaries() {
 export async function getGamesByCategory(slug: string) {
   return findGames({ where: { category: { slug } }, orderBy: byPopularity });
 }
-
-/** Similar games across categories, ranked by shared tags. */
-export async function getRelatedGames(game: Game, limit = 6) {
-  const otherCategory: Prisma.GameWhereInput = {
-    slug: { not: game.slug },
-    category: { slug: { not: game.category.slug } },
-  };
-  const candidates = await findGames({ where: { ...otherCategory, tags: { some: { slug: { in: game.tags } } } } });
+/** Same category and at least one shared tag, ranked by shared tags then popularity; tops up from the category. */
+export async function getSimilarGames(game: Game, limit = 6) {
+  const sameCategory: Prisma.GameWhereInput = { slug: { not: game.slug }, category: { slug: game.category.slug } };
+  const candidates =
+    game.tags.length > 0 ? await findGames({ where: { ...sameCategory, tags: { some: { slug: { in: game.tags } } } } }) : [];
   return rankWithFallback(
     candidates,
     (other) => other.tags.filter((tag) => game.tags.includes(tag)).length,
     limit,
     (exclude, take) =>
-      findGames({ where: { ...otherCategory, AND: [{ slug: { notIn: exclude } }] }, orderBy: byPopularity, take }),
+      findGames({ where: { ...sameCategory, AND: [{ slug: { notIn: exclude } }] }, orderBy: byPopularity, take }),
   );
 }
 
@@ -158,16 +155,6 @@ export async function getSameCategoryGames(game: Game, limit = 6) {
     take: limit,
   });
 }
-
-/** Trending games the player has not just seen, for the "Play next" rail. */
-export async function getPlayNextGames(game: Game, exclude: string[], limit = 4) {
-  return findGames({
-    where: { trending: true, slug: { notIn: [game.slug, ...exclude] } },
-    orderBy: byPopularity,
-    take: limit,
-  });
-}
-
 /* ---------- Tools ---------- */
 
 async function findTools({ where, orderBy = bySortOrder, take }: FindArgs<Prisma.ToolWhereInput>): Promise<Tool[]> {

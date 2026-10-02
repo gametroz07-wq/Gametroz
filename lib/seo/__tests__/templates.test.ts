@@ -10,6 +10,10 @@ import {
   gameCategoryIntro,
   gameCategoryTitle,
   gameImageAlt,
+  gameMetaDescription,
+  gameSummary,
+  gameTitle,
+  orientationFact,
   limitDescription,
   platformIntro,
 } from "../templates";
@@ -148,5 +152,84 @@ describe("image alt text", () => {
   it("describes game thumbnails and app icons", () => {
     assert.equal(gameImageAlt("Neon Drift"), "Neon Drift online game");
     assert.equal(appIconAlt("VLC Media Player"), "VLC Media Player icon");
+  });
+});
+
+describe("gameTitle", () => {
+  it("prefers the Play ... Online for Free form when it fits 60 characters with the suffix", () => {
+    assert.equal(gameTitle("Neon Drift"), "Play Neon Drift Online for Free");
+  });
+
+  it("falls back to the shorter form, then to the bare name", () => {
+    const medium = "A".repeat(30);
+    assert.equal(gameTitle(medium), `${medium} - Free Online Game`);
+    const long = "B".repeat(45);
+    assert.equal(gameTitle(long), long);
+  });
+});
+
+describe("gameSummary", () => {
+  it("answers what the game is using only data", () => {
+    assert.equal(gameSummary("Neon Drift", "Racing"), "Neon Drift is a free racing game you can play in your web browser.");
+  });
+});
+
+describe("orientationFact", () => {
+  it("notes that portrait games suit phones", () => {
+    assert.equal(orientationFact("landscape"), "Landscape");
+    assert.match(orientationFact("portrait"), /^Portrait.*phones/);
+  });
+});
+
+describe("gameMetaDescription", () => {
+  const CTA = "Play free in your browser, no download.";
+
+  it("never starts with the bare game name repeated as a sentence", () => {
+    const text = gameMetaDescription({
+      name: "SPLATCHA!",
+      category: "Puzzle",
+      description:
+        "SPLATCHA! Splatcha is a colorful puzzle game where you match paint splats to clear each level. Plan your moves and chain combos.",
+    });
+    assert.ok(text.startsWith("Splatcha is a colorful puzzle game"), text);
+    assert.ok(text.length >= 120 && text.length <= 158, `${text.length}: ${text}`);
+  });
+
+  it("uses first sentences and appends the call to action when it fits", () => {
+    const description = "Drive fast through neon streets and dodge traffic. Collect boosts to climb the leaderboard.";
+    const text = gameMetaDescription({ name: "Neon Drift", category: "Racing", description });
+    assert.equal(text, `${description} ${CTA}`);
+  });
+
+  it("cuts at a word boundary with an ellipsis only when the text is cut", () => {
+    const words = Array.from({ length: 60 }, (_, i) => `word${i}`).join(" ");
+    const text = gameMetaDescription({ name: "Long", category: "Action", description: `${words}.` });
+    assert.ok(text.length <= 158);
+    assert.ok(text.endsWith("…"));
+    assert.match(text.slice(0, -1), /word\d+$/);
+    assert.ok(!text.includes(CTA));
+  });
+
+  it("does not add an ellipsis when nothing was cut", () => {
+    const text = gameMetaDescription({
+      name: "Tiny",
+      category: "Puzzle",
+      description: "Slide the tiles into place and solve each board with as few moves as you can manage today.",
+    });
+    assert.ok(!text.includes("…"));
+    assert.ok(text.endsWith(CTA));
+  });
+
+  it("combines very short descriptions with truthful category info", () => {
+    const text = gameMetaDescription({ name: "Pong Plus", category: "Arcade", description: "Classic paddle fun." });
+    assert.ok(text.startsWith("Classic paddle fun."));
+    assert.ok(text.includes("free arcade game"));
+    assert.ok(text.length >= 120 && text.length <= 158, `${text.length}: ${text}`);
+  });
+
+  it("falls back to a category sentence when there is no description", () => {
+    const text = gameMetaDescription({ name: "Blank", category: "Arcade", description: "" });
+    assert.ok(text.startsWith("Blank is a free arcade game you can play in your web browser."));
+    assert.ok(text.length <= 158);
   });
 });
