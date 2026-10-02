@@ -37,6 +37,12 @@ describe("editorial review rules", () => {
     assert.match(messages({ instructions: "Tap to play" }), /instructions/i);
   });
 
+  it("flags school-filter bypass wording and the Getting Over It franchise", () => {
+    assert.match(messages({ title: "DanDan Slime Unblocked" }), /unblocked/i);
+    assert.match(messages({ title: "Getting Over It Unblocked" }), /getting over it/i);
+    assert.equal(messages({ title: "Blocked Road Rush" }), "");
+  });
+
   it("flags brands, misspelled franchises and real people seen in the live popularity feeds", () => {
     for (const title of [
       "Pou Online",

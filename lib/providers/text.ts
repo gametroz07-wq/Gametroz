@@ -57,6 +57,22 @@ export function toPlainText(value: string | null | undefined) {
     .trim();
 }
 
+const URL_PATTERN = /(?:https?:\/\/|www\.)\S+/i;
+
+/**
+ * Provider texts often end with a promotional sentence that links a third-party site (many of them
+ * look-alike domains of other portals). Drops every sentence that contains a URL; text without URLs
+ * is returned unchanged. Applied at render time and during sync.
+ */
+export function removeUrlSentences(value: string) {
+  if (!URL_PATTERN.test(value)) return value;
+  return value
+    .split(/(?<=[.!?])\s+/)
+    .filter((sentence) => !URL_PATTERN.test(sentence))
+    .join(" ")
+    .trim();
+}
+
 export function slugify(value: string | null | undefined) {
   return toPlainText(value)
     .normalize("NFKD")

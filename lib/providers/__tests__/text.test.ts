@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { toPlainText } from "../text";
+import { removeUrlSentences, toPlainText } from "../text";
 
 describe("toPlainText", () => {
   it("decodes typographic and numeric entities", () => {
@@ -31,6 +31,16 @@ describe("toPlainText", () => {
       "Movement W ↑ — forward S ↓ — backward",
     );
     assert.equal(toPlainText("swap with harr"), "swap with ↔");
+  });
+
+  it("drops promotional sentences that carry third-party URLs", () => {
+    assert.equal(
+      removeUrlSentences("Shoot enemies and survive. Play more free games at https://www.crazygames.com.es/ now! Good luck."),
+      "Shoot enemies and survive. Good luck.",
+    );
+    assert.equal(removeUrlSentences("Drive the bus. More at www.pokii,com.es/"), "Drive the bus.");
+    assert.equal(removeUrlSentences("A text without links stays as it is."), "A text without links stays as it is.");
+    assert.equal(removeUrlSentences("Visit https://www.example.com"), "");
   });
 
   it("decodes proper arrow entities and ignores words that only contain the letters", () => {

@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: PageProps<"/game/[slug]">): P
 
 function InfoBlock({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
-    <section aria-labelledby={id} className="space-y-2 rounded-2xl bg-surface p-4 ring-1 ring-white/5 sm:p-5">
+    <section aria-labelledby={id} className="min-w-0 space-y-2 rounded-2xl bg-surface p-4 break-words ring-1 ring-white/5 sm:p-5">
       <h2 id={id} className="text-base font-bold">
         {title}
       </h2>

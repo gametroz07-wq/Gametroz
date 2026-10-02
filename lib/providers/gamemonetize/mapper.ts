@@ -1,4 +1,4 @@
-import { parseDimension, slugify, splitTags, toPlainText, toShortDescription } from "../text";
+import { parseDimension, slugify, splitTags, removeUrlSentences, toPlainText, toShortDescription } from "../text";
 import type { NormalizedGame } from "../types";
 import { GAMEMONETIZE, mapGameMonetizeCategory } from "./config";
 import type { GameMonetizeGame } from "./types";
@@ -6,7 +6,7 @@ import type { GameMonetizeGame } from "./types";
 /** Maps one GameMonetize feed item to Gametroz fields. Never trusts or renders provider HTML. */
 export function normalizeGameMonetizeGame(game: GameMonetizeGame): NormalizedGame {
   const name = toPlainText(game.title);
-  const description = toPlainText(game.description);
+  const description = removeUrlSentences(toPlainText(game.description));
   const width = parseDimension(game.width);
   const height = parseDimension(game.height);
   const providerCategory = toPlainText(game.category);
@@ -19,7 +19,7 @@ export function normalizeGameMonetizeGame(game: GameMonetizeGame): NormalizedGam
     slug: slugify(name),
     shortDescription: toShortDescription(description),
     description,
-    instructions: toPlainText(game.instructions),
+    instructions: removeUrlSentences(toPlainText(game.instructions)),
     embedUrl: (game.url ?? "").trim(),
     thumbnailUrl: (game.thumb ?? "").trim(),
     // The feed has no hero image; editors can add one during review.

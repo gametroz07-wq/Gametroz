@@ -173,6 +173,14 @@ export function editorialIssues(game: NormalizedGame): ValidationIssue[] {
   const brands = KNOWN_BRANDS.filter((brand) => containsTerm(title, brand) || containsTerm(tagText, brand));
   if (brands.length) issues.push(issue(`Possible third-party brand: ${[...new Set(brands)].join(", ")}. Check rights before publishing.`));
 
+  if (containsTerm(title, "getting over it")) {
+    issues.push(issue("Possible third-party brand: getting over it. Check rights before publishing."));
+  }
+  // "Unblocked" targets school-filter bypass searches: a policy and brand risk with ad networks.
+  if (containsTerm(title, "unblocked") || containsTerm(tagText, "unblocked")) {
+    issues.push(issue('Title or tags use "unblocked" (school-filter bypass wording). Rename or skip the game.'));
+  }
+
   const words = title.split(/[^a-z0-9]+/).filter(Boolean);
   const keywordHits = words.filter((word) => SEO_KEYWORDS.has(word)).length;
   const repeated = words.length !== new Set(words).size;

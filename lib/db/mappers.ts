@@ -1,6 +1,6 @@
 import "server-only";
 import type { Prisma } from "@/lib/generated/prisma/client";
-import { toPlainText } from "@/lib/providers/text";
+import { removeUrlSentences, toPlainText } from "@/lib/providers/text";
 import type {
   App,
   Category,
@@ -73,9 +73,10 @@ export function toGame(row: GameRow): Game {
     category: row.category,
     thumbnailUrl: row.thumbnailUrl,
     // Render-time repair of feed artifacts (bare "uarr", "mdash", ...) in rows published before the fix.
-    shortDescription: toPlainText(row.shortDescription),
-    description: toPlainText(row.description),
-    instructions: toPlainText(row.instructions),
+    // Also drops promotional sentences with third-party URLs (look-alike portal domains in provider text).
+    shortDescription: removeUrlSentences(toPlainText(row.shortDescription)),
+    description: removeUrlSentences(toPlainText(row.description)),
+    instructions: removeUrlSentences(toPlainText(row.instructions)),
     controls: row.controls as GameControl[],
     tags: row.tags.map((tag) => tag.slug),
     orientation: row.orientation === "PORTRAIT" ? "portrait" : "landscape",
