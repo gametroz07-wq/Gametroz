@@ -38,7 +38,7 @@ Turn /tools into a real, useful, SEO-ready section: 30 working tools, no mocks, 
 - [x] T3 Developer (5) + Generators (4): base64-encoder-decoder, url-encoder-decoder, timestamp-converter, hash-generator, uuid-generator, password-generator, random-number-generator, qr-code-generator (json-formatter from T1).
 - [x] T4 Calculators (5 new) + Converters (4): discount, age, date-difference, bmi, tip; length, weight, temperature, data-storage.
 - [x] T5 Image tools (4): image-compressor, image-resizer, png-to-jpg, webp-to-jpg.
-- [ ] T6 Local data sync (Docker), full checks, responsive 375/768/1440, report. Production sync + push after approval.
+- [x] T6 Local data sync (Docker), full checks, responsive 375/768/1440, report. Production sync + push after approval.
 
 ## Checks
 TDD: strict (session config), runner `npm test`. Per task: npm test, lint, typecheck. Final: + prisma validate, build.
@@ -85,3 +85,13 @@ TDD: strict (session config), runner `npm test`. Per task: npm test, lint, typec
 - Route: delegated direct, single writer. Not committed (left for the orchestrator).
 - Decisions: pure math/validation in lib/tools/image.ts (tested); canvas/decoding in lib/tools/image-browser.ts (not unit-tested, browser-only); limits 25 MB, 50 MP, 16384 px per side, batch 10; downscale in halving steps with imageSmoothingQuality high; JPEG output fills background (white default) before drawing; useConversion hook debounces 150 ms and owns preview object URLs (revoked on replace/clear/unmount); downloads use blob links, no fetch, CSP unchanged (img-src already allows blob:); resizer keeps input format, JPEG/WebP at quality 92; webp-to-jpg detects WebP decode with a 1x1 data URI; shared JpgConverter for png-to-jpg and webp-to-jpg.
 - Not done: no real-browser run of canvas/encoding or responsive check (T6); Engram mirror still pending.
+
+### T6 evidence (2026-10-02)
+- tools:sync --apply on local Docker only: categories 1 create/5 update; tools 18 create/12 update/4 archive.
+- Build OK (Docker DB). Local crawl: 30 tool pages 200, one H1 each, LocalProcessingNote, JSON-LD BreadcrumbList+WebApplication+FAQPage (parses); /tools/<6 categories> 200; archived tools and empty categories (pdf, seo) 404.
+- Browser functional test: 13/13 tools produce correct output with no console errors (word, case, slug, JSON error, Base64, SHA-256 vector, 212°F→100°C, length, tip, password, QR, UUID v4, image compressor with a real JPEG).
+- Responsive: 14 pages (/tools, 3 categories, 10 tools) without horizontal overflow at 375/768/1440.
+- Sitemap: 200 with 0 URLs while indexing is off. Search finds tools by title/description.
+- npm test 466/466, prisma validate, lint, typecheck, build OK.
+- Pending (needs approval): production tools:sync --apply (Supabase) then push to main (deploy).
+- Follow-up: npm audit reports 4 high (deepmerge-ts, mysql2) — pre-existing transitive deps, not from qrcode.
