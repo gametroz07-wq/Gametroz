@@ -87,6 +87,12 @@ Generar sitemaps separados si el volumen crece:
 /sitemaps/guides.xml
 ```
 
+## Implementation status (Tools section)
+
+- `app/sitemap.ts` is live and returns `[]` while `NEXT_PUBLIC_INDEXING_ENABLED` is not `true`. Once enabled it lists home, `/games`, `/tools`, `/tools/<category>`, `/tool/<slug>`, `/apps` and `/guides` (built by `lib/seo/sitemap.ts`). Game, app and guide detail pages are not in the sitemap yet.
+- JSON-LD (`components/seo/json-ld.tsx`, builders in `lib/seo/structured-data.ts`): `BreadcrumbList` on `/tools`, `/tools/<category>` and tool pages; `WebApplication` on tool pages; `FAQPage` only when the FAQ is visible on the page. No ratings or reviews.
+- Tool content (meta title/description, intro, examples, FAQ) lives in `lib/tools/definitions.ts`. `npm run tools:sync` (dry run by default, `--apply` to write) syncs it to the database and archives published tools that are no longer defined.
+
 ---
 
 # 6. Internal Linking

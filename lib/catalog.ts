@@ -401,6 +401,7 @@ export async function searchCatalog(rawQuery: string) {
           { name: contains },
           { slug: contains },
           { shortDescription: contains },
+          { description: contains },
           { category: { name: contains } },
           tagMatch,
         ],

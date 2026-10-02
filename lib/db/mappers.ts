@@ -11,7 +11,6 @@ import type {
   IconKey,
   PlatformSlug,
   Tool,
-  ToolComponentKey,
 } from "@/types/content";
 
 /**
@@ -60,13 +59,6 @@ type AppRow = Prisma.AppGetPayload<{ include: typeof appInclude }>;
 type GuideRow = Prisma.GuideGetPayload<{ include: typeof guideInclude }>;
 type CategoryRow = { name: string; slug: string; description: string; iconKey: string };
 
-const toolComponentKeys: readonly ToolComponentKey[] = [
-  "word-counter",
-  "json-formatter",
-  "image-converter",
-  "percentage-calculator",
-];
-
 const isoDate = (date: Date | null) => (date ? date.toISOString().slice(0, 10) : "");
 
 export function toCategory(row: CategoryRow): Category {
@@ -95,7 +87,6 @@ export function toGame(row: GameRow): Game {
 }
 
 export function toTool(row: ToolRow): Tool {
-  const componentKey = toolComponentKeys.find((key) => key === row.componentKey);
   return {
     slug: row.slug,
     name: row.name,
@@ -107,7 +98,7 @@ export function toTool(row: ToolRow): Tool {
     tags: row.tags.map((tag) => tag.slug),
     featured: row.featured,
     popularity: row.popularity,
-    componentKey,
+    componentKey: row.componentKey ?? undefined,
   };
 }
 

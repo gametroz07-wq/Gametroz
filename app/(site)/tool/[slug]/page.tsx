@@ -3,19 +3,25 @@ import { notFound } from "next/navigation";
 import { AdSlot } from "@/components/ads/ad-slot";
 import { GuideCard } from "@/components/guides/guide-card";
 import { Container } from "@/components/layout/container";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { CardGrid } from "@/components/shared/card-grid";
 import { PageSection } from "@/components/shared/page-section";
-import { TagList } from "@/components/shared/tag-list";
 import { ToolCard } from "@/components/tools/tool-card";
 import { toolAccent } from "@/components/tools/tool-category-style";
+import { ToolContent } from "@/components/tools/tool-content";
 import { ToolWorkspace } from "@/components/tools/tool-workspace";
+import { LocalProcessingNote } from "@/components/tools/ui/local-processing-note";
 import { getGuidesFor, getRelatedTools, getToolBySlug, getTools } from "@/lib/catalog";
 import { contentIcons } from "@/lib/icons";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { breadcrumbList, faqPage, webApplication } from "@/lib/seo/structured-data";
+import { getToolDefinition } from "@/lib/tools/definitions";
 import { cn } from "@/lib/utils";
 
-export const dynamicParams = false;
+// ISR: tool pages are prerendered at build, refresh hourly, and tools added later render on first
+// request (dynamicParams defaults to true), so publishing a tool never needs a rebuild.
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   return (await getTools()).map((tool) => ({ slug: tool.slug }));
@@ -24,9 +30,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/tool/[slug]">): Promise<Metadata> {
   const tool = await getToolBySlug((await params).slug);
   if (!tool) return {};
+  const definition = getToolDefinition(tool.slug);
   return pageMetadata({
-    title: `${tool.name} — Free Online Tool`,
-    description: tool.description,
+    title: definition?.metaTitle ?? `${tool.name} — Free Online Tool`,
+    description: definition?.metaDescription ?? tool.description,
     path: `/tool/${tool.slug}`,
   });
 }
@@ -38,9 +45,22 @@ export default async function ToolPage({ params }: PageProps<"/tool/[slug]">) {
   const [related, guides] = await Promise.all([getRelatedTools(tool, 4), getGuidesFor({ tools: tool.slug })]);
   const Icon = contentIcons[tool.iconKey];
   const accent = toolAccent(tool.category.slug);
+  const definition = getToolDefinition(tool.slug);
+  const path = `/tool/${tool.slug}`;
+  const content = definition ?? { intro: [tool.description], howTo: tool.howTo, examples: [], faq: [] };
 
   return (
     <Container className="pb-12">
+      <JsonLd
+        data={breadcrumbList([
+          { name: "Home", path: "/" },
+          { name: "Tools", path: "/tools" },
+          { name: tool.category.name, path: `/tools/${tool.category.slug}` },
+          { name: tool.name, path },
+        ])}
+      />
+      <JsonLd data={webApplication({ name: tool.name, description: tool.description, path })} />
+      <JsonLd data={faqPage(content.faq)} />
       <Breadcrumbs
         items={[
           { label: "Tools", href: "/tools" },
@@ -63,35 +83,13 @@ export default async function ToolPage({ params }: PageProps<"/tool/[slug]">) {
             <p className="type-muted">{tool.shortDescription}</p>
           </div>
         </header>
-        <div className="p-4 sm:p-6">
+        <div className="space-y-3 p-4 sm:p-6">
           <ToolWorkspace tool={tool} />
+          {definition?.localOnly && <LocalProcessingNote />}
         </div>
       </section>
 
-      <div className="grid gap-6 py-6 lg:grid-cols-2">
-        <section aria-labelledby="about-tool-heading" className="space-y-3">
-          <h2 id="about-tool-heading" className="type-h3">
-            About {tool.name}
-          </h2>
-          <p className="type-body text-foreground/90">{tool.description}</p>
-          <TagList tags={tool.tags} label={`${tool.name} tags`} />
-        </section>
-        <section aria-labelledby="how-tool-heading" className="space-y-3">
-          <h2 id="how-tool-heading" className="type-h3">
-            How to use it
-          </h2>
-          <ol className="space-y-2">
-            {tool.howTo.map((step, index) => (
-              <li key={step} className="flex items-start gap-3">
-                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-surface-2 text-sm font-semibold">
-                  {index + 1}
-                </span>
-                <span className="type-body pt-0.5">{step}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
-      </div>
+      <ToolContent name={tool.name} definition={content} />
 
       <AdSlot placement="content-inline" />
 

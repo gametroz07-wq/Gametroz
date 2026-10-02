@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/layout/container";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { CardGrid } from "@/components/shared/card-grid";
 import { PageHeader } from "@/components/shared/page-header";
@@ -8,8 +9,10 @@ import { ToolCard } from "@/components/tools/tool-card";
 import { ToolCategoryTile } from "@/components/tools/tool-category-tile";
 import { getToolCategories, getToolCategory, getToolCategorySummaries, getToolsByCategory } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { breadcrumbList } from "@/lib/seo/structured-data";
 
-export const dynamicParams = false;
+// ISR: categories refresh every 10 minutes; a category added later renders on first request.
+export const revalidate = 600;
 
 export async function generateStaticParams() {
   return (await getToolCategories()).map((category) => ({ category: category.slug }));
@@ -38,10 +41,17 @@ export default async function ToolCategoryPage({ params }: PageProps<"/tools/[ca
 
   return (
     <Container className="pb-10">
+      <JsonLd
+        data={breadcrumbList([
+          { name: "Home", path: "/" },
+          { name: "Tools", path: "/tools" },
+          { name: category.name, path: `/tools/${category.slug}` },
+        ])}
+      />
       <Breadcrumbs items={[{ label: "Tools", href: "/tools" }, { label: category.name }]} className="pt-3" />
       <PageHeader title={`${category.name} tools`} description={category.description} />
 
-      <nav aria-label="Tool categories" className="grid grid-cols-2 gap-2 pt-3 sm:grid-cols-4 lg:grid-cols-7">
+      <nav aria-label="Tool categories" className="grid grid-cols-2 gap-2 pt-3 sm:grid-cols-3 lg:grid-cols-6">
         {categories.map((item) => (
           <ToolCategoryTile
             key={item.slug}

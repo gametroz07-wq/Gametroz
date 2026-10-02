@@ -17,6 +17,7 @@ import {
   MessageCircle,
   Monitor,
   Palette,
+  Percent,
   Play,
   Puzzle,
   Search,
@@ -27,6 +28,7 @@ import {
   Terminal,
   Trophy,
   Type,
+  WandSparkles,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
@@ -63,4 +65,6 @@ export const contentIcons: Record<IconKey, LucideIcon> = {
   terminal: Terminal,
   smartphone: Smartphone,
   book: BookOpen,
+  percent: Percent,
+  wand: WandSparkles,
 };

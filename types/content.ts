@@ -29,7 +29,9 @@ export type IconKey =
   | "laptop"
   | "terminal"
   | "smartphone"
-  | "book";
+  | "book"
+  | "percent"
+  | "wand";
 
 export type CategoryRef = {
   name: string;
@@ -81,20 +83,14 @@ export type ToolSummary = {
   iconKey: IconKey;
 };
 
-export type ToolComponentKey =
-  | "word-counter"
-  | "json-formatter"
-  | "image-converter"
-  | "percentage-calculator";
-
 export type Tool = ToolSummary & {
   description: string;
   howTo: string[];
   tags: string[];
   featured: boolean;
   popularity: number;
-  // Which UI renders the tool. Tools without one show a "coming soon" workspace.
-  componentKey?: ToolComponentKey;
+  // Which UI renders the tool: the tool slug, resolved by components/tools/registry.tsx.
+  componentKey?: string;
 };
 
 /* ---------- Apps ---------- */
