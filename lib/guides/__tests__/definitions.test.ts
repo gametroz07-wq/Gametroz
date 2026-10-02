@@ -42,9 +42,12 @@ function textsOf(blocks: GuideBlock[]): string[] {
 }
 
 describe("guide definitions", () => {
-  it("defines 17 guides: 10 games plus the ported tools and apps guides", () => {
-    assert.equal(guideDefinitions.length, 17);
+  it("defines 29 guides: 10 games, 10 tools and 9 software guides", () => {
+    assert.equal(guideDefinitions.length, 29);
     assert.equal(gamesGuides.length, 10);
+    assert.equal(guideDefinitions.filter((guide) => guide.section === "tools").length, 10);
+    assert.equal(guideDefinitions.filter((guide) => guide.section === "apps").length, 9);
+    assert.ok(!guideDefinitions.some((guide) => guide.slug === "how-to-install-vlc"));
   });
 
   it("has unique slugs, titles, sort orders and excerpts", () => {
@@ -170,5 +173,39 @@ describe("games guides", () => {
     assert.ok(slugs.has("how-to-play-games-in-fullscreen"));
     assert.ok(!slugs.has("puzzle-games-for-beginners"));
     assert.ok(slugs.has("best-puzzle-games-online"));
+  });
+});
+
+describe("tools and software guides", () => {
+  const other = guideDefinitions.filter((guide) => guide.section !== "games");
+
+  it("open with a short answer, have 3+ sections and are 600 to 1100 words", () => {
+    for (const guide of other) {
+      assert.equal(guide.body[0].type, "answer", guide.slug);
+      assert.ok(guide.body.filter((block) => block.type === "h2").length >= 3, `${guide.slug} needs 3+ h2 sections`);
+      const words = countWords(guide.body);
+      assert.ok(words >= 600 && words <= 1100, `${guide.slug} has ${words} words`);
+    }
+  });
+
+  it("show their recommended tools or apps as cards and link at least three catalog items", () => {
+    for (const guide of other) {
+      const references = extractReferences(guide.body);
+      assert.ok(guide.body.some((block) => block.type === "items"), `${guide.slug} has no items block`);
+      assert.ok(references.tools.length + references.apps.length >= 3, `${guide.slug} links too few catalog items`);
+    }
+  });
+
+  it("make no invented experience, rating or audience claims", () => {
+    const banned = /we tested|we played|we tried|hours of use|our team|our testers|our favorite|we love|rated|stars?|millions|best-selling|since \d{4}/i;
+    for (const guide of other) {
+      for (const text of textsOf(guide.body)) assert.ok(!banned.test(text), `${guide.slug}: "${text.slice(0, 80)}"`);
+    }
+  });
+
+  it("state how software roundups were picked", () => {
+    for (const guide of other.filter((entry) => entry.section === "apps" && entry.slug.startsWith("best-"))) {
+      assert.match(textsOf(guide.body).join(" "), /not a (?:ranking|test result)/i, guide.slug);
+    }
   });
 });

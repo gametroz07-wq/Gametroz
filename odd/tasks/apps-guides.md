@@ -36,8 +36,8 @@ Games, Tools and Apps. Local only: no push, no deploy, no production DB writes.
 - [x] A1 Apps infra + first batch of app definitions (45 apps; uncommitted, awaiting review/commit).
 - [x] A2 Remaining app definitions (105 total; uncommitted, awaiting review/commit).
 - [x] B1 Guides infra + game guides (uncommitted, awaiting review/commit).
-- [ ] B2 Tool guides.
-- [ ] B3 Software guides.
+- [x] B2 Tool guides (10; uncommitted).
+- [x] B3 Software guides (9; uncommitted).
 - [ ] E  Local integration: Docker DB with games copied read-only from production + tools/apps/guides sync; crawl, responsive, console/CSP, validations; report.
 
 ## A1 evidence (2026-10-02)
@@ -87,6 +87,18 @@ Games, Tools and Apps. Local only: no push, no deploy, no production DB writes.
   "not a test result". 74 distinct published games referenced. Tools/apps guides ported as-is (7) with a closing items block so relations survive.
 - Dry run against local Docker: guides 8 create / 9 update / 0 unchanged / 1 archive (puzzle-games-for-beginners); references 74 games,
   7 tools, 6 apps, 0 problems. Nothing applied.
+
+## B2 + B3 evidence (2026-10-02)
+- Tools guides (10, 617-700 words each, 3-10 tool/app links): how-to-format-json, how-to-count-words-and-characters, how-to-generate-a-strong-password,
+  how-to-calculate-percentages, how-to-calculate-a-discount-and-sales-tax, how-to-convert-fahrenheit-to-celsius, how-to-convert-webp-and-png-to-jpg,
+  what-is-a-unix-timestamp, how-to-compress-images, best-free-online-developer-tools. Files: content/tools.ts + tools-more.ts.
+- Software guides (9, 611-655 words, 6-12 app links): best-free-windows-apps, best-free-mac-apps, best-free-video-players, best-free-office-suites,
+  best-chrome-alternatives, best-free-code-editors, best-free-password-managers, how-to-download-software-safely, how-to-record-your-screen.
+  Files: content/apps.ts + apps-more.ts. how-to-install-vlc dropped (archived by sync). Roundups state how picks were made ("not a ranking").
+- Tests: definitions count 29 (10/10/9); new suite for tools+software guides (answer first, 3+ h2, 600-1100 words, items block, 3+ catalog links,
+  no invented experience/rating claims, pick-method statement). Examples (sales tax rate 7%) are labeled as illustrations.
+- Dry run against local Docker: guides 21 create / 8 update / 0 unchanged / 2 archive (how-to-install-vlc, puzzle-games-for-beginners);
+  references 74 games, 25 tools, 48 apps, 0 problems; 34 apps not yet in the DB (run apps:sync first). Nothing applied.
 
 ## Checks
 TDD strict, `npm test`; per task lint + typecheck; final prisma validate, build, npm audit.
