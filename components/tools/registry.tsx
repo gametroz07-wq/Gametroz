@@ -1,5 +1,13 @@
 import type { ReactElement } from "react";
 import type { ImplementedToolSlug } from "@/lib/tools/implemented";
+import { Base64Workspace } from "./workspaces/base64-encoder-decoder";
+import { UrlCodecWorkspace } from "./workspaces/url-encoder-decoder";
+import { TimestampWorkspace } from "./workspaces/timestamp-converter";
+import { HashWorkspace } from "./workspaces/hash-generator";
+import { UuidWorkspace } from "./workspaces/uuid-generator";
+import { PasswordWorkspace } from "./workspaces/password-generator";
+import { RandomNumberWorkspace } from "./workspaces/random-number-generator";
+import { QrCodeWorkspace } from "./workspaces/qr-code-generator";
 import { CaseConverterWorkspace } from "./workspaces/case-converter";
 import { CharacterCounterWorkspace } from "./workspaces/character-counter";
 import { JsonFormatterWorkspace } from "./workspaces/json-formatter";
@@ -24,6 +32,14 @@ export const toolWorkspaces: Record<ImplementedToolSlug, ReactElement> = {
   "text-sorter": <TextSorterWorkspace />,
   "slug-generator": <SlugGeneratorWorkspace />,
   "json-formatter": <JsonFormatterWorkspace />,
+  "base64-encoder-decoder": <Base64Workspace />,
+  "url-encoder-decoder": <UrlCodecWorkspace />,
+  "timestamp-converter": <TimestampWorkspace />,
+  "hash-generator": <HashWorkspace />,
+  "uuid-generator": <UuidWorkspace />,
+  "password-generator": <PasswordWorkspace />,
+  "random-number-generator": <RandomNumberWorkspace />,
+  "qr-code-generator": <QrCodeWorkspace />,
   "percentage-calculator": <PercentageCalculatorWorkspace />,
 };
 

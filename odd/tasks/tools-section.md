@@ -35,7 +35,7 @@ Turn /tools into a real, useful, SEO-ready section: 30 working tools, no mocks, 
 ## Tasks
 - [x] T1 Foundation: definitions + sync script + seed, routes ISR, registry, shared UI, JSON-LD, content blocks, /tools page, sitemap, search.
 - [x] T2 Text tools (7): character-counter, case-converter, remove-duplicate-lines, remove-extra-spaces, text-sorter, slug-generator (word-counter from T1).
-- [ ] T3 Developer (5) + Generators (4).
+- [x] T3 Developer (5) + Generators (4): base64-encoder-decoder, url-encoder-decoder, timestamp-converter, hash-generator, uuid-generator, password-generator, random-number-generator, qr-code-generator (json-formatter from T1).
 - [ ] T4 Calculators (6) + Converters (4).
 - [ ] T5 Image tools (4).
 - [ ] T6 Local data sync (Docker), full checks, responsive 375/768/1440, report. Production sync + push after approval.
@@ -61,4 +61,12 @@ TDD: strict (session config), runner `npm test`. Per task: npm test, lint, typec
 - Verified: npm test (250 pass), npm run lint (clean), npm run typecheck (clean).
 - Route: delegated direct, single writer. Not committed (left for the orchestrator).
 - Decisions: Intl.Segmenter graphemes with code point fallback; "Ignore empty lines" in dedupe leaves blank lines untouched; slug drops non-Latin text and says so; shuffle uses crypto.getRandomValues (unbiased) and re-draws only on request.
+- Engram mirror: still pending.
+
+### T3 evidence
+- RED: `npm test` showed 9 failing test files (missing modules base64, url-codec, timestamp, hash, random, uuid, password, random-number, qr) with 250 passing; after the logic, the examples/definitions tests failed (10 failures) until the definitions existed, and the toDateTimeInputValue tests failed until it was added. GREEN: 351 tests pass.
+- Verified: npm test (351 pass), npm run lint (clean), npm run typecheck (clean). qrcode toDataURL/toString smoke-checked in node.
+- Dependency: qrcode ^1.5.4 (MIT), @types/qrcode (dev). Loaded with a dynamic import inside the QR workspace only.
+- Route: delegated direct, single writer. Not committed (left for the orchestrator).
+- Decisions: shared unbiased RNG in lib/tools/random.ts (rejection sampling) used by password, random numbers, shuffle; hash tool states MD5 is not offered and SHA-1 is not for security; passphrase mode skipped; password-generator set featured (4 featured total; the explorer shows at most 4); new ToolSegmented control in ui/tool-options.tsx; timestamp zone read via useSyncExternalStore to avoid hydration mismatch.
 - Engram mirror: still pending.

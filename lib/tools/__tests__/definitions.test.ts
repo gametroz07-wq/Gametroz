@@ -86,4 +86,26 @@ describe("tool definitions", () => {
     );
     assert.ok(toolDefinitions.every((tool) => tool.localOnly));
   });
+
+  it("defines the developer and generator tools", () => {
+    const inCategory = (category: string) => toolDefinitions.filter((tool) => tool.categorySlug === category).map((tool) => tool.slug);
+    assert.deepEqual(inCategory("developer"), [
+      "json-formatter",
+      "base64-encoder-decoder",
+      "url-encoder-decoder",
+      "timestamp-converter",
+      "hash-generator",
+    ]);
+    assert.deepEqual(inCategory("generators"), ["uuid-generator", "password-generator", "random-number-generator", "qr-code-generator"]);
+  });
+
+  it("keeps sort orders unique and the featured set small", () => {
+    assert.deepEqual(duplicates(toolDefinitions.map((tool) => String(tool.sortOrder))), []);
+    assert.ok(toolDefinitions.filter((tool) => tool.featured).length <= 4, "the /tools explorer shows at most four featured tools");
+  });
+
+  it("states the MD5 and SHA-1 limits on the hash tool", () => {
+    const copy = JSON.stringify(getToolDefinition("hash-generator")).toLowerCase();
+    assert.ok(copy.includes("md5") && copy.includes("sha-1"));
+  });
 });

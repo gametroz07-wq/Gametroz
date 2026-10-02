@@ -500,6 +500,454 @@ export const toolDefinitions: ToolDefinition[] = [
     localOnly: true,
   },
   {
+    slug: "base64-encoder-decoder",
+    name: "Base64 Encoder & Decoder",
+    categorySlug: "developer",
+    shortDescription: "Encode text to Base64 or decode it back, with correct UTF-8 handling and a URL-safe option.",
+    description:
+      "Convert text to Base64 and Base64 back to text. Emoji and accented letters round-trip correctly because the text is handled as UTF-8, and a URL-safe alphabet is available for tokens and query strings.",
+    howTo: [
+      "Choose Encode or Decode.",
+      "Type or paste your text or Base64 string.",
+      "For tokens and URLs, turn on the URL-safe alphabet, and drop the = padding if you need to.",
+      "Copy the result, or use Swap to run the output back through the opposite direction.",
+    ],
+    iconKey: "braces",
+    featured: false,
+    sortOrder: 9,
+    tags: ["base64", "encode", "decode", "utf-8"],
+    metaTitle: "Base64 Encoder & Decoder Online",
+    metaDescription:
+      "Encode and decode Base64 in your browser with full UTF-8 support, a URL-safe option and clear errors for invalid input. Free, private and instant.",
+    intro: [
+      "Base64 turns bytes into plain ASCII letters, digits and a few symbols, so data can travel through systems that only accept text: email bodies, JSON fields, data URLs, HTTP headers. It is an encoding, not encryption, so anyone can reverse it.",
+      "Text is converted to UTF-8 before encoding, so café, 日本語 and emoji come out right, which the browser's built-in btoa cannot do on its own. Decoding accepts standard and URL-safe input, with or without padding, and tells you exactly where invalid input goes wrong. It works the same on a phone.",
+    ],
+    examples: [
+      { input: "Hello, Gametroz!", output: "SGVsbG8sIEdhbWV0cm96IQ==", note: "Plain ASCII text, standard alphabet." },
+      { input: "Café ☕", output: "Q2Fmw6kg4piV", note: "The accent and the emoji are encoded as UTF-8 bytes." },
+      {
+        input: "SGVsbG8*",
+        output: 'Invalid character "*" at position 8. Base64 uses A-Z, a-z, 0-9, + / (or - _) and = padding.',
+        note: "Decoding reports the first character that does not belong.",
+      },
+    ],
+    faq: [
+      {
+        question: "Is Base64 a form of encryption?",
+        answer:
+          "No. Base64 only changes how data is written, and anyone can decode it in one step. Never use it to hide passwords or secrets; use real encryption for that.",
+      },
+      {
+        question: "What is URL-safe Base64?",
+        answer:
+          "The standard alphabet uses + and /, which have special meaning in URLs. The URL-safe variant swaps them for - and _ and often drops the trailing = padding, which is why JWTs and many tokens look the way they do.",
+      },
+      {
+        question: "Why does decoding say the bytes are not valid UTF-8?",
+        answer:
+          "The Base64 itself is fine, but it does not hold text. It probably encodes binary data such as an image or a compressed file, which cannot be shown as readable characters.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "url-encoder-decoder",
+    name: "URL Encoder & Decoder",
+    categorySlug: "developer",
+    shortDescription: "Percent-encode or decode URLs and query values, and list the key/value pairs of any query string.",
+    description:
+      "Encode text with encodeURIComponent for a single value or encodeURI for a whole address, decode percent-escapes with clear errors for malformed ones, and break a query string into a readable list of keys and values.",
+    howTo: [
+      "Pick Encode or Decode, then choose the mode: component for a single value, full URL for a whole address.",
+      "Paste your text or URL.",
+      "When decoding query strings, turn on plus-as-space so form data reads correctly.",
+      "Use the query parser to list every key and value of a URL, then copy what you need.",
+    ],
+    iconKey: "globe",
+    featured: false,
+    sortOrder: 10,
+    tags: ["url", "percent-encoding", "query-string", "encode"],
+    metaTitle: "URL Encoder & Decoder: Percent Encoding",
+    metaDescription:
+      "Encode or decode URLs with encodeURIComponent or encodeURI, spot malformed percent-escapes, and parse query strings into key/value pairs. Free and private.",
+    intro: [
+      "URLs can only carry a limited set of characters. Spaces, accents, ampersands and slashes inside a value must be written as percent-escapes such as %20 or %C3%A9, otherwise they break the address or change its meaning.",
+      "Component mode encodes everything that is not safe inside one value, which is what you want for a query parameter. Full URL mode leaves the structure (:, /, ?, &, =, #) alone and only escapes the rest. The query parser splits a URL into its keys and values and keeps repeated keys, which makes long tracking links easy to read.",
+    ],
+    examples: [
+      { input: "name=Ana & Bob/2026?", output: "name%3DAna%20%26%20Bob%2F2026%3F", note: "Component mode: every reserved character is escaped." },
+      {
+        input: "https://example.com/a b?q=café",
+        output: "https://example.com/a%20b?q=caf%C3%A9",
+        note: "Full URL mode keeps the address structure and escapes only the space and the accent.",
+      },
+      {
+        input: "https://shop.example.com/search?q=red+shoes&size=9&sort=price%20asc",
+        output: "q = red shoes\nsize = 9\nsort = price asc",
+        note: "Query parser: each parameter on its own line, decoded.",
+      },
+    ],
+    faq: [
+      {
+        question: "Should I use component or full URL mode?",
+        answer:
+          "Use component mode for a single piece such as a query value or a path segment. Use full URL mode only when you already have a complete address and want to escape stray spaces or non-ASCII characters without breaking its structure.",
+      },
+      {
+        question: "Why does decoding fail with a malformed percent-encoding error?",
+        answer:
+          "A percent sign must be followed by two hex digits, and the escaped bytes must form valid UTF-8. A lone % (as in 100%) or a truncated sequence such as %E2%98 cannot be decoded.",
+      },
+      {
+        question: "What does plus-as-space do?",
+        answer:
+          "HTML forms write a space as + in query strings, while %20 is used everywhere else. Turn the option on when decoding form data or query strings, and leave it off for paths and other text where a + is a real plus sign.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "timestamp-converter",
+    name: "Unix Timestamp Converter",
+    categorySlug: "developer",
+    shortDescription: "Convert Unix timestamps to readable dates and dates back to timestamps, in UTC and your time zone.",
+    description:
+      "Paste a Unix timestamp in seconds or milliseconds and see it as UTC ISO 8601, your local time, a US-style date and a relative time. Or pick a date and time to get its timestamp.",
+    howTo: [
+      "Paste a Unix timestamp, or press Now to use the current time.",
+      "Leave the unit on Auto-detect, or force seconds or milliseconds.",
+      "Read the UTC, local, US-style and relative results, and copy any of them.",
+      "To go the other way, pick a date and time in the second panel to get its timestamp.",
+    ],
+    iconKey: "terminal",
+    featured: false,
+    sortOrder: 11,
+    tags: ["timestamp", "unix-time", "epoch", "date"],
+    metaTitle: "Unix Timestamp Converter to Date & Back",
+    metaDescription:
+      "Convert Unix timestamps in seconds or milliseconds to UTC, local and US-formatted dates, see relative time, and turn any date into a timestamp. Free.",
+    intro: [
+      "A Unix timestamp counts the seconds (or milliseconds) since January 1, 1970 at 00:00:00 UTC. Logs, APIs, databases and JWTs use it because it is a single number with no time zone attached.",
+      "The tool tells seconds and milliseconds apart by size, so a 10-digit value is read as seconds and a 13-digit value as milliseconds. You can override that. Results are shown as UTC (ISO 8601), in your device's time zone, in a US-friendly format and as relative time, such as 3 days ago. The date-to-timestamp panel reads the time in your time zone.",
+    ],
+    examples: [
+      {
+        input: "1700000000",
+        output: "2023-11-14T22:13:20.000Z\nTuesday, November 14, 2023, 5:13:20 PM (America/New_York)",
+        note: "Ten digits are read as seconds; the second line is the same moment in New York.",
+      },
+      {
+        input: "1700000000000",
+        output: "Detected milliseconds: 2023-11-14T22:13:20.000Z",
+        note: "Thirteen digits are read as milliseconds, so it is the same moment.",
+      },
+      {
+        input: "2023-11-14 17:13:20 in America/New_York",
+        output: "1700000000",
+        note: "A wall-clock time in a time zone converted to Unix seconds.",
+      },
+    ],
+    faq: [
+      {
+        question: "How does the tool tell seconds from milliseconds?",
+        answer:
+          "By magnitude. Values with an absolute size of 100 billion or more are read as milliseconds, anything smaller as seconds. That covers every date from 1973 to the year 5138 in seconds. Choose a unit yourself if you have an unusual value.",
+      },
+      {
+        question: "What time zone is used for local time?",
+        answer:
+          "The time zone your browser reports for your device. The date-to-timestamp panel reads the date and time you enter in that same zone, including its daylight saving rules.",
+      },
+      {
+        question: "What happens in 2038?",
+        answer:
+          "Systems that store seconds in a signed 32-bit number overflow on January 19, 2038. This converter uses 64-bit floating point numbers, so dates far beyond 2038 work fine here.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "hash-generator",
+    name: "Hash Generator (SHA-256 & more)",
+    categorySlug: "developer",
+    shortDescription: "Generate SHA-1, SHA-256, SHA-384 and SHA-512 hashes of text or a file, locally in your browser.",
+    description:
+      "Compute SHA-1, SHA-256, SHA-384 and SHA-512 checksums for text or a file using your browser's Web Crypto API. Files are read on your device and never uploaded. MD5 is not offered.",
+    howTo: [
+      "Type or paste text, or choose a file to hash.",
+      "Pick lowercase or uppercase hex output.",
+      "Read all four hashes, which update as you type.",
+      "Copy the hash you need, or compare it with a published checksum to verify a download.",
+    ],
+    iconKey: "shield",
+    featured: false,
+    sortOrder: 12,
+    tags: ["hash", "sha-256", "checksum", "sha-1"],
+    metaTitle: "Hash Generator: SHA-256, SHA-1, SHA-512",
+    metaDescription:
+      "Generate SHA-1, SHA-256, SHA-384 and SHA-512 hashes for text or files using Web Crypto. Everything stays in your browser. Free; MD5 is not offered.",
+    intro: [
+      "A hash is a fixed-length fingerprint of some data: the same input always gives the same hash, and changing a single character changes it completely. It is used to verify downloads, detect changes and identify content.",
+      "Hashes are computed with the Web Crypto API built into your browser. Files are read on your device, so nothing is uploaded, and very large files are limited only by your device's memory. MD5 is not offered because it is broken for security use and the browser does not provide it. SHA-1 is included for compatibility with older systems, but it should not be used for anything security-related; prefer SHA-256 or stronger.",
+    ],
+    examples: [
+      { input: "abc", output: "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", note: "SHA-256 of the text abc." },
+      { input: "abc", output: "a9993e364706816aba3e25717850c26c9cd0d89d", note: "SHA-1 of the same text: shorter, and no longer considered safe." },
+      {
+        input: "(empty text)",
+        output: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        note: "Even nothing has a SHA-256 hash.",
+      },
+    ],
+    faq: [
+      {
+        question: "Why is there no MD5?",
+        answer:
+          "MD5 has been broken for security purposes for years, and the Web Crypto API deliberately leaves it out. To compare a download against an old MD5 checksum, use a command-line tool; for new work, use SHA-256.",
+      },
+      {
+        question: "Is SHA-1 safe to use?",
+        answer:
+          "Not for security. Collisions can be produced deliberately, so it should not be used for signatures or certificates. It is still fine for non-adversarial uses such as matching an existing checksum or a Git object ID.",
+      },
+      {
+        question: "Can I hash a password with this?",
+        answer:
+          "You can compute the hash, but a plain SHA hash is the wrong way to store passwords because it is fast to brute-force. Real systems use slow, salted algorithms such as Argon2, scrypt or bcrypt.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "uuid-generator",
+    name: "UUID Generator & Validator",
+    categorySlug: "generators",
+    shortDescription: "Generate random version 4 UUIDs in bulk, or check whether a UUID is valid and which version it is.",
+    description:
+      "Create up to 100 random version 4 UUIDs at once with uppercase and hyphen options, or paste UUIDs to validate them and see their version and variant.",
+    howTo: [
+      "Choose how many UUIDs you need, from 1 to 100.",
+      "Set uppercase or no hyphens if your system expects it, then press Generate.",
+      "Copy one UUID or the whole list.",
+      "To check existing ones, paste them into the validator, one per line.",
+    ],
+    iconKey: "code",
+    featured: false,
+    sortOrder: 13,
+    tags: ["uuid", "guid", "identifier", "random"],
+    metaTitle: "UUID Generator & Validator (v4)",
+    metaDescription:
+      "Generate random v4 UUIDs in bulk with uppercase and no-hyphen options, and validate pasted UUIDs to see their version. Free, private, and runs in your browser.",
+    intro: [
+      "A UUID is a 128-bit identifier written as 32 hex digits in five groups, such as f47ac10b-58cc-4372-a567-0e02b2c3d479. Version 4 UUIDs are random, so you can create them anywhere without a central counter and still expect no collisions.",
+      "They are generated with your browser's cryptographic random number generator. The validator accepts the usual spellings (with braces, a urn:uuid: prefix, uppercase or without hyphens) and tells you the version and variant, for example whether an identifier is time-based version 1 or version 7. Nothing is sent or stored.",
+    ],
+    examples: [
+      {
+        input: "Generate 1 UUID (version 4)",
+        output: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        note: "A sample result; every click gives a new random value.",
+      },
+      { input: "123e4567-e89b-12d3-a456-426614174000", output: "Valid UUID, version 1 (RFC 9562 variant).", note: "Validator: a time-based UUID." },
+      {
+        input: "f47ac10b-58cc-4372-a567-0e02b2c3d47",
+        output: "Not a UUID. Expected 32 hex digits, usually as 8-4-4-4-12 groups.",
+        note: "One digit short, so it is rejected.",
+      },
+    ],
+    faq: [
+      {
+        question: "Can two UUIDs ever be the same?",
+        answer:
+          "In theory yes, in practice no. A version 4 UUID has 122 random bits, so you would need to generate billions per second for decades before a collision became likely.",
+      },
+      {
+        question: "What is the difference between a UUID and a GUID?",
+        answer:
+          "Nothing in practice. GUID is Microsoft's name for the same 128-bit format, and it is often written in uppercase or with braces, which this tool can produce and read.",
+      },
+      {
+        question: "Are these UUIDs safe to use as secrets?",
+        answer:
+          "They are random, but a UUID is an identifier, not a credential. Do not use one as a password or an access token; use a long random token generated for that purpose.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "password-generator",
+    name: "Password Generator",
+    categorySlug: "generators",
+    shortDescription: "Create strong random passwords with the length and character types you choose, with an entropy estimate.",
+    description:
+      "Generate random passwords from 8 to 128 characters using uppercase, lowercase, digits and symbols, with an option to skip look-alike characters. Passwords are created in your browser with a cryptographic random number generator and are never stored.",
+    howTo: [
+      "Set the length, from 8 to 128 characters; longer is stronger.",
+      "Choose the character types to include, and exclude look-alike characters if you will type it by hand.",
+      "Press Generate; make several at once if you want to pick one.",
+      "Copy the password straight into your password manager.",
+    ],
+    iconKey: "shield",
+    featured: true,
+    sortOrder: 14,
+    tags: ["password", "random", "security", "entropy"],
+    metaTitle: "Random Password Generator: Strong & Secure",
+    metaDescription:
+      "Generate strong random passwords up to 128 characters with an entropy estimate. Uses your browser's secure random generator; nothing is stored or sent.",
+    intro: [
+      "A strong password is long and unpredictable. This generator picks each character with your browser's cryptographic random number generator and avoids modulo bias, so every allowed character is equally likely. Each selected character type is guaranteed to appear at least once.",
+      "The strength meter shows an estimate of entropy in bits, which grows with length and with the size of the character pool. Passwords are generated on your device and are not saved, logged or sent anywhere, and they are gone when you leave the page or press Clear. Use a password manager to keep them.",
+    ],
+    examples: [
+      {
+        input: "16 characters, uppercase + lowercase + digits + symbols",
+        output: "103 bits of entropy: Very strong",
+        note: "Using the full pool of 87 characters.",
+      },
+      {
+        input: "12 characters, lowercase letters only",
+        output: "56 bits of entropy: Fair",
+        note: "Same idea with a much smaller pool.",
+      },
+      {
+        input: "20 characters, letters and digits, no ambiguous characters",
+        output: "116 bits of entropy: Very strong",
+        note: "Skipping I, l, 1, O, 0 and o makes it easier to read aloud.",
+      },
+    ],
+    faq: [
+      {
+        question: "How long should my password be?",
+        answer:
+          "At least 14 characters for most accounts, and 20 or more for important ones such as email or your password manager. Length adds more strength than extra symbols do.",
+      },
+      {
+        question: "Is it safe to generate a password in a web page?",
+        answer:
+          "Here, yes: the password is created in your browser and never leaves it, and nothing is stored. Still, paste it directly into a password manager and avoid sharing it in chat or email.",
+      },
+      {
+        question: "What does the entropy estimate mean?",
+        answer:
+          "It is the length times the base-2 logarithm of the character pool, a measure of how many guesses an attacker would need. It slightly overstates the true value because each selected type must appear once. Above 80 bits is very strong for online accounts.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "random-number-generator",
+    name: "Random Number Generator",
+    categorySlug: "generators",
+    shortDescription: "Pick random numbers in any range, with unique-only, decimals and sorting, using secure randomness.",
+    description:
+      "Generate one or many random numbers between a minimum and maximum (both included), with options for unique values, decimal places and sorting. Quick presets cover dice and coin flips.",
+    howTo: [
+      "Enter the minimum and maximum; both can be picked.",
+      "Set how many numbers you want, and turn on Unique to avoid repeats.",
+      "Add decimal places or sorting if you need them, or tap a preset such as a die.",
+      "Press Generate and copy the results.",
+    ],
+    iconKey: "sparkles",
+    featured: false,
+    sortOrder: 15,
+    tags: ["random-number", "dice", "lottery", "generator"],
+    metaTitle: "Random Number Generator: Range, Unique, Dice",
+    metaDescription:
+      "Generate random numbers in any range with unique-only, decimals and sorting. Uses secure browser randomness without bias. Free, with dice and coin presets.",
+    intro: [
+      "Choose a range and get fair random numbers: raffle picks, lottery-style draws, test data, dice rolls or a quick yes or no. Both the minimum and the maximum can come up.",
+      "Numbers come from your browser's cryptographic random number generator. The tool throws away the few values that would make small results slightly more likely, so every number in the range has exactly the same chance. In unique mode a number appears at most once, and you get a clear message if the range is too small for the count you asked for.",
+    ],
+    examples: [
+      {
+        input: "Lottery style: 6 unique numbers from 1 to 49, sorted",
+        output: "e.g. 4, 12, 19, 27, 38, 45",
+        note: "A sample result; every draw is different.",
+      },
+      { input: "Roll two six-sided dice: min 1, max 6, count 2", output: "e.g. 3, 5", note: "Repeats are allowed, as with real dice." },
+      {
+        input: "7 unique numbers from 1 to 6",
+        output: "Cannot pick 7 unique numbers from a range that only holds 6 values. Widen the range or lower the count.",
+        note: "Impossible requests are explained instead of silently repeating numbers.",
+      },
+    ],
+    faq: [
+      {
+        question: "Are the numbers truly random?",
+        answer:
+          "They come from the cryptographically secure generator built into your browser, which is much better than Math.random and is unbiased across the range. It is suitable for games, draws and sampling, but verify the rules of any official lottery or legal drawing yourself.",
+      },
+      {
+        question: "How do decimals work?",
+        answer:
+          "With 2 decimal places, every value on that grid is equally likely, such as 1.25, 1.26 and so on up to the maximum. The maximum itself can be drawn, as long as it fits the grid.",
+      },
+      {
+        question: "What are the limits?",
+        answer:
+          "Minimum and maximum can be between -1,000,000,000 and 1,000,000,000, you can ask for up to 1,000 numbers at once, and use up to 6 decimal places.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "qr-code-generator",
+    name: "QR Code Generator",
+    categorySlug: "generators",
+    shortDescription: "Make a QR code from a URL or text, choose colors and error correction, and download it as PNG or SVG.",
+    description:
+      "Create a QR code from any text or link, with four error correction levels, a size from 128 to 1024 pixels, custom colors with a contrast warning, and downloads as PNG or SVG. Generated on your device.",
+    howTo: [
+      "Type or paste a URL or any text.",
+      "Pick an error correction level: higher levels survive damage better but hold less data.",
+      "Choose the size and colors; keep a dark code on a light background.",
+      "Scan the preview with your phone to test it, then download the PNG or SVG.",
+    ],
+    iconKey: "wand",
+    featured: false,
+    sortOrder: 16,
+    tags: ["qr-code", "generator", "url", "svg"],
+    metaTitle: "QR Code Generator: PNG & SVG Download",
+    metaDescription:
+      "Create a QR code from a link or text, pick colors and error correction, and download PNG or SVG. Generated in your browser, so your data is never uploaded.",
+    intro: [
+      "Paste a link, a Wi-Fi string, a phone number or plain text and get a QR code you can print or share. The code is generated entirely in your browser: your text is never sent to a server, and there is no account, watermark or expiry.",
+      "Error correction lets a code stay readable when part of it is dirty or covered: level L restores about 7% of the data, M about 15%, Q about 25% and H about 30%. Download a PNG for documents and screens, or an SVG that stays sharp at any print size. The tool warns you when your colors have too little contrast to scan reliably.",
+    ],
+    examples: [
+      {
+        input: "https://example.com/menu (error correction M)",
+        output: "Fits level M (24 of 2,331 bytes)",
+        note: "A short link uses a tiny fraction of the capacity, so the code stays simple and easy to scan.",
+      },
+      { input: "Code #1f2937 on background #ffffff", output: "Contrast 14.7:1, no warning", note: "Dark gray on white scans reliably." },
+      {
+        input: "Code #999999 on background #ffffff",
+        output: "Low contrast (2.8:1). Many scanners need at least 3:1, so this code may not scan. Use a darker code on a lighter background.",
+        note: "Pale colors can look nice but fail in poor light.",
+      },
+    ],
+    faq: [
+      {
+        question: "Does the QR code expire or track scans?",
+        answer:
+          "No. The code simply contains your text, so it works forever and nobody can see who scans it. If the link inside changes, the code does not update; point it at a redirect you control if you may need to change the destination.",
+      },
+      {
+        question: "Which error correction level should I choose?",
+        answer:
+          "M is a good default. Use Q or H if the code will be printed on rough surfaces or partly covered by a logo, and L when you need to fit a lot of text.",
+      },
+      {
+        question: "Why will my code not scan?",
+        answer:
+          "The usual causes are low contrast, an inverted (light on dark) code, a very small print size, or too much data. Keep a quiet margin around the code, use dark on light, and test with your phone before printing.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
     slug: "percentage-calculator",
     name: "Percentage Calculator",
     categorySlug: "calculators",

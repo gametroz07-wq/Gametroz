@@ -12,6 +12,14 @@ export const implementedToolSlugs = [
   "text-sorter",
   "slug-generator",
   "json-formatter",
+  "base64-encoder-decoder",
+  "url-encoder-decoder",
+  "timestamp-converter",
+  "hash-generator",
+  "uuid-generator",
+  "password-generator",
+  "random-number-generator",
+  "qr-code-generator",
   "percentage-calculator",
 ] as const;
 

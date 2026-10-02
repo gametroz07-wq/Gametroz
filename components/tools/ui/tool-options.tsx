@@ -73,3 +73,35 @@ export function ToolSummary({ children }: { children?: React.ReactNode }) {
     </p>
   );
 }
+
+type ToolSegmentedProps<T extends string> = {
+  label: string;
+  value: T;
+  onChange: (value: T) => void;
+  options: { value: T; label: string }[];
+};
+
+/** Small mode switcher (Encode / Decode...). A labelled group of toggle buttons. */
+export function ToolSegmented<T extends string>({ label, value, onChange, options }: ToolSegmentedProps<T>) {
+  return (
+    <div role="group" aria-label={label} className="inline-flex flex-wrap gap-1 rounded-xl border border-input bg-background p-1">
+      {options.map((option) => {
+        const active = option.value === value;
+        return (
+          <button
+            key={option.value}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(option.value)}
+            className={cn(
+              "h-9 rounded-lg px-3.5 text-sm font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+              active ? "bg-surface-2 text-foreground shadow-sm ring-1 ring-brand-strong/50" : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {option.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
