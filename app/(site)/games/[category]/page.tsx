@@ -11,7 +11,8 @@ import { getGameCategories, getGameCategory, getGamesByCategory } from "@/lib/ca
 import { contentIcons } from "@/lib/icons";
 import { pageMetadata } from "@/lib/seo/metadata";
 
-export const dynamicParams = false;
+// ISR: refreshed every 10 minutes and on demand via POST /api/revalidate.
+export const revalidate = 600;
 
 export async function generateStaticParams() {
   return (await getGameCategories()).map((category) => ({ category: category.slug }));

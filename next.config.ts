@@ -1,45 +1,14 @@
 import type { NextConfig } from "next";
-import { providerHosts } from "./lib/providers/hosts";
+import { embedFrameOrigins } from "./lib/providers/embed";
+import { buildSecurityHeaders } from "./lib/security/headers";
 
-const isDev = process.env.NODE_ENV === "development";
-const embedsEnabled = process.env.GAME_EMBEDS_ENABLED === "true";
-const indexingEnabled = process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true";
-
-// Game iframes are only allowed when embeds are enabled, and only from allowlisted provider hosts.
-const frameSources = embedsEnabled
-  ? Object.values(providerHosts).flatMap((hosts) => hosts.embedHosts.map((host) => `https://${host}`))
-  : [];
-
-// CSP without nonces (Next.js guide): keeps every page static. 'unsafe-inline' covers the
-// Next.js runtime payload and the theme script; 'unsafe-eval' is development-only.
-const contentSecurityPolicy = [
-  "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' blob: data:",
-  "font-src 'self'",
-  `connect-src 'self'${isDev ? " ws:" : ""}`,
-  `frame-src ${frameSources.length ? frameSources.join(" ") : "'none'"}`,
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "frame-ancestors 'none'",
-  ...(isDev ? [] : ["upgrade-insecure-requests"]),
-].join("; ");
-
-const securityHeaders = [
-  { key: "Content-Security-Policy", value: contentSecurityPolicy },
-  { key: "X-Content-Type-Options", value: "nosniff" },
-  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  // Legacy companion of frame-ancestors 'none'.
-  { key: "X-Frame-Options", value: "DENY" },
-  {
-    key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=(), fullscreen=(self)",
-  },
-  // Also covers non-HTML responses (API, images) while the site is not public.
-  ...(indexingEnabled ? [] : [{ key: "X-Robots-Tag", value: "noindex, nofollow" }]),
-];
+// Policy lives in lib/security/headers.ts (unit-tested). Env flags are read when the server starts.
+const securityHeaders = buildSecurityHeaders({
+  isDev: process.env.NODE_ENV === "development",
+  embedsEnabled: process.env.GAME_EMBEDS_ENABLED === "true",
+  indexingEnabled: process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true",
+  frameOrigins: embedFrameOrigins(),
+});
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,

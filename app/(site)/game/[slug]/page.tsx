@@ -25,7 +25,9 @@ import {
 } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
 
-export const dynamicParams = false;
+// ISR: games published after the build render on first request (dynamicParams defaults to true);
+// pages refresh hourly and immediately through POST /api/revalidate when a game is published.
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   return (await getGames()).map((game) => ({ slug: game.slug }));
@@ -38,6 +40,7 @@ export async function generateMetadata({ params }: PageProps<"/game/[slug]">): P
     title: `Play ${game.name} Online Free`,
     description: `${game.shortDescription} Play ${game.name} free in your browser on Gametroz.`,
     path: `/game/${game.slug}`,
+    image: { url: game.thumbnailUrl, width: 512, height: 384, alt: `${game.name} artwork` },
   });
 }
 

@@ -19,6 +19,22 @@ Phases 0–4 approved. Phase 5 has not started. Deployment runbook: `docs/13_DEP
 - Create Neon, then the Render Blueprint (secrets in Render, `SEED_ON_DEPLOY=true` on the first deploy), then Cloudflare (see the runbook).
 - Production verification by the assistant.
 
+## Release block: embeds, catalog pipeline, ISR
+
+Done locally:
+- Production `GameEmbed` with CSP and Permissions-Policy (`frame-src` limited to `https://html5.gamemonetize.co`, gated by `GAME_EMBEDS_ENABLED`).
+- Batch sync limits (10/50/100/500, default max 100, `--confirm-large` above 100) with feed fan-out.
+- Editorial filters (`EDITORIAL_REVIEW_REQUIRED`, publish needs `--ack-editorial`), category fallback to `casual`, thumbnail checks on live sync.
+- CLI: `provider:review`, `provider:publish`, `provider:archive`.
+- ISR plus `POST /api/revalidate` (Bearer `REVALIDATE_SECRET`); the CLI calls it after publish/archive.
+- Validation: 87 tests passing; lint, typecheck and build OK; responsive checked at 375/768/1024/1440.
+
+Pending:
+- Commit, push and deploy after user approval.
+- Set `GAME_EMBEDS_ENABLED=true` and `REVALIDATE_SECRET` in Render (embeds need a redeploy because the CSP is built at build time).
+
+Not done by design: mass import, Adsterra, indexing, cron, GameDistribution, Famobi, Supabase Auth.
+
 # Previous phase
 
 **Phase 4 — Game Provider Layer** (approved)

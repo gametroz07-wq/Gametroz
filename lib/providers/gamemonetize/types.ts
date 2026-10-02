@@ -24,5 +24,5 @@ export type GameMonetizeFeedQuery = {
   category?: string;
   popularity?: "newest" | "most popular" | "hot games" | "best games" | "exclusive games" | "editor picks";
   company?: string;
-  amount?: 10 | 20;
+  amount?: 10 | 20 | 30 | 40 | 100;
 };

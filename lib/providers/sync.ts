@@ -1,4 +1,5 @@
 import type { Prisma, PrismaClient } from "@/lib/generated/prisma/client";
+import { type ImageProbe, probeRemoteImage } from "./image-size";
 import type {
   GameProvider,
   NormalizedGame,
@@ -8,12 +9,30 @@ import type {
   ValidationResult,
 } from "./types";
 
-/** Hard cap while the provider layer is being validated (Phase 4). Raising it needs explicit approval. */
-export const MAX_SYNC_LIMIT = 20;
+/** Explicit batch sizes. There is no "all": an import can never be unlimited by accident. */
+export const SYNC_BATCH_SIZES = [10, 50, 100, 500] as const;
+/** Safety limit when PROVIDER_SYNC_MAX is not set. */
+export const DEFAULT_SYNC_MAX = 100;
+/** Ceiling for PROVIDER_SYNC_MAX itself. */
+export const ABSOLUTE_SYNC_MAX = 500;
+const LARGE_BATCH = 100;
 
-export function assertSyncLimit(limit: number) {
-  if (!Number.isInteger(limit) || limit < 1) throw new Error("Sync limit must be at least 1.");
-  if (limit > MAX_SYNC_LIMIT) throw new Error(`Sync limit must be at most ${MAX_SYNC_LIMIT} during this phase.`);
+type LimitOptions = { max?: number; confirmLarge?: boolean };
+
+/**
+ * Validates an import size: required, one of SYNC_BATCH_SIZES, within the configurable safety limit
+ * (PROVIDER_SYNC_MAX, default 100, never above 500) and explicitly confirmed above 100.
+ */
+export function resolveSyncLimit(limit: number | undefined, { max, confirmLarge = false }: LimitOptions) {
+  if (limit === undefined || !Number.isFinite(limit)) throw new Error("--limit is required (10, 50, 100 or 500).");
+  if (!(SYNC_BATCH_SIZES as readonly number[]).includes(limit)) {
+    throw new Error(`--limit must be one of ${SYNC_BATCH_SIZES.join(", ")}.`);
+  }
+  const safety = Math.min(max && max > 0 ? max : DEFAULT_SYNC_MAX, ABSOLUTE_SYNC_MAX);
+  if (limit > safety) {
+    throw new Error(`--limit ${limit} exceeds the safety limit of ${safety}. Raise PROVIDER_SYNC_MAX (max ${ABSOLUTE_SYNC_MAX}) to allow it.`);
+  }
+  if (limit > LARGE_BATCH && !confirmLarge) throw new Error(`Batches above ${LARGE_BATCH} require --confirm-large.`);
   return limit;
 }
 
@@ -35,9 +54,32 @@ export function dedupeByProviderGameId<T>(items: T[], getId: (item: T) => string
 
 export type SyncOptions = {
   prisma: PrismaClient;
-  limit?: number;
+  limit: number;
   dryRun?: boolean;
+  /** PROVIDER_SYNC_MAX safety limit. */
+  maxLimit?: number;
+  confirmLarge?: boolean;
+  /** Fetch each thumbnail header (HTTPS, 200, image, dimensions). Off for fixtures. */
+  checkImages?: boolean;
+  probeImage?: (url: string) => Promise<ImageProbe>;
 };
+
+const MIN_THUMBNAIL_WIDTH = 200;
+const IMAGE_PROBE_CONCURRENCY = 8;
+
+async function mapWithConcurrency<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>) {
+  const results = new Array<R>(items.length);
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(limit, items.length) }, async () => {
+      while (next < items.length) {
+        const index = next++;
+        results[index] = await fn(items[index]);
+      }
+    }),
+  );
+  return results;
+}
 
 const reject = (validation: ValidationResult, issue: ValidationIssue): ValidationResult => ({
   status: "REJECTED",
@@ -55,9 +97,9 @@ const tagsInput = (tags: string[]) => ({
  */
 export async function syncProviderGames<TRaw>(
   provider: GameProvider<TRaw>,
-  { prisma, limit = MAX_SYNC_LIMIT, dryRun = false }: SyncOptions,
+  { prisma, limit, dryRun = false, maxLimit, confirmLarge, checkImages = false, probeImage = probeRemoteImage }: SyncOptions,
 ): Promise<SyncResult> {
-  assertSyncLimit(limit);
+  resolveSyncLimit(limit, { max: maxLimit, confirmLarge });
 
   const providerRow = await prisma.provider.upsert({
     where: { slug: provider.slug },
@@ -102,6 +144,9 @@ export async function syncProviderGames<TRaw>(
     const ownerBySlug = new Map(slugOwners.map((row) => [row.slug, row]));
     const categoryIdBySlug = new Map(categories.map((row) => [row.slug, row.id]));
     const batchSlugs = new Map<string, string>();
+    const probes = checkImages
+      ? await mapWithConcurrency(normalized, IMAGE_PROBE_CONCURRENCY, ({ data }) => probeImage(data.thumbnailUrl))
+      : [];
 
     const isSlugTaken = (slug: string, providerGameId: string) => {
       const owner = ownerBySlug.get(slug);
@@ -110,9 +155,24 @@ export async function syncProviderGames<TRaw>(
       return batchOwner !== undefined && batchOwner !== providerGameId;
     };
 
-    for (const { game, data } of normalized) {
+    for (const [index, { game, data }] of normalized.entries()) {
       let validation = provider.validate(game, { isSlugTaken });
-      if (validation.status !== "REJECTED" && !categoryIdBySlug.has(data.category ?? "")) {
+      const probe = probes[index];
+      if (probe && validation.status !== "REJECTED") {
+        if (!probe.ok) {
+          validation = reject(validation, {
+            code: "THUMBNAIL_UNREACHABLE",
+            message: `Thumbnail check failed: ${probe.reason}.`,
+            severity: "error",
+          });
+        } else if (probe.width < MIN_THUMBNAIL_WIDTH) {
+          validation = {
+            status: "NEEDS_REVIEW",
+            issues: [...validation.issues, { code: "THUMBNAIL_SMALL", message: `Thumbnail is ${probe.width}x${probe.height}px.`, severity: "warning" }],
+          };
+        }
+      }
+      if (validation.status !== "REJECTED" && !categoryIdBySlug.has(data.category)) {
         validation = reject(validation, {
           code: "CATEGORY_UNMAPPED",
           message: `Category "${data.category}" does not exist in the database.`,

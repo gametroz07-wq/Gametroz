@@ -73,7 +73,7 @@ export const gameWithUnmappedCategory: GameMonetizeGame = {
   ...validGame,
   id: "fixture-1007",
   title: "Fixture Unmapped Category",
-  category: "3D",
+  category: "Brand New Genre",
   url: embed("fixture-1007"),
   thumb: thumb("fixture-1007"),
 };

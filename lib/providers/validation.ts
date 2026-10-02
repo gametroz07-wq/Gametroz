@@ -1,3 +1,4 @@
+import { editorialIssues } from "./editorial";
 import { checkUrl } from "./security";
 import { SLUG_PATTERN } from "./text";
 import type { NormalizedGame, ValidationContext, ValidationIssue, ValidationResult } from "./types";
@@ -51,7 +52,14 @@ export function validateNormalizedGame(
     issues.push(error("EMBED_HOST_NOT_ALLOWED", "Embed host is not in the provider allowlist."));
   }
 
-  if (!game.category) issues.push(error("CATEGORY_UNMAPPED", "Provider category is not mapped to a Gametroz category."));
+  if (game.categoryMatch === "fallback") {
+    issues.push(
+      warning(
+        "CATEGORY_UNMAPPED",
+        `Provider category "${game.providerCategory || "(empty)"}" is not mapped; imported as "${game.category}" for review.`,
+      ),
+    );
+  }
 
   const sizeOk = (value: number | null) => value !== null && value >= MIN_SIZE && value <= MAX_SIZE;
   if (!sizeOk(game.width) || !sizeOk(game.height)) {
@@ -61,6 +69,7 @@ export function validateNormalizedGame(
     issues.push(warning("DESCRIPTION_TOO_SHORT", `Description has fewer than ${MIN_DESCRIPTION_LENGTH} characters.`));
   }
   if (!game.instructions.trim()) issues.push(warning("INSTRUCTIONS_MISSING", "Instructions are missing."));
+  issues.push(...editorialIssues(game));
 
   const status = issues.some((issue) => issue.severity === "error")
     ? "REJECTED"

@@ -21,6 +21,9 @@ import {
 } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
 
+// ISR: refreshed every 10 minutes and on demand via POST /api/revalidate.
+export const revalidate = 600;
+
 export const metadata = pageMetadata({
   title: "Free Online Games — Play Instantly",
   description: "Play free HTML5 games in your browser: racing, puzzle, action, sports and more. No downloads, no sign-up.",

@@ -26,6 +26,9 @@ import {
 import { pageMetadata } from "@/lib/seo/metadata";
 import { siteConfig } from "@/lib/site";
 
+// ISR: refreshed every 10 minutes and on demand via POST /api/revalidate.
+export const revalidate = 600;
+
 export const metadata = pageMetadata({
   title: `${siteConfig.name} — Free Games, Online Tools and Apps`,
   description: siteConfig.description,

@@ -1,6 +1,6 @@
 import { parseDimension, slugify, splitTags, toPlainText, toShortDescription } from "../text";
 import type { NormalizedGame } from "../types";
-import { GAMEMONETIZE, GAMEMONETIZE_CATEGORY_MAP } from "./config";
+import { GAMEMONETIZE, mapGameMonetizeCategory } from "./config";
 import type { GameMonetizeGame } from "./types";
 
 /** Maps one GameMonetize feed item to Gametroz fields. Never trusts or renders provider HTML. */
@@ -9,7 +9,8 @@ export function normalizeGameMonetizeGame(game: GameMonetizeGame): NormalizedGam
   const description = toPlainText(game.description);
   const width = parseDimension(game.width);
   const height = parseDimension(game.height);
-  const categoryKey = toPlainText(game.category).toLowerCase();
+  const providerCategory = toPlainText(game.category);
+  const category = mapGameMonetizeCategory(providerCategory);
 
   return {
     provider: GAMEMONETIZE.slug,
@@ -28,7 +29,9 @@ export function normalizeGameMonetizeGame(game: GameMonetizeGame): NormalizedGam
     height,
     // The feed has no language field; GameMonetize games are listed in English.
     language: "en",
-    category: GAMEMONETIZE_CATEGORY_MAP[categoryKey] ?? null,
+    category: category.slug,
+    categoryMatch: category.match,
+    providerCategory,
     tags: splitTags(game.tags),
     status: "REVIEW",
   };

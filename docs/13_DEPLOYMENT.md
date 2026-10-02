@@ -39,7 +39,7 @@ Why: Prisma 7 recommends routing app traffic through Neon's pooler and running m
 
 - `db:deploy` = `prisma migrate deploy`. It only applies pending migrations and never resets or deletes data. `migrate dev` is never used in production.
 - `db:seed:deploy` seeds only when `SEED_ON_DEPLOY=true`. Set it for the **first** deploy, then set it back to `false`. The seed upserts and never deletes, but it would reset seeded records on every build.
-- Pages are prerendered during `npm run build`, so the build needs the database. Content changes need a redeploy until revalidation is added.
+- Pages are prerendered during `npm run build`, so the build needs the database. After the first build, catalog changes go live through ISR and on-demand revalidation (section 8), without a redeploy.
 
 ## Environment variables
 
@@ -50,7 +50,10 @@ Why: Prisma 7 recommends routing app traffic through Neon's pooler and running m
 | `NEXT_PUBLIC_SITE_URL` | `https://gametroz.online` | no |
 | `NEXT_PUBLIC_INDEXING_ENABLED` | `false` | no |
 | `GAMEMONETIZE_FEED_ENABLED` | `false` | no |
-| `GAME_EMBEDS_ENABLED` | `false` | no |
+| `GAME_EMBEDS_ENABLED` | `true`/`false`, set in the Render dashboard (`sync: false`). **Build-time:** see the note below. | no |
+| `REVALIDATE_SECRET` | Min 16 characters. Set it in Render. The endpoint returns 404 when it is unset. | yes |
+| `REVALIDATE_ENDPOINT` | Used only by the CLI on the operator machine, e.g. `https://gametroz.online/api/revalidate`. Not needed in Render. | no |
+| `PROVIDER_SYNC_MAX` | **Optional.** Default 100, absolute max 500. | no |
 | `ADSTERRA_ENABLED` | `false` | no |
 | `SEED_ON_DEPLOY` | `true` on the first deploy, then `false` | no |
 | `GAMEMONETIZE_API_KEY` | empty | yes |
@@ -60,6 +63,8 @@ Why: Prisma 7 recommends routing app traffic through Neon's pooler and running m
 | `DATABASE_POOL_MAX` | **Optional.** Connections per process. Default: 2 during `next build` (4 workers), 5 at runtime; this keeps the total under a session-mode pooler limit (Supabase: 15 clients). | no |
 
 Never put a secret in a `NEXT_PUBLIC_*` variable: those are inlined into browser JavaScript.
+
+**`GAME_EMBEDS_ENABLED` is read at build time.** The CSP and Permissions-Policy come from `headers()` in `next.config` and are baked into the build, so changing the variable requires a rebuild/redeploy. `render.yaml` declares it with `sync: false`, so Blueprint syncs never overwrite the dashboard value; unset means disabled.
 
 URL resolution lives in `lib/db/database-url.ts`: the Prisma CLI uses `DIRECT_URL` when it is non-empty, otherwise `DATABASE_URL`; the app uses `DATABASE_URL` only. On Render (`RENDER=true`) or CI, any URL pointing to localhost is refused with an error that names the variable, never its value. Do not ship a `.env` secret file to Render: dotenv would load it for any variable the service does not define.
 
@@ -93,7 +98,7 @@ URL resolution lives in `lib/db/database-url.ts`: the Prisma CLI uses `DIRECT_UR
 | X-Robots-Tag | `noindex, nofollow` (while `NEXT_PUBLIC_INDEXING_ENABLED=false`) |
 
 - `'unsafe-inline'` follows the Next.js "CSP without nonces" guide and keeps every page static. A nonce-based CSP would make every page dynamic.
-- `frame-src` only lists provider hosts when `GAME_EMBEDS_ENABLED=true`; today it is `'none'`.
+- `frame-src` only lists provider hosts when `GAME_EMBEDS_ENABLED=true` (`https://html5.gamemonetize.co`); otherwise it is `'none'`. With embeds on, `Permissions-Policy` also delegates `fullscreen`, `autoplay` and `gamepad` to that host. Details: `docs/12_GAME_PROVIDERS.md`.
 
 # 5. Health check
 
@@ -118,4 +123,25 @@ URL resolution lives in `lib/db/database-url.ts`: the Prisma CLI uses `DIRECT_UR
 
 # 7. Not in this phase
 
-Indexing, sitemap submission, Adsterra, analytics, live provider feeds, cron jobs, public iframes, GameDistribution, Famobi, Supabase.
+Indexing, sitemap submission, Adsterra, analytics, mass import, cron jobs, GameDistribution, Famobi, Supabase.
+
+# 8. ISR and on-demand revalidation
+
+| Route | `revalidate` |
+|---|---|
+| `/game/[slug]` | 3600 s |
+| `/`, `/games`, `/games/[category]` | 600 s |
+
+New slugs render on demand (`dynamicParams`).
+
+`POST /api/revalidate` with header `Authorization: Bearer <REVALIDATE_SECRET>` and JSON body `{"slugs":["a","b"]}` revalidates `/`, `/games`, `/games/[category]` and `/game/<slug>` for each slug.
+
+Flow: `provider:publish` or `provider:archive` → the CLI calls the endpoint → the change is visible on the next visit, with no redeploy. Verified locally: archive → 404 and the game disappears from `/games` and search; publish → 200 and it is listed again.
+
+Caveats:
+- The Next.js filesystem cache is per instance. It is fine on a single Render instance; with several instances use a shared cache handler.
+- Cloudflare must not cache HTML (see section 3).
+
+# 9. Testing a production build locally
+
+`next build` and `next start` load `.env.production.local` with priority over `.env`, while Prisma CLI and the scripts (dotenv) load only `.env`. To test against the Docker database, export `DATABASE_URL` explicitly in the shell for both `next build` and `next start`: process environment wins over every env file.

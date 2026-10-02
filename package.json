@@ -19,7 +19,8 @@
     "provider:sync:gamemonetize": "tsx scripts/provider-sync.ts --provider gamemonetize",
     "provider:review": "tsx scripts/provider-review.ts",
     "provider:publish": "tsx scripts/provider-publish.ts",
-    "db:seed:deploy": "node scripts/deploy-seed.mjs"
+    "db:seed:deploy": "node scripts/deploy-seed.mjs",
+    "provider:archive": "tsx scripts/provider-archive.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",

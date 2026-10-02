@@ -30,8 +30,13 @@ services:
         value: "false"
       - key: GAMEMONETIZE_FEED_ENABLED
         value: "false"
+      # Managed in the Render dashboard ("true"/"false"); Blueprint syncs never overwrite it.
+      # Read at BUILD time (it shapes the CSP): change it, then redeploy. Unset means disabled.
       - key: GAME_EMBEDS_ENABLED
-        value: "false"
+        sync: false
+      # REQUIRED secret, min 16 characters. Protects POST /api/revalidate (returns 404 when unset).
+      - key: REVALIDATE_SECRET
+        sync: false
       - key: ADSTERRA_ENABLED
         value: "false"
       - key: GAMEMONETIZE_API_KEY

@@ -44,8 +44,11 @@ describe("GameMonetize mapper", () => {
     assert.equal(normalizeGameMonetizeGame({ ...validGame, category: "Puzzles" }).category, "puzzle");
   });
 
-  it("returns null for unmapped categories", () => {
-    assert.equal(normalizeGameMonetizeGame(gameWithUnmappedCategory).category, null);
+  it("falls back to casual for unmapped categories, keeping the original label", () => {
+    const game = normalizeGameMonetizeGame(gameWithUnmappedCategory);
+    assert.equal(game.category, "casual");
+    assert.equal(game.categoryMatch, "fallback");
+    assert.equal(game.providerCategory, "Brand New Genre");
   });
 
   it("tolerates missing fields and non-numeric sizes", () => {

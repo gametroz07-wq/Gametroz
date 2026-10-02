@@ -20,6 +20,9 @@ export type ValidationCode =
   | "INSTRUCTIONS_MISSING"
   | "DUPLICATE_IN_FEED"
   | "DUPLICATE_SLUG"
+  | "THUMBNAIL_UNREACHABLE"
+  | "THUMBNAIL_SMALL"
+  | "EDITORIAL_REVIEW_REQUIRED"
   | "WRITE_FAILED";
 
 export type ValidationIssue = {
@@ -50,8 +53,12 @@ export type NormalizedGame = {
   width: number | null;
   height: number | null;
   language: string;
-  /** Gametroz GameCategory slug, or null when the provider category is not mapped. */
-  category: string | null;
+  /** Gametroz GameCategory slug. Unknown provider categories fall back to a default for review. */
+  category: string;
+  /** How confidently the provider category was mapped (see gamemonetize/config.ts). */
+  categoryMatch: "exact" | "approximate" | "fallback";
+  /** Original provider category label, for review messages. */
+  providerCategory: string;
   tags: string[];
   status: "REVIEW";
 };

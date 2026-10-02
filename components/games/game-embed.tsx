@@ -1,17 +1,17 @@
+import { GAME_IFRAME_ALLOW, GAME_IFRAME_SANDBOX } from "@/lib/providers/embed";
 import { cn } from "@/lib/utils";
 import type { Game } from "@/types/content";
 import { GAME_PLAYER_ID } from "./game-player-placeholder";
 
 /**
- * Sandboxed provider iframe. Never rendered from an unchecked URL and never uses
- * dangerouslySetInnerHTML. Permissions are the minimum HTML5 games need:
- * scripts + same-origin (the game's own origin, not Gametroz's), pointer lock, fullscreen, gamepad.
- * No popups, top navigation, forms or downloads.
+ * Sandboxed provider iframe. Only rendered from a URL that passed resolveEmbedUrl (flag + host
+ * allowlist); never uses dangerouslySetInnerHTML. The wrapper keeps the aspect ratio (no CLS) and is
+ * the element GameActions sends to fullscreen. Sandbox and permissions: lib/providers/embed.ts.
  */
 export function GameEmbed({ src, title, orientation }: { src: string; title: string; orientation: Game["orientation"] }) {
   const portrait = orientation === "portrait";
   return (
-    <div className="overflow-hidden rounded-2xl bg-black sm:rounded-3xl">
+    <div className="overflow-hidden rounded-2xl bg-black ring-1 ring-white/5">
       <div
         id={GAME_PLAYER_ID}
         className={cn(
@@ -22,10 +22,12 @@ export function GameEmbed({ src, title, orientation }: { src: string; title: str
         <iframe
           src={src}
           title={`Play ${title}`}
-          loading="lazy"
+          // The player is the main content above the fold, so it loads immediately.
+          loading="eager"
           referrerPolicy="strict-origin-when-cross-origin"
-          sandbox="allow-scripts allow-same-origin allow-pointer-lock"
-          allow="fullscreen; gamepad; autoplay"
+          sandbox={GAME_IFRAME_SANDBOX}
+          allow={GAME_IFRAME_ALLOW}
+          allowFullScreen
           className="absolute inset-0 size-full border-0"
         />
       </div>

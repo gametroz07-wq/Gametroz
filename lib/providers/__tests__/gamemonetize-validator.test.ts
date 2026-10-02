@@ -48,9 +48,9 @@ describe("GameMonetize validator", () => {
     assert.ok(codes(result).includes("SLUG_INVALID"));
   });
 
-  it("rejects an unmapped category", () => {
+  it("keeps an unmapped category for review instead of rejecting it", () => {
     const result = validateGameMonetizeGame(gameWithUnmappedCategory);
-    assert.equal(result.status, "REJECTED");
+    assert.equal(result.status, "NEEDS_REVIEW");
     assert.ok(codes(result).includes("CATEGORY_UNMAPPED"));
   });
 

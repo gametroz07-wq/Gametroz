@@ -40,7 +40,7 @@ lib/providers/
   It redirects to `rss.gamemonetize.com` and needs no API key.
 - Item fields (observed 2026-10-01): `id, title, description, instructions, url, category, tags, thumb, width, height`. All are strings, and `tags` is comma-separated.
 - The live feed is **off** unless `GAMEMONETIZE_FEED_ENABLED=true`. By default the adapter uses `fixtures.ts`: clearly marked mock data whose ids start with `fixture-`.
-- Category mapping lives in `gamemonetize/config.ts`. Unmapped categories (3D, AI, 2 Player, Multiplayer…) are rejected until a mapping is added.
+- Category mapping lives in `gamemonetize/config.ts`. Unmapped categories (3D, AI, 2 Player, Multiplayer…) fall back to `casual` with a warning (see "Category mapping").
 - **2026-10-01, first live test:** the live feed sends `Puzzles` (plural) while the RSS builder lists `Puzzle`; `puzzles → puzzle` was added. Other live categories seen (Arcade, Adventure, Shooting, Girls, Racing) were already mapped.
 - Feed text quirks: double-encoded entities (`&amp;mdash;`) and bare words left by the provider sanitizer (`mdash`, `ndash`). `toPlainText` decodes entities in two passes and repairs those words. Missing line breaks (e.g. "playPlayer") are left as-is for manual editing.
 
@@ -75,7 +75,7 @@ lib/providers/
 | Same id repeated in the feed | DUPLICATE_IN_FEED | ignored |
 | Thumbnail present, HTTPS, allowlisted host | THUMBNAIL_* | REJECTED |
 | Embed present, valid, HTTPS, allowlisted host | EMBED_* | REJECTED |
-| Category mapped and present in the DB | CATEGORY_UNMAPPED | REJECTED |
+| Category mapped and present in the DB | CATEGORY_UNMAPPED | warning, falls back to `casual` (stays REVIEW) |
 | Width/height between 200 and 4096 px | SIZE_UNREASONABLE | NEEDS_REVIEW |
 | Description ≥ 40 characters | DESCRIPTION_TOO_SHORT | NEEDS_REVIEW |
 | Instructions present | INSTRUCTIONS_MISSING | NEEDS_REVIEW |
@@ -90,24 +90,30 @@ lib/providers/
   - GameMonetize images: `img.gamemonetize.com`, which `next.config.ts` → `images.remotePatterns` mirrors.
 - Provider text is stripped of HTML and rendered as React text. There is no `dangerouslySetInnerHTML` and provider scripts are never executed.
 - **The iframe** (`components/games/game-embed.tsx`) renders only when `resolveEmbedUrl()` returns a URL:
-  - `GAME_EMBEDS_ENABLED=true` **and** the URL passes the provider allowlist.
-  - `sandbox="allow-scripts allow-same-origin allow-pointer-lock"`. The game runs on its own origin, never Gametroz's, and gets no popups, top navigation, forms or downloads.
-  - `allow="fullscreen; gamepad; autoplay"`, `referrerpolicy="strict-origin-when-cross-origin"`, `loading="lazy"`.
-- **Recommended CSP** for the phase that enables embeds (not applied yet):
+  - Only the allowlisted origin `https://html5.gamemonetize.co` is embedded, and only when `GAME_EMBEDS_ENABLED=true` (`lib/providers/embed.ts`).
+  - `sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups allow-popups-to-escape-sandbox"`:
+    - `allow-scripts` + `allow-same-origin`: required by the game runtime and its storage. Safe here because the game origin is cross-origin to Gametroz.
+    - `allow-pointer-lock`: needed by many games.
+    - `allow-popups` + `allow-popups-to-escape-sandbox`: only so ad clicks inside the game open in a new tab.
+    - **Not allowed:** `allow-top-navigation`, `allow-forms`, `allow-modals`, `allow-downloads`.
+  - `allow="fullscreen; autoplay; gamepad"`, `title="Play <name>"`, `referrerpolicy="strict-origin-when-cross-origin"`, `loading="lazy"`.
+  - Aspect ratio 16:9 (9:16 for portrait games) and Gametroz's own fullscreen button.
+- **CSP** (`lib/security/headers.ts`), per directive, with no wildcards:
 
-```text
-frame-src https://html5.gamemonetize.co;
-img-src 'self' data: https://img.gamemonetize.com;
-```
+| Directive | Value | Why |
+|---|---|---|
+| `frame-src` | `https://html5.gamemonetize.co` (`'none'` when embeds are disabled) | The only embeddable origin |
+| `img-src` | `'self' blob: data:` | Thumbnails from `img.gamemonetize.com` are proxied by `next/image`, so no remote host is needed |
+| `script-src`, `connect-src`, `media-src` | `'self'` | The game's scripts, ads (Google IMA/DoubleClick) and media run inside the nested cross-origin frame and are governed by that frame's CSP, not ours |
 
-  Before enabling it, test that the CSP does not break `next/script`, the theme script or the ads phase.
+  `Permissions-Policy` delegates `fullscreen`, `autoplay` and `gamepad` to `self` and `html5.gamemonetize.co` only when embeds are on.
 
 # 6. Sync service
 
 `syncProviderGames(provider, { prisma, limit, dryRun })`:
 
 1. Upserts the `Provider` row (created with `enabled=false`) and starts an `ImportRecord`.
-2. Fetches at most `limit` games. **The limit is capped at 20 during Phase 4**; anything above throws.
+2. Fetches at most `limit` games. See "Sync batches" below for the allowed sizes.
 3. Deduplicates by provider id.
 4. Validates and normalizes, then checks slug collisions against the database and the current batch.
 5. Upserts by `(providerId, providerGameId)`:
@@ -119,15 +125,45 @@ img-src 'self' data: https://img.gamemonetize.com;
 
 **Dry run** (`dryRun: true`): same pipeline and report, and an `ImportRecord` flagged `dryRun`, but no game is written. It is mandatory before any larger import.
 
+## Sync batches
+
+- `--limit` is required and must be one of `10`, `50`, `100`, `500`.
+- Default safety maximum: 100. `PROVIDER_SYNC_MAX` raises it, up to an absolute maximum of 500.
+- Any batch above 100 also needs `--confirm-large`.
+- Above 100 the client fans out: the newest list plus one query of 100 per category, deduplicated by id. The feed ignores `page` and `amount=all` is broken, so this is the only way to get more than one page.
+
+## Thumbnail check (live sync)
+
+- Checks HTTPS, allowed host, then a `GET` with `Range`: status 200/206, `image/*` content type and decodable dimensions.
+- Unreachable thumbnail: `THUMBNAIL_UNREACHABLE` error (REJECTED). Width below 200 px: `THUMBNAIL_SMALL` warning.
+- `--skip-image-check` disables it. Images still load remotely at runtime.
+
+## Category mapping
+
+Entries in `gamemonetize/config.ts` are either exact or approximate. An unknown category falls back to `casual` with a `CATEGORY_UNMAPPED` warning: the game stays in REVIEW and the sync never fails because of it.
+
+## Editorial filters
+
+`lib/providers/editorial.ts` adds `EDITORIAL_REVIEW_REQUIRED` warnings for:
+- brand names in the title or tags;
+- SEO-spam titles;
+- instructions shorter than 25 characters;
+- an approximate category.
+
+Games are never auto-rejected by these filters. Publishing a game that carries them requires `--ack-editorial` after a human review.
+
 # 7. Publishing
 
 The only way a provider game becomes public:
 
 ```bash
-npm run provider:review                      # list provider games, validation and recent imports
-npm run provider:publish -- --slug <slug>    # REVIEW → PUBLISHED
-npm run build                                # pages are static: rebuild to show it
+npm run provider:review [-- --status REVIEW|PUBLISHED|ARCHIVED|DRAFT|all] [--issues] [--provider x]
+npm run provider:publish -- --slug <slug> | --id <n> | --ids a,b [--ack-editorial]   # REVIEW → PUBLISHED
+npm run provider:archive -- --slug <slug> | --id <n> | --ids a,b                     # take a game offline
 ```
+
+- Publish accepts at most 100 games per call; there is no publish-all.
+- After publish or archive the CLI calls the revalidation endpoint (see `docs/13_DEPLOYMENT.md`), so no redeploy is needed.
 
 `publishGame` refuses a game when:
 - its status is not `REVIEW`;
@@ -143,14 +179,16 @@ npm run build                                # pages are static: rebuild to show
 | `npm run provider:sync:gamemonetize` | Sync fixtures into REVIEW (`-- --limit N`) |
 | `... -- --source live` | Use the real feed (requires `GAMEMONETIZE_FEED_ENABLED=true`) |
 | `npm run provider:review` | Read-only review table |
-| `npm run provider:publish -- --slug <slug>` | Publish one reviewed game |
+| `npm run provider:publish -- --slug <slug>` | Publish reviewed games (`--slug`, `--id`, `--ids`; `--ack-editorial`) |
+| `npm run provider:archive -- --slug <slug>` | Archive games (`--slug`, `--id`, `--ids`) |
 | `npm test` | Mapper, validator, allowlist, embed gate and sync helper tests |
 
 # 9. Environment
 
 ```env
 GAMEMONETIZE_FEED_ENABLED=false   # allow live feed requests
-GAME_EMBEDS_ENABLED=false         # render real iframes (build-time for static pages)
+GAME_EMBEDS_ENABLED=false         # render real iframes; also drives CSP/Permissions-Policy (build-time)
+PROVIDER_SYNC_MAX=100             # optional, default 100, absolute max 500
 ```
 
 `GAMEMONETIZE_API_KEY` from `.env.example` is not used: the documented feed needs no key.
