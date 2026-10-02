@@ -57,6 +57,17 @@ describe("editorial review rules", () => {
       "Labubu Auto Adventure",
       "Chainsaw Man Anime",
       "Brookhaven Real Life",
+      "Red Impostor vs. Crew",
+      "Red and Blue Stickman Huggy",
+      "Hugi Wugi",
+      "Flappy Poppy",
+      "Skibidi Titans Hide And Seek",
+      "HIll climb Racings 2",
+      "Shadowgun War Game",
+      "Fiva 26: Soccer",
+      "Fire Boy Run Adventure",
+      "WorldCup2026",
+      "Cyber Truck Drive Simulator",
     ]) {
       assert.match(messages({ title }), /brand/i, title);
     }
