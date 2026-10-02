@@ -1449,6 +1449,231 @@ export const toolDefinitions: ToolDefinition[] = [
     ],
     localOnly: true,
   },
+  {
+    slug: "image-compressor",
+    name: "Image Compressor (JPEG & WebP)",
+    categorySlug: "images",
+    shortDescription: "Shrink JPEG, PNG and WebP images to JPEG or WebP with a quality slider. Private: nothing is uploaded.",
+    description:
+      "Compress a JPEG, PNG or WebP image to a smaller JPEG or WebP file right in your browser. Choose the quality, optionally limit the width, and compare the original and compressed size before you download. The image never leaves your device.",
+    howTo: [
+      "Drop an image onto the box or choose a file. JPEG, PNG and WebP up to 25 MB are accepted.",
+      "Pick JPEG or WebP and move the quality slider. 80 is a good starting point.",
+      "Optionally set a maximum width to scale large photos down as well.",
+      "Compare the sizes. If the result is larger than the original, keep the original instead.",
+      "Download the compressed image.",
+    ],
+    iconKey: "image",
+    featured: false,
+    sortOrder: 26,
+    tags: ["image-compressor", "compress-image", "jpeg", "webp"],
+    metaTitle: "Image Compressor: Reduce JPEG & WebP Size",
+    metaDescription:
+      "Compress JPEG, PNG and WebP images to smaller JPEG or WebP files with a quality slider and optional max width. Runs in your browser; files are never uploaded.",
+    intro: [
+      "Photos straight from a phone or camera are often several megabytes, which is more than most emails, forms and web pages need. This tool re-encodes your image as JPEG or WebP at the quality you choose, so you can trade a little detail for a much smaller file.",
+      "Everything happens in your browser using the canvas, so the image is never uploaded and it works on a phone as well as a desktop. Nothing is stored; close the tab and it is gone. Re-encoding drops metadata such as EXIF (camera model, GPS location), which is also a privacy benefit.",
+    ],
+    examples: [
+      {
+        input: "4032 × 3024 photo, maximum width 1600",
+        output: "1600 × 1200 px",
+        note: "The height follows the original aspect ratio.",
+      },
+      {
+        input: "1200 × 800 image, maximum width 1600",
+        output: "1200 × 800 px, not enlarged",
+        note: "A maximum width only ever shrinks an image.",
+      },
+      {
+        input: "2,000,000 bytes original, 500,000 bytes result",
+        output: "75% saved",
+        note: "How the saving shown next to the sizes is worked out.",
+      },
+    ],
+    faq: [
+      {
+        question: "Which quality should I choose?",
+        answer:
+          "For photos, 75 to 85 is usually hard to tell apart from the original while being much smaller. Go lower for thumbnails, and higher for images you will edit again.",
+      },
+      {
+        question: "Why is my compressed image bigger than the original?",
+        answer:
+          "Files that are already well compressed, small images and screenshots with flat colors can grow when re-encoded. The tool warns you when that happens so you can keep the original.",
+      },
+      {
+        question: "Is the image metadata kept?",
+        answer:
+          "No. Re-encoding through the canvas drops EXIF data such as the camera model and GPS position. Image orientation is applied to the pixels, so photos still appear the right way up.",
+      },
+      {
+        question: "What happens to transparent PNG areas?",
+        answer:
+          "JPEG cannot store transparency, so transparent areas are filled with white. Choose WebP as the output to keep transparency.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "image-resizer",
+    name: "Image Resizer",
+    categorySlug: "images",
+    shortDescription: "Resize a JPEG, PNG or WebP image by pixels or percentage, with aspect ratio lock. Nothing is uploaded.",
+    description:
+      "Change the dimensions of a JPEG, PNG or WebP image by exact pixels or by percentage, with an optional aspect ratio lock. High-quality downscaling runs in your browser, and the image never leaves your device.",
+    howTo: [
+      "Drop an image onto the box or choose a file.",
+      "Choose Pixels or Percent. In Pixels mode, type a width or height; keep the lock on to preserve the proportions.",
+      "Check the new dimensions and the file size next to the original.",
+      "Download the resized image, which keeps the original format.",
+    ],
+    iconKey: "image",
+    featured: false,
+    sortOrder: 27,
+    tags: ["image-resizer", "resize-image", "image-dimensions", "scale-image"],
+    metaTitle: "Image Resizer: Change Image Size Online",
+    metaDescription:
+      "Resize JPEG, PNG and WebP images by width, height or percentage with aspect ratio lock and smooth downscaling. Free, runs in your browser, no upload.",
+    intro: [
+      "Resize a picture to the exact size a form, profile, store listing or document asks for. Enter a width or a height in pixels, or scale by a percentage; with the lock on, the other side follows automatically so the picture is not stretched.",
+      "Large reductions are done in several halving steps with the browser's highest smoothing quality, which keeps edges cleaner than shrinking in one jump. The work happens on your device; nothing is uploaded or stored. The output keeps the format of the original and drops metadata such as EXIF.",
+    ],
+    examples: [
+      {
+        input: "4000 × 3000, width 1000, aspect ratio locked",
+        output: "1000 × 750 px",
+        note: "The height is calculated from the original proportions.",
+      },
+      { input: "1920 × 1080 at 50%", output: "960 × 540 px", note: "Percent mode scales both sides equally." },
+      {
+        input: "4000 × 3000 down to 400 × 300",
+        output: "2000×1500 → 1000×750 → 500×375 → 400×300",
+        note: "Large reductions are drawn in halving steps for a smoother result.",
+      },
+    ],
+    faq: [
+      {
+        question: "Will making an image bigger improve it?",
+        answer:
+          "No. Enlarging only stretches the existing pixels, so the picture gets softer, not sharper. The tool allows it, up to 50 megapixels, because sometimes an exact size is required.",
+      },
+      {
+        question: "Why is the file size different from the original?",
+        answer:
+          "Resizing re-encodes the image. A smaller picture usually means a smaller file, but a PNG of a photo or an already well-compressed JPEG can behave differently. Compare the two sizes shown before you download.",
+      },
+      {
+        question: "What happens to transparency?",
+        answer:
+          "PNG and WebP keep their transparent areas. JPEG cannot store transparency, so a JPEG never has any to lose.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "png-to-jpg",
+    name: "PNG to JPG Converter",
+    categorySlug: "images",
+    shortDescription: "Convert PNG images to JPG with a background color for transparency and a quality slider. Up to 10 files.",
+    description:
+      "Convert PNG images to JPG in your browser. Pick the background color that replaces transparent areas, set the JPG quality, and convert up to 10 files at once. Files are never uploaded.",
+    howTo: [
+      "Drop up to 10 PNG files onto the box, or choose them from your device.",
+      "Pick the background color for transparent areas. White is the default.",
+      "Set the JPG quality. 90 keeps text and edges crisp; lower values give smaller files.",
+      "Download each converted file with its own button.",
+    ],
+    iconKey: "image",
+    featured: false,
+    sortOrder: 28,
+    tags: ["png-to-jpg", "png-to-jpeg", "convert-image", "transparent-background"],
+    metaTitle: "PNG to JPG Converter: Free, No Upload",
+    metaDescription:
+      "Convert PNG to JPG online with a custom background for transparent areas and adjustable quality. Batch up to 10 files. Everything stays in your browser.",
+    intro: [
+      "JPG files are usually much smaller than PNGs of the same photo, and they are accepted almost everywhere. This converter turns PNG images into JPG without uploading them anywhere, in batches of up to 10.",
+      "JPG has no transparency, so any transparent area of a PNG has to be filled with a solid color. White is used by default, and you can pick any other background color. The converted file does not keep PNG metadata, and everything runs on your device.",
+    ],
+    examples: [
+      { input: "holiday-photo.png", output: "holiday-photo.jpg", note: "The name is kept; only the extension changes." },
+      {
+        input: "PNG with a transparent logo, background #ffffff",
+        output: "Transparent pixels become solid white",
+        note: "Pick another color to match the page the image will sit on.",
+      },
+      { input: "Quality slider at 90", output: "Encoder quality 0.9", note: "The 1 to 100 slider maps to the browser's 0 to 1 setting." },
+    ],
+    faq: [
+      {
+        question: "What happens to the transparent parts of my PNG?",
+        answer:
+          "JPG cannot be transparent, so those areas are filled with the background color you choose, white by default. Pick a color that matches where the image will be used to avoid a visible box.",
+      },
+      {
+        question: "Will the JPG look worse than the PNG?",
+        answer:
+          "JPG is lossy, so tiny differences are possible, especially around sharp text and thin lines. A quality of 90 or above keeps them very close. For screenshots and graphics with flat colors, PNG may be the better format.",
+      },
+      {
+        question: "Is metadata copied to the JPG?",
+        answer: "No. The image is redrawn and re-encoded, so PNG text chunks and color profiles are not carried over.",
+      },
+    ],
+    localOnly: true,
+  },
+  {
+    slug: "webp-to-jpg",
+    name: "WebP to JPG Converter",
+    categorySlug: "images",
+    shortDescription: "Convert WebP images to JPG with a background color for transparency and a quality slider. Up to 10 files.",
+    description:
+      "Convert WebP images to JPG in your browser, with a background color for transparent areas and adjustable quality. Batch up to 10 files. Your files are never uploaded.",
+    howTo: [
+      "Drop up to 10 WebP files onto the box, or choose them from your device.",
+      "Pick the background color for transparent areas. White is the default.",
+      "Set the JPG quality. 85 to 90 is a good balance.",
+      "Download each converted file with its own button.",
+    ],
+    iconKey: "image",
+    featured: false,
+    sortOrder: 29,
+    tags: ["webp-to-jpg", "webp-to-jpeg", "convert-image", "image-format"],
+    metaTitle: "WebP to JPG Converter: Free, No Upload",
+    metaDescription:
+      "Convert WebP to JPG online with a custom background for transparent areas and adjustable quality. Batch up to 10 files. Files stay in your browser.",
+    intro: [
+      "WebP images save bandwidth on websites, but many older apps, print services and upload forms still only accept JPG. This tool converts WebP files to JPG on your device, in batches of up to 10, without uploading anything.",
+      "WebP can contain transparency and JPG cannot, so transparent areas are filled with a background color you choose (white by default). Reading WebP depends on your browser; current versions of Chrome, Edge, Firefox and Safari support it, and the tool tells you if yours does not.",
+    ],
+    examples: [
+      { input: "banner.webp", output: "banner.jpg", note: "The name is kept; only the extension changes." },
+      {
+        input: "WebP with a transparent background, background #ffffff",
+        output: "Transparent pixels become solid white",
+        note: "Choose another color if the image will sit on a colored page.",
+      },
+      { input: "Quality slider at 85", output: "Encoder quality 0.85", note: "The 1 to 100 slider maps to the browser's 0 to 1 setting." },
+    ],
+    faq: [
+      {
+        question: "What happens to transparency in a WebP image?",
+        answer:
+          "JPG cannot store transparency, so transparent areas are filled with the background color you choose, white by default.",
+      },
+      {
+        question: "What about animated WebP files?",
+        answer:
+          "The result is a single still image, normally the first frame. JPG cannot be animated, so use a video or GIF tool if you need the animation.",
+      },
+      {
+        question: "Why does the tool say my browser cannot read WebP?",
+        answer:
+          "Very old browsers cannot decode WebP. Update your browser or open this page in a current Chrome, Edge, Firefox or Safari, then try again.",
+      },
+    ],
+    localOnly: true,
+  },
 ];
 
 const definitionsBySlug = new Map(toolDefinitions.map((tool) => [tool.slug, tool]));

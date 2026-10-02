@@ -30,6 +30,10 @@ export const implementedToolSlugs = [
   "weight-converter",
   "temperature-converter",
   "data-storage-converter",
+  "image-compressor",
+  "image-resizer",
+  "png-to-jpg",
+  "webp-to-jpg",
 ] as const;
 
 export type ImplementedToolSlug = (typeof implementedToolSlugs)[number];

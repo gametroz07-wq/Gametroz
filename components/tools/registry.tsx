@@ -26,6 +26,10 @@ import { LengthWorkspace } from "./workspaces/length-converter";
 import { TemperatureWorkspace } from "./workspaces/temperature-converter";
 import { TipWorkspace } from "./workspaces/tip-calculator";
 import { WeightWorkspace } from "./workspaces/weight-converter";
+import { ImageCompressorWorkspace } from "./workspaces/image-compressor";
+import { ImageResizerWorkspace } from "./workspaces/image-resizer";
+import { PngToJpgWorkspace } from "./workspaces/png-to-jpg";
+import { WebpToJpgWorkspace } from "./workspaces/webp-to-jpg";
 
 /**
  * Maps a tool's componentKey (its slug) to the element that renders it. The type forces an entry
@@ -59,6 +63,10 @@ export const toolWorkspaces: Record<ImplementedToolSlug, ReactElement> = {
   "weight-converter": <WeightWorkspace />,
   "temperature-converter": <TemperatureWorkspace />,
   "data-storage-converter": <DataStorageWorkspace />,
+  "image-compressor": <ImageCompressorWorkspace />,
+  "image-resizer": <ImageResizerWorkspace />,
+  "png-to-jpg": <PngToJpgWorkspace />,
+  "webp-to-jpg": <WebpToJpgWorkspace />,
 };
 
 export function getToolWorkspace(key: string | undefined): ReactElement | undefined {

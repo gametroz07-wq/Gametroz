@@ -37,7 +37,7 @@ Turn /tools into a real, useful, SEO-ready section: 30 working tools, no mocks, 
 - [x] T2 Text tools (7): character-counter, case-converter, remove-duplicate-lines, remove-extra-spaces, text-sorter, slug-generator (word-counter from T1).
 - [x] T3 Developer (5) + Generators (4): base64-encoder-decoder, url-encoder-decoder, timestamp-converter, hash-generator, uuid-generator, password-generator, random-number-generator, qr-code-generator (json-formatter from T1).
 - [x] T4 Calculators (5 new) + Converters (4): discount, age, date-difference, bmi, tip; length, weight, temperature, data-storage.
-- [ ] T5 Image tools (4).
+- [x] T5 Image tools (4): image-compressor, image-resizer, png-to-jpg, webp-to-jpg.
 - [ ] T6 Local data sync (Docker), full checks, responsive 375/768/1440, report. Production sync + push after approval.
 
 ## Checks
@@ -77,3 +77,11 @@ TDD: strict (session config), runner `npm test`. Per task: npm test, lint, typec
 - Route: delegated direct, single writer. Not committed (left for the orchestrator).
 - Decisions: money as integer cents parsed from digits (no floats), half-up rounding once per step, tax after discounts; calendar maths on plain y/m/d values (no time zones), months added with end-of-month clamping, Feb 29 birthday observed on Feb 28 in non-leap years; business days Mon-Fri, end date excluded unless "Include end date", no holidays; BMI category uses the 1-decimal value shown, healthy range = BMI 18.5 to 24.9, adults 20+ and not a diagnosis; temperature converts via kelvin and rejects values below absolute zero; shared UnitConverter (ui/unit-converter.tsx) for length, weight, temperature, storage; length has a Feet + inches input mode; storage has an optional download-time estimate (1 Mbps = 1,000,000 bits/s).
 - Not done: no browser/responsive check (T6); Engram mirror still pending.
+
+### T5 evidence
+- RED: image.test.ts failed (module lib/tools/image missing); examples-images.test.ts failed (4 example lookups + guide resolution + category tests) before the 4 definitions existed. GREEN: 466 tests pass (432 before).
+- Verified: npm test (466 pass), npm run lint (clean), npm run typecheck (clean). tools:sync dry run against local Docker DB only: categories 1 create, 5 update; tools 18 create, 12 update, 4 archive (merge-pdf, pdf-to-jpg, meta-title-preview, unit-converter). Nothing applied.
+- Full catalog of 30 is defined; every tool referenced by prisma/seed-data/guides.ts now resolves (test added), so the seed note from T1 is resolved.
+- Route: delegated direct, single writer. Not committed (left for the orchestrator).
+- Decisions: pure math/validation in lib/tools/image.ts (tested); canvas/decoding in lib/tools/image-browser.ts (not unit-tested, browser-only); limits 25 MB, 50 MP, 16384 px per side, batch 10; downscale in halving steps with imageSmoothingQuality high; JPEG output fills background (white default) before drawing; useConversion hook debounces 150 ms and owns preview object URLs (revoked on replace/clear/unmount); downloads use blob links, no fetch, CSP unchanged (img-src already allows blob:); resizer keeps input format, JPEG/WebP at quality 92; webp-to-jpg detects WebP decode with a 1x1 data URI; shared JpgConverter for png-to-jpg and webp-to-jpg.
+- Not done: no real-browser run of canvas/encoding or responsive check (T6); Engram mirror still pending.
