@@ -68,7 +68,7 @@ describe("image tool definitions", () => {
 
   it("resolves every tool referenced by a guide", () => {
     const defined = new Set(toolDefinitions.map((tool) => tool.slug));
-    const missing = guides.flatMap((guide) => guide.related.tools ?? []).filter((slug) => !defined.has(slug));
+    const missing = guides.flatMap((guide) => guide.tools).filter((slug) => !defined.has(slug));
     assert.deepEqual(missing, []);
   });
 });

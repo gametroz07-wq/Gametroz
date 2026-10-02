@@ -18,6 +18,8 @@ export const metadata = pageMetadata({
   path: "/guides",
 });
 
+export const revalidate = 600;
+
 export default async function GuidesPage() {
   const [featured, sections] = await Promise.all([getFeaturedGuides(3), getGuideSections()]);
   const groups = await Promise.all(

@@ -1,0 +1,336 @@
+import type { GuideDefinition } from "../definitions";
+import { game, gameCards, link, selectionNote } from "./game-links";
+
+// "Best of" lists, part 2: arcade, casual, sports and the all-genres list.
+
+export const arcadeGuide: GuideDefinition = {
+  slug: "best-arcade-games-online",
+  title: "The Best Arcade Games to Play Online",
+  section: "games",
+  excerpt: "Eleven free arcade games for your browser: fighting, idle management, balancing, shooting and hook-swinging, with controls and screen layout for each.",
+  metaTitle: "Best Arcade Games to Play Online Free | Gametroz",
+  publishedAt: "2026-10-02",
+  updatedAt: "2026-10-02",
+  featured: false,
+  sortOrder: 5,
+  tags: ["arcade", "ranking", "quick play"],
+  body: [
+    {
+      type: "answer",
+      text: `Try ${game("halloween-fighters")} for a one-on-one fighter, ${game("heist-idle")} for idle management, or ${game("stickboys-hook")} for swing-and-jump levels. All are free and play in the browser.`,
+    },
+    { type: "h2", text: "How these arcade games were picked" },
+    { type: "p", text: selectionNote("arcade") },
+    { type: "h2", text: "What counts as arcade here" },
+    {
+      type: "p",
+      text: "The arcade category in the catalog is broad: it holds pick-up-and-play games, from fighters and shooters to idle games where you upgrade a business between short bursts of action. The list below covers that range, so you can choose by mood rather than by genre label.",
+    },
+    { type: "h2", text: "Controls and screen layout at a glance" },
+    {
+      type: "table",
+      caption: "Controls and screen orientation of the arcade games in this list",
+      header: ["Game", "Controls", "Screen"],
+      rows: [
+        [game("halloween-fighters"), "Arrow keys or W A S D to move; Z or J punch, X or K kick", "Landscape"],
+        [game("heist-idle"), "W A S D or arrows to move; mouse for buttons and upgrades", "Landscape"],
+        [game("haunted-house-idle"), "W A S D or arrows to move; mouse for menus and upgrades", "Landscape"],
+        [game("extreme-ball-balancer-3d"), "W A S D rolls the ball; mouse moves the camera", "Landscape"],
+        [game("birdy-trip"), "One touch or click", "Portrait"],
+        [game("stickboys-hook"), "Click or tap to rope", "Landscape"],
+        [game("dandan-slime-unblocked"), "Left mouse button or a finger tap to move the slime", "Landscape"],
+        [game("clucknrun"), "A and D keys, or the mouse", "Landscape"],
+        [game("mini-car-simulator"), "On-screen buttons on mobile, with boost and camera buttons", "Landscape"],
+        [game("island-idle-survival"), "Mouse click or tap", "Landscape"],
+        [game("1945-air-force-airplane"), "Mouse click or tap", "Portrait"],
+      ],
+    },
+    { type: "h2", text: "The picks" },
+    { type: "h3", text: "Fighting and shooting" },
+    {
+      type: "p",
+      text: `${game("halloween-fighters")} lets you choose from 11 monsters and fight through 12 haunted arenas to reach three bosses. You combine ten directional punches and kicks, chain combos and break guards. ${game("1945-air-force-airplane")} is a portrait shooter in the sky where you upgrade your plane and defeat enemies. ${game("dandan-slime-unblocked")} is a 2D horde-survival game in which a slime dashes through waves of enemies and collects coins for power-ups.`,
+    },
+    { type: "h3", text: "Idle and management" },
+    {
+      type: "p",
+      text: `${game("heist-idle")} is a 3D idle game in which you rob stores, banks and museums, upgrade your character and recruit crew. ${game("haunted-house-idle")} has you build a haunted attraction, welcome visitors, earn cash and unlock new areas. ${game("island-idle-survival")} asks you to collect wood, stone and food, craft tools and upgrade a raft.`,
+    },
+    { type: "h3", text: "Balance, swing and fly" },
+    {
+      type: "p",
+      text: `${game("extreme-ball-balancer-3d")} has you roll a ball across wooden bridges and narrow rails above deep water, where one wrong move ends the run. ${game("stickboys-hook")} is a 2D game with 20 levels in which you rope and swing to the finish line; falling from the sky loses. ${game("birdy-trip")} is a one-touch portrait game about migrating birds, with more than eight birds to catch and eagles to avoid.`,
+    },
+    { type: "h3", text: "Driving and farm runs" },
+    {
+      type: "p",
+      text: `${game("mini-car-simulator")} has 40 levels across city streets, forests and beach roads, with a booster and camera button. In ${game("clucknrun")} you return lost chickens to their farm while collecting chickens and gasoline and avoiding barrels.`,
+    },
+    gameCards(
+      ["halloween-fighters", "heist-idle", "haunted-house-idle", "extreme-ball-balancer-3d", "birdy-trip", "stickboys-hook", "dandan-slime-unblocked", "clucknrun", "mini-car-simulator", "island-idle-survival", "1945-air-force-airplane"],
+      "Arcade games in this guide",
+    ),
+    { type: "h2", text: "Tips for quick arcade sessions" },
+    {
+      type: "ul",
+      items: [
+        "Idle games are built around upgrading between short bursts of play, which suits short breaks.",
+        "For fighters and runners, click the game first so the keyboard works, and learn the two or three main keys before the extras.",
+        `Many arcade games are 2D and light on hardware; ${link("browser games for low-end PCs", "/guide/browser-games-for-low-end-pcs")} lists some of them.`,
+      ],
+    },
+    { type: "note", title: "More arcade", text: `Browse the whole ${link("arcade category", "/games/arcade")}, or see ${link("the best action games", "/guide/best-action-games-online")} if you want longer missions.` },
+  ],
+};
+
+export const casualGuide: GuideDefinition = {
+  slug: "best-casual-browser-games",
+  title: "The Best Casual Browser Games",
+  section: "games",
+  excerpt: "Twelve free casual browser games for short breaks: one-tap reflex games, drawing, match-three, coloring and a physics quiz, with how each one is played.",
+  metaTitle: "Best Casual Browser Games to Play Free | Gametroz",
+  publishedAt: "2026-10-02",
+  updatedAt: "2026-10-02",
+  featured: false,
+  sortOrder: 7,
+  tags: ["casual", "relaxing", "ranking"],
+  body: [
+    {
+      type: "answer",
+      text: `For a one-tap reflex game try ${game("arrow-patrol")} or ${game("neon-jumper")}; for something calm try ${game("one-line-drawling")} or ${game("magic-coloring-book-for-little-artists")}. All are free in the browser.`,
+    },
+    { type: "h2", text: "How these casual games were picked" },
+    { type: "p", text: selectionNote("casual") },
+    { type: "h2", text: "Choose by mood" },
+    {
+      type: "ul",
+      items: [
+        `Quick reflexes, one input: ${game("arrow-patrol")}, ${game("neon-jumper")}, ${game("balls-vs-lasers")} and ${game("flex-escape")}.`,
+        `Aim and release: ${game("world-archery-league")}, ${game("throw-sword")} and ${game("pixel-destroyer")}.`,
+        `Relaxed and creative: ${game("one-line-drawling")} and ${game("magic-coloring-book-for-little-artists")}.`,
+        `Match and think: ${game("crazy-three-puzzle")} and ${game("sink-or-float")}.`,
+        `Caring and building: ${game("panda-lu-treehouse")}.`,
+      ],
+    },
+    { type: "h2", text: "How each game is played" },
+    {
+      type: "table",
+      caption: "Input and screen orientation of the casual games in this list",
+      header: ["Game", "What you do", "Screen"],
+      rows: [
+        [game("arrow-patrol"), "Click to make the arrow switch between up and down, and avoid saws", "Landscape"],
+        [game("throw-sword"), "A and D or left and right arrows to rotate, Z to collect and throw the sword", "Landscape"],
+        [game("world-archery-league"), "Mouse click or tap to play an archery sport simulation", "Landscape"],
+        [game("magic-coloring-book-for-little-artists"), "Hold the screen to draw an outline, then color it", "Portrait"],
+        [game("neon-jumper"), "Tap to jump, tap again to double jump", "Landscape"],
+        [game("crazy-three-puzzle"), "Tap and hold the left mouse button to play 3D match-three", "Landscape"],
+        [game("pixel-destroyer"), "Drag to aim, release to fire a burst of balls", "Landscape"],
+        [game("one-line-drawling"), "Line-drawing levels you can play for relaxation or as puzzles", "Portrait"],
+        [game("balls-vs-lasers"), "Control two balls and avoid incoming lasers", "Portrait"],
+        [game("sink-or-float"), "Select an object and decide whether it sinks or floats", "Landscape"],
+        [game("panda-lu-treehouse"), "Mouse click or tap to care for a panda and build a tree house", "Landscape"],
+        [game("flex-escape"), "Move left or right to dodge thrown objects", "Portrait"],
+      ],
+    },
+    { type: "h2", text: "The picks" },
+    { type: "h3", text: "One-input reflex games" },
+    {
+      type: "p",
+      text: `In ${game("arrow-patrol")} the arrow keeps moving up and down and a click changes its direction; a collision with a saw ends the game. ${game("neon-jumper")} guides a small green square through glowing circuits: tap to jump, tap again to double jump, and survive as long as you can. ${game("balls-vs-lasers")} has you control two balls and place balls of the same color against the matching laser. ${game("flex-escape")} keeps you on a mat, dodging furniture and appliances by flexing left or right while collecting gems.`,
+    },
+    { type: "h3", text: "Aim and release" },
+    {
+      type: "p",
+      text: `${game("world-archery-league")} is an archery sport simulation with realistic physics. ${game("throw-sword")} is a stickman game about aiming and throwing swords at opponents. ${game("pixel-destroyer")} is a physics arcade puzzle where bouncing balls destroy pixel shapes within a limited number of shots.`,
+    },
+    { type: "h3", text: "Calm, creative and curious" },
+    {
+      type: "p",
+      text: `${game("one-line-drawling")} offers relaxing line drawing and puzzle-style line drawing. ${game("magic-coloring-book-for-little-artists")} is described as a calm game for kids: a marker draws an outline while the player holds the screen, and then the picture is colored. ${game("sink-or-float")} asks you to predict whether objects sink or float, and earns points for correct answers. ${game("crazy-three-puzzle")} is a 3D triple-match puzzle with hundreds of levels, and ${game("panda-lu-treehouse")} is a simulator in which you build a tree house and look after a panda.`,
+    },
+    gameCards(
+      ["arrow-patrol", "throw-sword", "world-archery-league", "magic-coloring-book-for-little-artists", "neon-jumper", "crazy-three-puzzle", "pixel-destroyer", "one-line-drawling", "balls-vs-lasers", "sink-or-float", "panda-lu-treehouse", "flex-escape"],
+      "Casual games in this guide",
+    ),
+    { type: "h2", text: "Tips for casual play" },
+    {
+      type: "ul",
+      items: [
+        "Most of these games need only a click or tap, so they work on a phone as well as a computer.",
+        "Portrait games suit a phone held upright; landscape ones are better on a laptop or a phone turned sideways.",
+        `Looking for a mental workout instead? See ${link("the best puzzle games", "/guide/best-puzzle-games-online")}.`,
+      ],
+    },
+    { type: "note", title: "More casual games", text: `Every title is listed in the ${link("casual category", "/games/casual")}.` },
+  ],
+};
+
+export const sportsGuide: GuideDefinition = {
+  slug: "best-sports-games-online",
+  title: "The Best Sports Games to Play Online",
+  section: "games",
+  excerpt: "Ten free sports games for your browser: football, basketball, pool, mini golf and motocross, with modes, controls and screen layout for each.",
+  metaTitle: "Best Sports Games to Play Online Free | Gametroz",
+  publishedAt: "2026-10-02",
+  updatedAt: "2026-10-02",
+  featured: false,
+  sortOrder: 6,
+  tags: ["sports", "football", "basketball"],
+  body: [
+    {
+      type: "answer",
+      text: `For football try ${game("dream-football-game")}, for basketball ${game("basketball-school")}, and for pool ${game("mini-pool-3d")}. All ten games below are free and run in the browser.`,
+    },
+    { type: "h2", text: "How these sports games were picked" },
+    { type: "p", text: selectionNote("sports") },
+    { type: "p", text: "The sports category is smaller than most, so this list covers a large share of what it holds, from football and basketball to pool, mini golf and motocross." },
+    { type: "h2", text: "Modes and controls at a glance" },
+    {
+      type: "table",
+      caption: "Sport, controls and screen orientation of the sports games in this list",
+      header: ["Game", "Sport and controls", "Screen"],
+      rows: [
+        [game("dream-football-game"), "Football: K sprint, N short pass, M long pass, Space shoot, W A S D or arrows to move", "Landscape"],
+        [game("mini-pool-3d"), "Pool: mouse click or tap", "Landscape"],
+        [game("flick-shot-soccer"), "Soccer: drag to aim, release to kick", "Portrait"],
+        [game("crazy-kick-ball"), "Soccer: dribble, fake the keeper and shoot", "Portrait"],
+        [game("basketball-school"), "Basketball: drag the left mouse button to aim, release to shoot", "Landscape"],
+        [game("basketball-arcade"), "Basketball: W A S D move, mouse aims, left click shoots, Space jumps", "Landscape"],
+        [game("basketball-park"), "Basketball: drag and release to shoot", "Landscape"],
+        [game("mini-golf-3d"), "Mini golf: aim, charge and strike with the mouse or a tap", "Landscape"],
+        [game("football-kick-3d"), "Football: charge through defenders and score", "Portrait"],
+        [game("super-motocross"), "Motocross: balance and accelerate over ramps and jumps", "Landscape"],
+      ],
+    },
+    { type: "h2", text: "The picks" },
+    { type: "h3", text: "Football and soccer" },
+    {
+      type: "p",
+      text: `${game("dream-football-game")} covers penalty kicks, free kicks and fast-paced matches with sprint, short-pass and long-pass keys. ${game("flick-shot-soccer")} is a portrait shooting game where you drag to aim and release to kick, and smart angles and timing matter. ${game("crazy-kick-ball")} has you dribble past defenders, fake the keeper and shoot, with skins to choose from. In ${game("football-kick-3d")} you smash through defenders with tackles to steal possession and score.`,
+    },
+    { type: "h3", text: "Basketball" },
+    {
+      type: "p",
+      text: `${game("basketball-school")} has arcade, time attack and distance modes; arcade mode gives you 10 balls and gets harder every time you score. ${game("basketball-arcade")} gives you 20 balls to take free throws from different angles and distances against a time limit. ${game("basketball-park")} starts with 10 balls, rewards shots that do not touch the rim with extra balls, and mentions a leaderboard.`,
+    },
+    { type: "h3", text: "Pool, golf and motocross" },
+    {
+      type: "p",
+      text: `${game("mini-pool-3d")} offers Classic free play, 20 Arcade levels and a Time Attack mode. ${game("mini-golf-3d")} has more than 40 levels with sand traps that slow the ball and water hazards that cost a stroke; gems unlock colored balls. ${game("super-motocross")} is a dirt-bike game with ramps, jumps and obstacles where you balance and accelerate to the finish.`,
+    },
+    { type: "h2", text: "Choosing between them" },
+    {
+      type: "ul",
+      items: [
+        `Full matches with passing and sprinting: ${game("dream-football-game")}, which uses several keys, so it suits a keyboard.`,
+        `Short rounds with one gesture: ${game("flick-shot-soccer")}, ${game("basketball-park")} and ${game("mini-golf-3d")} all use a drag or tap to aim and shoot.`,
+        `Modes and levels to work through: ${game("basketball-school")} has three modes, ${game("mini-pool-3d")} has 20 Arcade levels, and ${game("mini-golf-3d")} has more than 40 courses.`,
+        `Contact and physics: ${game("football-kick-3d")} rewards tackling through defenders, and ${game("super-motocross")} is about balance on ramps.`,
+      ],
+    },
+    gameCards(
+      ["dream-football-game", "mini-pool-3d", "flick-shot-soccer", "crazy-kick-ball", "basketball-school", "basketball-arcade", "basketball-park", "mini-golf-3d", "football-kick-3d", "super-motocross"],
+      "Sports games in this guide",
+    ),
+    { type: "h2", text: "Tips for sports games in the browser" },
+    {
+      type: "ul",
+      items: [
+        "Aim-and-release games (basketball, mini golf, flick soccer) are easier with a mouse or a finger than with a trackpad: drag slowly and watch the aim line.",
+        `Football matches such as ${game("dream-football-game")} use several keys, so open the controls screen before kickoff.`,
+        `Portrait games like ${game("flick-shot-soccer")} suit a phone held upright; read ${link("how to play games in fullscreen", "/guide/how-to-play-games-in-fullscreen")} for both layouts.`,
+      ],
+    },
+    { type: "note", title: "More sports", text: `All of them are in the ${link("sports category", "/games/sports")}; for driving instead, see ${link("the best racing games", "/guide/best-racing-games-online")}.` },
+  ],
+};
+
+export const freeBrowserGamesGuide: GuideDefinition = {
+  slug: "best-free-browser-games",
+  title: "The Best Free Browser Games to Play Now",
+  section: "games",
+  excerpt: "Fourteen free browser games across racing, puzzle, action, arcade, casual, sports and adventure: no download, no account, with controls for each.",
+  metaTitle: "Best Free Browser Games to Play Now | Gametroz",
+  publishedAt: "2026-10-02",
+  updatedAt: "2026-10-02",
+  featured: true,
+  sortOrder: 1,
+  tags: ["free games", "browser games", "ranking"],
+  body: [
+    {
+      type: "answer",
+      text: `Good places to start are ${game("drift-car-driving")} for racing, ${game("pondhero")} for puzzles and ${game("steel-directive-city-zero")} for action. All fourteen games below are free, run in your browser and need no download.`,
+    },
+    { type: "h2", text: "How these games were picked" },
+    {
+      type: "p",
+      text: "This list takes two games from each of the seven main categories in the Gametroz catalog, choosing from the top of each category according to the popularity rankings that the game provider's feeds supply (most played, best games, hot games and editor picks). We left out games built around third-party brands. It is a curated starting list, not a test result, and Gametroz does not publish ratings or scores.",
+    },
+    { type: "h2", text: "The games at a glance" },
+    {
+      type: "table",
+      caption: "Category, controls and screen orientation of the games in this list",
+      header: ["Game", "Category", "Controls", "Screen"],
+      rows: [
+        [game("drift-car-driving"), "Racing", "W A S D or arrow keys", "Landscape"],
+        [game("monsters-wheels-2"), "Racing", "Arrow keys or W A S D, Space or X for nitro", "Landscape"],
+        [game("pondhero"), "Puzzle", "Click the remembered path", "Landscape"],
+        [game("pixel-flow"), "Puzzle", "Tap to send cannons onto the conveyor", "Landscape"],
+        [game("steel-directive-city-zero"), "Action", "A and D move, Space jump, mouse click or J shoot", "Landscape"],
+        [game("call-of-tanks"), "Action", "Click or tap cards to deploy tanks", "Landscape"],
+        [game("halloween-fighters"), "Arcade", "Arrow keys or W A S D; Z or J punch, X or K kick", "Landscape"],
+        [game("stickboys-hook"), "Arcade", "Click or tap to rope", "Landscape"],
+        [game("world-archery-league"), "Casual", "Mouse click or tap", "Landscape"],
+        [game("arrow-patrol"), "Casual", "Click to change the arrow's direction", "Landscape"],
+        [game("dream-football-game"), "Sports", "W A S D or arrows; K, N, M and Space for sprint, passes and shot", "Landscape"],
+        [game("mini-pool-3d"), "Sports", "Mouse click or tap", "Landscape"],
+        [game("octopus-run"), "Adventure", "W A S D or mouse", "Landscape"],
+        [game("farming-simulation-game"), "Adventure", "W A S D or arrows to drive and steer the tractor", "Landscape"],
+      ],
+    },
+    { type: "h2", text: "Racing" },
+    {
+      type: "p",
+      text: `${game("drift-car-driving")} is a 3D driving game about highway drifting. ${game("monsters-wheels-2")} offers 24 monster-truck levels across jungles, a beach, an amusement park and the Arizona desert. More in our guide to ${link("the best racing games", "/guide/best-racing-games-online")}.`,
+    },
+    { type: "h2", text: "Puzzle" },
+    {
+      type: "p",
+      text: `${game("pondhero")} is a memory puzzle: a safe path across a pond appears, disappears, and you guide a frog along the same route. In ${game("pixel-flow")}, cannons fire at pixel blocks of their own color and you manage the order of shots. See ${link("the best puzzle games", "/guide/best-puzzle-games-online")} for more.`,
+    },
+    { type: "h2", text: "Action" },
+    {
+      type: "p",
+      text: `${game("steel-directive-city-zero")} is a 2D action shooter with 20 missions. ${game("call-of-tanks")} lets you deploy tank units from cards and upgrade your defenses. Action games can involve combat, so check each description. More in ${link("the best action games", "/guide/best-action-games-online")}.`,
+    },
+    { type: "h2", text: "Arcade" },
+    {
+      type: "p",
+      text: `${game("halloween-fighters")} has 11 monsters, 12 haunted arenas and three bosses. ${game("stickboys-hook")} is a 2D swinging game with 20 levels. Try ${link("more arcade games", "/guide/best-arcade-games-online")}.`,
+    },
+    { type: "h2", text: "Casual" },
+    {
+      type: "p",
+      text: `${game("world-archery-league")} is an archery sport simulation. ${game("arrow-patrol")} is a one-click reflex game in which an arrow moves up and down and a click changes its direction. See ${link("the best casual games", "/guide/best-casual-browser-games")}.`,
+    },
+    { type: "h2", text: "Sports" },
+    {
+      type: "p",
+      text: `${game("dream-football-game")} covers penalty kicks, free kicks and fast-paced matches. ${game("mini-pool-3d")} has Classic free play, 20 Arcade levels and Time Attack. More in ${link("the best sports games", "/guide/best-sports-games-online")}.`,
+    },
+    { type: "h2", text: "Adventure" },
+    {
+      type: "p",
+      text: `${game("octopus-run")} is an underwater runner in which you hunt divers and fish, dodge obstacles and upgrade your abilities. ${game("farming-simulation-game")} has you drive tractors, plant crops and harvest while completing farming missions.`,
+    },
+    gameCards(
+      ["drift-car-driving", "monsters-wheels-2", "pondhero", "pixel-flow", "steel-directive-city-zero", "call-of-tanks", "halloween-fighters", "stickboys-hook", "world-archery-league", "arrow-patrol", "dream-football-game", "mini-pool-3d", "octopus-run", "farming-simulation-game"],
+      "Free browser games in this guide",
+    ),
+    { type: "h2", text: "Playing without a download" },
+    {
+      type: "p",
+      text: `These games run in the page itself, so there is nothing to install. ${link("Games you can play without downloading", "/guide/games-you-can-play-without-downloading")} explains how that works and how to stay safe, and ${link("how to play in fullscreen", "/guide/how-to-play-games-in-fullscreen")} shows how to get a bigger view. Prefer to browse? Open a whole category such as ${link("racing", "/games/racing")}, ${link("puzzle", "/games/puzzle")} or ${link("adventure", "/games/adventure")}.`,
+    },
+  ],
+};

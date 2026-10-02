@@ -10,7 +10,7 @@ import { getGuideSection, getGuideSections, getGuidesBySection } from "@/lib/cat
 import { pageMetadata } from "@/lib/seo/metadata";
 import { extendDescription } from "@/lib/seo/templates";
 
-export const dynamicParams = false;
+export const revalidate = 600;
 
 export async function generateStaticParams() {
   return (await getGuideSections()).map((section) => ({ section: section.slug }));

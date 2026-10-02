@@ -23,7 +23,8 @@
     "db:seed:deploy": "node scripts/deploy-seed.mjs",
     "provider:archive": "tsx scripts/provider-archive.ts",
     "tools:sync": "tsx scripts/tools-sync.ts",
-    "apps:sync": "tsx scripts/apps-sync.ts"
+    "apps:sync": "tsx scripts/apps-sync.ts",
+    "guides:sync": "tsx scripts/guides-sync.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",

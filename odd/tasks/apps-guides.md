@@ -35,7 +35,7 @@ Games, Tools and Apps. Local only: no push, no deploy, no production DB writes.
 - [x] G0 Dependency overrides (931e7d1).
 - [x] A1 Apps infra + first batch of app definitions (45 apps; uncommitted, awaiting review/commit).
 - [x] A2 Remaining app definitions (105 total; uncommitted, awaiting review/commit).
-- [ ] B1 Guides infra + game guides.
+- [x] B1 Guides infra + game guides (uncommitted, awaiting review/commit).
 - [ ] B2 Tool guides.
 - [ ] B3 Software guides.
 - [ ] E  Local integration: Docker DB with games copied read-only from production + tools/apps/guides sync; crawl, responsive, console/CSP, validations; report.
@@ -70,6 +70,23 @@ Games, Tools and Apps. Local only: no push, no deploy, no production DB writes.
   catalog keep none. Tests: featured cap raised 6 -> 8; new invariant (>= 4 apps per category, >= 10 per platform, >= 95 apps);
   extra official hosts allowed for zoom (zoom.us), powertoys (github.com), google-docs, microsoft-to-do, icloud-for-windows.
 - Dry run against local Docker: apps 89 create / 16 update / 0 archive; platforms 1 create / 1 rename / 4 update; categories 5 create / 6 update. Nothing applied.
+
+## B1 evidence (2026-10-02)
+- Infra: block model in types/content.ts (answer, h2, h3, p, ul, ol, steps, table, items, note) with pure helpers in lib/guides/blocks.ts
+  (internal-link parsing and validation, reference extraction, word count, reading minutes at 230 wpm, min 1). Source of truth:
+  lib/guides/definitions.ts (+ content/*.ts); lib/guides/sync-plan.ts; scripts/guides-sync.ts; npm run guides:sync (dry run by default,
+  --apply, --confirm-archive above 10). Seed derives from the definitions. Guide relations to games/tools/apps are derived from every
+  reference in the body; `--apply` refuses when a game is missing/unpublished, a tool/app is undefined or not yet in the DB, a guide
+  link is unknown or a listing page does not exist. updatedAt comes from the definition (written explicitly to Guide.updatedAt, no
+  schema change) and is shown as "Updated ..." with dateModified in the Article JSON-LD; no byline. ISR: guide pages 3600 s, /guides and
+  /guides/[section] 600 s, dynamicParams=false removed.
+- Games guides (10, all 2026-10-02, 619-763 words, 6-14 game links each, every linked game also shown as a card): best-free-browser-games,
+  best-racing-games-online (rewrite), best-puzzle-games-online, best-action-games-online, best-arcade-games-online, best-sports-games-online,
+  best-casual-browser-games, browser-games-for-low-end-pcs, games-you-can-play-without-downloading, how-to-play-games-in-fullscreen (rewrite).
+  Selection wording (true per docs/12): picked from the top of each category by the provider popularity rankings, brand titles excluded,
+  "not a test result". 74 distinct published games referenced. Tools/apps guides ported as-is (7) with a closing items block so relations survive.
+- Dry run against local Docker: guides 8 create / 9 update / 0 unchanged / 1 archive (puzzle-games-for-beginners); references 74 games,
+  7 tools, 6 apps, 0 problems. Nothing applied.
 
 ## Checks
 TDD strict, `npm test`; per task lint + typecheck; final prisma validate, build, npm audit.

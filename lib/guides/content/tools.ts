@@ -1,0 +1,72 @@
+import type { GuideDefinition } from "../definitions";
+
+// Tools guides. Ported from the original seed as-is (B2 rewrites them). The closing "items" block keeps the
+// links to the tools each guide was already about, now that relations derive from the body.
+
+export const toolGuides: GuideDefinition[] = [
+  {
+    slug: "how-to-compress-images",
+    title: "How to Compress Images Without Losing Quality",
+    section: "tools",
+    excerpt: "Make photos smaller for the web or email while keeping them sharp: choose a format, resize first, then compress step by step with free tools.",
+    metaTitle: "Compress Images Without Losing Quality | Gametroz",
+    publishedAt: "2026-09-10",
+    updatedAt: "2026-09-10",
+    featured: true,
+    sortOrder: 20,
+    tags: ["images", "compression", "web"],
+    body: [
+      { type: "p", text: "Large images slow down websites and fill up mailboxes. The good news: most photos can lose half of their file size with no visible difference." },
+      { type: "h2", text: "Pick the right format" },
+      { type: "ul", items: ["JPG for photos with many colors.", "PNG for screenshots, logos and transparency.", "WebP when you want the smallest file and your audience uses modern browsers."] },
+      { type: "h2", text: "Resize before you compress" },
+      { type: "p", text: "A 4000-pixel photo shown at 1200 pixels wastes bandwidth. Resize it to the size it will be displayed, then compress it." },
+      { type: "h2", text: "Compress step by step" },
+      { type: "ol", items: ["Open the Image Compressor.", "Drop your images.", "Start at 80% quality and compare.", "Download the result."] },
+      { type: "p", text: "Keep the original file in case you need to edit it again later." },
+      { type: "items", title: "Tools in this guide", refs: [{ kind: "tool", slug: "image-compressor" }, { kind: "tool", slug: "image-resizer" }, { kind: "tool", slug: "webp-to-jpg" }] },
+    ],
+  },
+  {
+    slug: "how-to-format-json",
+    title: "How to Format and Validate JSON",
+    section: "tools",
+    excerpt: "Turn messy, minified JSON into readable, valid data in seconds, and learn the three mistakes that cause most JSON errors.",
+    metaTitle: "How to Format and Validate JSON | Gametroz",
+    publishedAt: "2026-09-18",
+    updatedAt: "2026-09-18",
+    featured: false,
+    sortOrder: 21,
+    tags: ["json", "developer", "format"],
+    body: [
+      { type: "p", text: "Minified JSON is great for machines and hard for people. Formatting it adds indentation so you can read and debug it." },
+      { type: "h2", text: "Common JSON errors" },
+      { type: "ul", items: ["Trailing commas after the last item.", "Single quotes instead of double quotes.", "Unquoted property names."] },
+      { type: "h2", text: "Format it" },
+      { type: "ol", items: ["Paste your JSON into the JSON Formatter.", "Click Format.", "Fix any error it reports.", "Copy the clean output."] },
+      { type: "items", title: "Tools in this guide", refs: [{ kind: "tool", slug: "json-formatter" }, { kind: "tool", slug: "base64-encoder-decoder" }] },
+    ],
+  },
+  {
+    slug: "how-to-calculate-percentages",
+    title: "How to Calculate Percentages Quickly",
+    section: "tools",
+    excerpt: "Three formulas cover most everyday percentage questions, from discounts and tips to growth, each with a worked example and a calculator.",
+    metaTitle: "How to Calculate Percentages Quickly | Gametroz",
+    publishedAt: "2026-07-30",
+    updatedAt: "2026-07-30",
+    featured: false,
+    sortOrder: 22,
+    tags: ["math", "percentage", "calculator"],
+    body: [
+      { type: "p", text: "Most everyday percentage questions use one of three formulas." },
+      { type: "h2", text: "X% of a number" },
+      { type: "p", text: "Multiply the number by X and divide by 100. For example, 20% of 50 is 10." },
+      { type: "h2", text: "What percent is A of B" },
+      { type: "p", text: "Divide A by B and multiply by 100. For example, 15 of 60 is 25%." },
+      { type: "h2", text: "Percentage change" },
+      { type: "p", text: "Subtract the old value from the new one, divide by the old value and multiply by 100." },
+      { type: "items", title: "Tools in this guide", refs: [{ kind: "tool", slug: "percentage-calculator" }, { kind: "tool", slug: "discount-calculator" }] },
+    ],
+  },
+];

@@ -134,6 +134,7 @@ export function toGuide(row: GuideRow): Guide {
     excerpt: row.excerpt,
     section: row.section.toLowerCase() as GuideSection,
     publishedAt: isoDate(row.publishedAt),
+    updatedAt: isoDate(row.updatedAt),
     readingMinutes: row.readingMinutes,
     featured: row.featured,
     tags: row.tags.map((tag) => tag.slug),

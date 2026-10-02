@@ -165,22 +165,29 @@ async function seedApps() {
 }
 
 async function seedGuides() {
-  for (const [index, guide] of guides.entries()) {
+  // Guides reference games that only exist once the real catalog is published, so a fresh seed (mock games)
+  // connects only the games, tools and apps that exist. `npm run guides:sync` verifies every reference instead.
+  const existing = async (rows: Promise<{ slug: string }[]>, slugs: string[]) => {
+    const found = new Set((await rows).map((row) => row.slug));
+    return bySlug(slugs.filter((slug) => found.has(slug)));
+  };
+  for (const guide of guides) {
     const data = {
       title: guide.title,
       excerpt: guide.excerpt,
-      section: guide.section.toUpperCase() as "GAMES" | "TOOLS" | "APPS",
-      body: guide.body as Prisma.InputJsonValue,
+      section: guide.section as "GAMES" | "TOOLS" | "APPS",
+      body: guide.body as unknown as Prisma.InputJsonValue,
       readingMinutes: guide.readingMinutes,
       status: PUBLISHED,
       featured: guide.featured,
-      sortOrder: index,
-      publishedAt: new Date(`${guide.publishedAt}T00:00:00Z`),
+      sortOrder: guide.sortOrder,
+      publishedAt: new Date(guide.publishedAt),
+      updatedAt: new Date(guide.updatedAt),
     };
     const relations = {
-      games: bySlug(guide.related.games),
-      tools: bySlug(guide.related.tools),
-      apps: bySlug(guide.related.apps),
+      games: await existing(prisma.game.findMany({ where: { slug: { in: guide.games } }, select: { slug: true } }), guide.games),
+      tools: await existing(prisma.tool.findMany({ where: { slug: { in: guide.tools } }, select: { slug: true } }), guide.tools),
+      apps: await existing(prisma.app.findMany({ where: { slug: { in: guide.apps } }, select: { slug: true } }), guide.apps),
       tags: tagRefs(guide.tags),
     };
     await prisma.guide.upsert({

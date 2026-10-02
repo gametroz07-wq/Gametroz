@@ -128,11 +128,26 @@ export type App = AppSummary & {
 
 export type GuideSection = "games" | "tools" | "apps";
 
+export type GuideItemRef = { kind: "game" | "tool" | "app"; slug: string };
+
+/**
+ * Structured guide content, validated by lib/guides/blocks.ts. Text fields (except headings) may hold
+ * internal links written as `[label](/game/slug)`; guides never contain raw HTML.
+ */
 export type GuideBlock =
+  /** Short direct answer shown in a box at the top (one to three sentences). */
+  | { type: "answer"; text: string }
   | { type: "h2"; text: string }
+  | { type: "h3"; text: string }
   | { type: "p"; text: string }
   | { type: "ul"; items: string[] }
-  | { type: "ol"; items: string[] };
+  | { type: "ol"; items: string[] }
+  /** Numbered how-to steps. */
+  | { type: "steps"; items: string[] }
+  | { type: "table"; caption: string; header: string[]; rows: string[][] }
+  /** Cards for referenced games, tools or apps; unpublished references render nothing. */
+  | { type: "items"; title?: string; refs: GuideItemRef[] }
+  | { type: "note"; title?: string; text: string };
 
 export type GuideSummary = {
   slug: string;
@@ -144,6 +159,8 @@ export type GuideSummary = {
 };
 
 export type Guide = GuideSummary & {
+  /** ISO date of the last editorial update, shown on the page. */
+  updatedAt: string;
   featured: boolean;
   tags: string[];
   body: GuideBlock[];
