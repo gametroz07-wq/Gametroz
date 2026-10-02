@@ -153,7 +153,7 @@ npm run provider:sync:gamemonetize   -- --source plan --plan-file plan.json --of
 | Field | Value |
 |---|---|
 | `trending` | the game is in the trending group |
-| `featured` | the game is in the editorpicks feed |
+| `featured` | never written by sync: a small editorial selection (12–24 games) set by hand |
 | `popularity` | band by primary source (best 4000, hot 3000, trending 2000, editors_pick 1000) + `999 - (rank - 1)` |
 
 A plan sync writes these for new and REVIEW games and also refreshes them on already PUBLISHED provider games (ranking is catalog metadata, not editorial content); name, slug, description and status are still never touched. Without plan metadata nothing changes.

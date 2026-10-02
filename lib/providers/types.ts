@@ -64,7 +64,7 @@ export type NormalizedGame = {
   status: "REVIEW";
   /**
    * Catalog ranking metadata from a popularity plan. Optional: without it a sync behaves exactly as
-   * before. Written to `popularity`, `trending` and `featured` (ranking, not editorial content).
+   * before. Written to `popularity` and `trending` (ranking); `featured` stays an editorial choice.
    */
   popularity?: { source: string; rank: number; score: number; trending: boolean; featured: boolean };
 };

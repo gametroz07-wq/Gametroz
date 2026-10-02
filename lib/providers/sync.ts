@@ -273,10 +273,10 @@ export async function syncProviderGames<TRaw>(
   return result;
 }
 
+// `featured` is an editorial selection (a handful of games), so sync never writes it.
 const popularityFields = (popularity: NonNullable<NormalizedGame["popularity"]>) => ({
   popularity: popularity.score,
   trending: popularity.trending,
-  featured: popularity.featured,
 });
 
 async function writeGame({

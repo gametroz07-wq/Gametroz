@@ -64,7 +64,7 @@ const run = (prisma: PrismaClient, entries: PlanEntry[], dryRun = false) =>
   syncProviderGames(createGameMonetizeProvider("plan", entries), { prisma, limit: 100, dryRun });
 
 describe("sync with popularity metadata", () => {
-  it("writes popularity, trending and featured on new games and reports the source", async () => {
+  it("writes popularity and trending on new games, never featured (editorial), and reports the source", async () => {
     const { prisma, calls } = fakePrisma();
     const result = await run(prisma, [
       entry(raw("p1", "Alpha Racer"), { source: "trending", sourceRank: 3, inTrending: true, inEditorsPick: true }),
@@ -72,7 +72,7 @@ describe("sync with popularity metadata", () => {
     assert.equal(result.created, 1);
     assert.equal(calls[0].data.popularity, 2997);
     assert.equal(calls[0].data.trending, true);
-    assert.equal(calls[0].data.featured, true);
+    assert.ok(!("featured" in calls[0].data), "featured is an editorial decision, not set by sync");
     assert.equal(result.items[0].source, "trending");
   });
 
@@ -93,7 +93,7 @@ describe("sync with popularity metadata", () => {
     assert.ok("name" in (byId.get("g1") ?? {}));
 
     assert.equal(byId.get("g2")?.popularity, 3998);
-    assert.equal(byId.get("g2")?.featured, true);
+    assert.ok(!("featured" in (byId.get("g2") ?? {})), "sync never overwrites the editorial featured selection");
     assert.ok(!("name" in (byId.get("g2") ?? {})), "published game keeps its editorial content");
     assert.ok("embedUrl" in (byId.get("g2") ?? {}), "published game still gets technical fields");
 

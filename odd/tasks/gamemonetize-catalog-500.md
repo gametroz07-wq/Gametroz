@@ -19,7 +19,7 @@ popularity, quality and variety, using the existing sync → review → publish 
 
 ## Popularity storage (existing fields only)
 - `trending = true` when the game is in the Trending (mostplayed) group.
-- `featured = true` when the game is in Editors' Picks.
+- `featured` is editorial, not written by sync: 21 games (3 per category) that are both Best Games and Editors' Picks, no warnings, no brand in title/description.
 - `popularity` band by primary source: best 4000+, hot 3000+, trending 2000+, editors_pick 1000+ (plus rank inside the band).
   Popular Games (by popularity) therefore surfaces Best/Hot; Trending Now uses the trending flag.
 - New Games: `publishedAt`; publish batches in ascending provider id so newer games get later timestamps.
@@ -45,5 +45,6 @@ popularity, quality and variety, using the existing sync → review → publish 
 - Native review (gentle-ai) unavailable: binary not executable.
 - Verification: 21 games load in production (200, iframe, fullscreen, mobile, 0 CSP errors, 0 popups, no navigation); gameplay visible for 19, the other 2 kept showing preroll ads under automation. Search, health, SEO OK. Local: 118 tests, prisma validate, lint, typecheck, build OK.
 - Final prod: 940 games: 500 PUBLISHED, 410 REVIEW, 30 ARCHIVED. Lists: odd/tasks/gamemonetize-catalog-500-review.md.
-- Next: push cf8bc29 (home Action section + bounded prerender) after user approval; featured flag is too broad (449/500).
+- Final corrections: featured reduced from 449 to 21 (plus 5 archived seeds cleared); Fall Bros (5023) and Super RunCraft (4990) moved back to REVIEW (feed descriptions name Fall Guys / Minecraft). 498 PUBLISHED.
+- 17 published games mention a known brand only in the description (editorial check reads title/tags only); left as is per scope, follow-up.
 - Engram mirror: pending (Engram MCP unavailable this session).
