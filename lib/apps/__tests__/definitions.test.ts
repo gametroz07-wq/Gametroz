@@ -16,6 +16,11 @@ const host = (url: string) => new URL(url).hostname.replace(/^www\./, "");
 // Hosts a download page may live on besides the app's own website host. Anything else fails the test.
 const EXTRA_OFFICIAL_HOSTS: Record<string, string[]> = {
   "windows-terminal": ["apps.microsoft.com"],
+  "icloud-for-windows": ["apps.microsoft.com"],
+  powertoys: ["github.com"],
+  zoom: ["zoom.us"],
+  "google-docs": ["google.com"],
+  "microsoft-to-do": ["microsoft.com"],
 };
 
 const EXISTING_SLUGS = [
@@ -84,6 +89,16 @@ describe("app definitions", () => {
     assert.ok(appDefinitions.length >= 35);
   });
 
+  it("gives every category at least four apps and every platform enough apps for its page", () => {
+    for (const category of appCategoryDefinitions) {
+      assert.ok(appDefinitions.filter((app) => app.categorySlug === category.slug).length >= 4, category.slug);
+    }
+    for (const platform of platformDefinitions) {
+      assert.ok(appDefinitions.filter((app) => app.platforms.includes(platform.slug)).length >= 10, platform.slug);
+    }
+    assert.ok(appDefinitions.length >= 95);
+  });
+
   it("has complete, bounded content", () => {
     for (const app of appDefinitions) {
       assert.ok(app.name && app.developer, `${app.slug} name/developer`);
@@ -146,7 +161,7 @@ describe("app definitions", () => {
   });
 
   it("keeps the featured set small and the verification date fixed", () => {
-    assert.ok(appDefinitions.filter((app) => app.featured).length <= 6);
+    assert.ok(appDefinitions.filter((app) => app.featured).length <= 8);
     assert.equal(LINKS_VERIFIED_AT, "2026-10-02");
   });
 

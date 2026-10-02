@@ -34,7 +34,7 @@ Games, Tools and Apps. Local only: no push, no deploy, no production DB writes.
 ## Tasks
 - [x] G0 Dependency overrides (931e7d1).
 - [x] A1 Apps infra + first batch of app definitions (45 apps; uncommitted, awaiting review/commit).
-- [ ] A2 Remaining app definitions (target 95–100 total).
+- [x] A2 Remaining app definitions (105 total; uncommitted, awaiting review/commit).
 - [ ] B1 Guides infra + game guides.
 - [ ] B2 Tool guides.
 - [ ] B3 Software guides.
@@ -58,6 +58,18 @@ Games, Tools and Apps. Local only: no push, no deploy, no production DB writes.
 - Mock icons (public/mock/apps) and the screenshots block were removed.
 - Dry run against local Docker: platforms 1 create (ios) / 1 rename (browser -> web) / 4 update; categories 5 create / 6 update;
   apps 29 create / 16 update / 0 archive. Nothing applied.
+
+## A2 evidence (2026-10-02)
+- Added 60 apps (58 candidate rows + 2 gaming additions to reach 4+ per category): productivity 9, communication 6, security 6,
+  utilities 13, design 6, cloud 7, education 8, gaming 5 (steam, epic-games-launcher, gog-galaxy plus heroic-games-launcher and
+  playnite; both home pages return HTTP 200, verified 2026-10-02 by curl, not in the original TSV).
+- Totals: 105 apps. Categories: browsers 8, productivity 10, media 12, communication 8, development 15, security 9, utilities 14,
+  design 9, cloud 7, education 8, gaming 5. Platforms: windows 93, mac 79, linux 60, android 53, ios 48, web 33.
+- Featured (8): firefox, vlc-media-player, obs-studio, visual-studio-code, 7zip, libreoffice, discord, steam.
+- Alternatives revisited across the catalog (2-5 where genuine peers exist; none editorial filler). Apps with no genuine peer in the
+  catalog keep none. Tests: featured cap raised 6 -> 8; new invariant (>= 4 apps per category, >= 10 per platform, >= 95 apps);
+  extra official hosts allowed for zoom (zoom.us), powertoys (github.com), google-docs, microsoft-to-do, icloud-for-windows.
+- Dry run against local Docker: apps 89 create / 16 update / 0 archive; platforms 1 create / 1 rename / 4 update; categories 5 create / 6 update. Nothing applied.
 
 ## Checks
 TDD strict, `npm test`; per task lint + typecheck; final prisma validate, build, npm audit.
