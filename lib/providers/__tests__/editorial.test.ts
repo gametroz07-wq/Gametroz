@@ -37,6 +37,31 @@ describe("editorial review rules", () => {
     assert.match(messages({ instructions: "Tap to play" }), /instructions/i);
   });
 
+  it("flags brands, misspelled franchises and real people seen in the live popularity feeds", () => {
+    for (const title of [
+      "Pou Online",
+      "Talking Tom Gold Run Online",
+      "Tom & Jerry Run",
+      "Baldi's Basics v1.4.3",
+      "Amongus Escape",
+      "Minescraft Steve Adventures",
+      "SoniK Run",
+      "Cuphead Rush",
+      "Poppy Playtime Survival",
+      "Ben10 Omnirush",
+      "Fireboy and Watergirl 6",
+      "Friday Night Funkin VS Garcello",
+      "Teen Titans Go ! Swamp Attack",
+      "Trump the Ragdoll",
+      "Ronaldo Kick Run",
+      "Labubu Auto Adventure",
+      "Chainsaw Man Anime",
+      "Brookhaven Real Life",
+    ]) {
+      assert.match(messages({ title }), /brand/i, title);
+    }
+  });
+
   it("flags the expanded brand list with word-boundary matching", () => {
     for (const [title, brand] of [
       ["Half-Life Escape", "half-life"],
