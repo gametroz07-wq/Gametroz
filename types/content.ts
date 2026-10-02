@@ -31,7 +31,8 @@ export type IconKey =
   | "smartphone"
   | "book"
   | "percent"
-  | "wand";
+  | "wand"
+  | "cloud";
 
 export type CategoryRef = {
   name: string;
@@ -95,7 +96,7 @@ export type Tool = ToolSummary & {
 
 /* ---------- Apps ---------- */
 
-export type PlatformSlug = "windows" | "mac" | "linux" | "android" | "browser";
+export type PlatformSlug = "windows" | "mac" | "linux" | "android" | "ios" | "web";
 
 export type AppSummary = {
   slug: string;
@@ -112,12 +113,14 @@ export type App = AppSummary & {
   version: string;
   license: string;
   officialWebsite: string;
+  /** Verified official download page; the primary button prefers it over the website. */
+  officialDownloadUrl: string | null;
   features: string[];
   requirements: string[];
   alternatives: string[];
   tags: string[];
   featured: boolean;
-  // null until the record is manually verified (Phase 8).
+  // Date the official links were last checked; null when never verified.
   lastVerifiedAt: string | null;
 };
 

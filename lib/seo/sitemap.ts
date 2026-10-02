@@ -18,6 +18,8 @@ type SitemapInput = {
   games?: SitemapItem[];
   gameCategorySlugs?: string[];
   platformSlugs?: string[];
+  /** Only categories that have published apps. */
+  appCategorySlugs?: string[];
   apps?: SitemapItem[];
   guideSectionSlugs?: string[];
   guides?: SitemapItem[];
@@ -47,6 +49,7 @@ export function buildSitemapEntries({
   games = [],
   gameCategorySlugs = [],
   platformSlugs = [],
+  appCategorySlugs = [],
   apps = [],
   guideSectionSlugs = [],
   guides = [],
@@ -74,6 +77,7 @@ export function buildSitemapEntries({
   for (const slug of toolCategorySlugs) add(`/tools/${slug}`, "weekly", 0.7);
   for (const slug of toolSlugs) add(`/tool/${slug}`, "monthly", 0.8);
   for (const slug of platformSlugs) add(`/apps/${slug}`, "weekly", 0.6);
+  for (const slug of appCategorySlugs) add(`/apps/category/${slug}`, "weekly", 0.6);
   for (const app of published(apps)) add(`/app/${app.slug}`, "monthly", 0.6, app.updatedAt);
   for (const slug of guideSectionSlugs) add(`/guides/${slug}`, "weekly", 0.6);
   for (const guide of published(guides)) add(`/guide/${guide.slug}`, "monthly", 0.6, guide.updatedAt);

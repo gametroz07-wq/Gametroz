@@ -6,7 +6,8 @@ export const platformLabels: Record<PlatformSlug, string> = {
   mac: "macOS",
   linux: "Linux",
   android: "Android",
-  browser: "Browser",
+  ios: "iOS",
+  web: "Web",
 };
 
 export function PlatformBadges({ platforms, className }: { platforms: PlatformSlug[]; className?: string }) {

@@ -7,14 +7,17 @@ import { CardGrid } from "@/components/shared/card-grid";
 import { ChipNav } from "@/components/shared/chip-nav";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageSection } from "@/components/shared/page-section";
-import { getAppCategories, getApps, getAppsByPlatform, getFeaturedApps, getPlatforms } from "@/lib/catalog";
+import { getAppCategorySummaries, getApps, getAppsByPlatform, getFeaturedApps, getPlatforms } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { extendDescription } from "@/lib/seo/templates";
 
+// ISR: refreshed every 10 minutes.
+export const revalidate = 600;
+
 export const metadata = pageMetadata({
-  title: "Free Apps and Software — Official Downloads",
+  title: "Apps and Software: Official Download Links",
   description: extendDescription(
-    "Discover useful free software for Windows, macOS, Linux, Android and your browser, always linked to the official publisher.",
+    "Find software for Windows, macOS, Linux, Android, iOS and the web, organized by platform and category, always linked to the official publisher.",
     ["Gametroz does not host any downloads."],
   ),
   path: "/apps",
@@ -24,7 +27,7 @@ export default async function AppsPage() {
   const [featured, platforms, categories, allApps] = await Promise.all([
     getFeaturedApps(4),
     getPlatforms(),
-    getAppCategories(),
+    getAppCategorySummaries(),
     getApps(),
   ]);
   const sections = await Promise.all(
@@ -36,21 +39,14 @@ export default async function AppsPage() {
       <Breadcrumbs items={[{ label: "Apps" }]} path="/apps" className="pt-3" />
       <PageHeader
         title="Apps & software"
-        description={`${allApps.length} trusted apps. Every download button goes to the official publisher.`}
+        description={`${allApps.length} apps by platform and category. Every download button goes to the official publisher.`}
         aside={<SearchInput placeholder="Search apps..." />}
       />
 
       <ChipNav
-        label="Platforms and categories"
+        label="Platforms"
         className="pt-3"
-        items={[
-          ...platforms.map((platform) => ({ label: platform.name, href: `/apps/${platform.slug}`, iconKey: platform.iconKey })),
-          ...categories.map((category) => ({
-            label: category.name,
-            href: `/search?q=${encodeURIComponent(category.name)}&type=apps`,
-            iconKey: category.iconKey,
-          })),
-        ]}
+        items={platforms.map((platform) => ({ label: platform.name, href: `/apps/${platform.slug}`, iconKey: platform.iconKey }))}
       />
 
       <PageSection id="featured" title="Featured apps" className="pt-5">
@@ -69,7 +65,7 @@ export default async function AppsPage() {
         <PageSection
           key={platform.slug}
           id={`platform-${platform.slug}`}
-          title={platform.slug === "browser" ? "Browser apps" : `${platform.name} apps`}
+          title={`${platform.name} apps`}
           action={{ label: "View all", href: `/apps/${platform.slug}` }}
         >
           <CardGrid variant="cards">
@@ -79,6 +75,18 @@ export default async function AppsPage() {
           </CardGrid>
         </PageSection>
       ))}
+
+      <PageSection id="categories" title="Browse by category" description="Compare software of the same kind.">
+        <ChipNav
+          label="App categories"
+          layout="wrap"
+          items={categories.map((category) => ({
+            label: `${category.name} (${category.itemCount ?? 0})`,
+            href: category.href,
+            iconKey: category.iconKey,
+          }))}
+        />
+      </PageSection>
     </Container>
   );
 }

@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { appRedirects } from "./lib/apps/redirects";
 import { embedFrameOrigins } from "./lib/providers/embed";
 import { buildSecurityHeaders } from "./lib/security/headers";
 
@@ -33,6 +34,7 @@ const nextConfig: NextConfig = {
         destination: "https://gametroz.online/:path*",
         permanent: true,
       },
+      ...appRedirects,
     ];
   },
 };

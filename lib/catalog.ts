@@ -13,6 +13,7 @@ import {
 } from "@/lib/db/mappers";
 import { prisma } from "@/lib/db/prisma";
 import type { Prisma } from "@/lib/generated/prisma/client";
+import { rankRelatedApps } from "@/lib/apps/related";
 import { guideSections } from "@/lib/guide-sections";
 import type { App, Category, CategorySummary, Game, Guide, GuideSection, PlatformSlug, Tool } from "@/types/content";
 
@@ -284,21 +285,40 @@ export async function getAppCategories(): Promise<Category[]> {
   return rows.map(toCategory);
 }
 
-/** Editorial alternatives first (in their saved order), then other apps from the same category. */
-export async function getAlternatives(app: App, limit = 4) {
-  const explicitRows = await findApps({ where: { slug: { in: app.alternatives } } });
-  const explicit = app.alternatives
-    .map((slug) => explicitRows.find((row) => row.slug === slug))
-    .filter((row): row is App => Boolean(row));
-  if (explicit.length >= limit) return explicit.slice(0, limit);
-  const sameCategory = await findApps({
-    where: {
-      category: { slug: app.category.slug },
-      slug: { notIn: [app.slug, ...explicit.map((row) => row.slug)] },
-    },
-    take: limit - explicit.length,
+export async function getAppCategory(slug: string) {
+  const row = await prisma.appCategory.findFirst({ where: { slug, apps: { some: PUBLISHED } } });
+  return row ? toCategory(row) : null;
+}
+
+export async function getAppCategorySummaries() {
+  const rows = await prisma.appCategory.findMany({
+    where: { apps: { some: PUBLISHED } },
+    orderBy: { sortOrder: "asc" },
+    include: { _count: { select: { apps: { where: PUBLISHED } } } },
   });
-  return [...explicit, ...sameCategory];
+  return rows.map((row) => toCategorySummary(row, row._count.apps, "/apps/category", "apps"));
+}
+
+export async function getAppsByCategory(slug: string) {
+  return findApps({ where: { category: { slug } } });
+}
+
+/** The editorial alternatives of an app, in their saved order. Unpublished or missing ones are skipped. */
+export async function getAlternatives(app: App, limit = 6) {
+  if (app.alternatives.length === 0) return [];
+  const rows = await findApps({ where: { slug: { in: app.alternatives } } });
+  return app.alternatives
+    .map((slug) => rows.find((row) => row.slug === slug))
+    .filter((row): row is App => Boolean(row))
+    .slice(0, limit);
+}
+
+/** Same category and a shared platform, ranked by overlap; alternatives are excluded (they have their own section). */
+export async function getRelatedApps(app: App, limit = 4) {
+  const candidates = await findApps({
+    where: { category: { slug: app.category.slug }, slug: { notIn: [app.slug, ...app.alternatives] } },
+  });
+  return rankRelatedApps(app, candidates, limit);
 }
 
 /* ---------- Guides ---------- */
@@ -376,7 +396,7 @@ const sitemapSelect = { slug: true, updatedAt: true, status: true } as const;
 
 /** Slugs, update times and statuses of everything public, for app/sitemap.ts. PUBLISHED only. */
 export async function getSitemapContent() {
-  const [games, tools, apps, guides, gameCategories, toolCategories, platforms, guideSections] = await Promise.all([
+  const [games, tools, apps, guides, gameCategories, toolCategories, platforms, appCategories, guideSections] = await Promise.all([
     prisma.game.findMany({ where: PUBLISHED, select: sitemapSelect, orderBy: [...byPopularity] }),
     prisma.tool.findMany({ where: PUBLISHED, select: sitemapSelect, orderBy: [...bySortOrder] }),
     prisma.app.findMany({ where: PUBLISHED, select: sitemapSelect, orderBy: [...bySortOrder] }),
@@ -384,9 +404,10 @@ export async function getSitemapContent() {
     getGameCategories(),
     getToolCategories(),
     getPlatforms(),
+    getAppCategories(),
     getGuideSections(),
   ]);
-  return { games, tools, apps, guides, gameCategories, toolCategories, platforms, guideSections };
+  return { games, tools, apps, guides, gameCategories, toolCategories, platforms, appCategories, guideSections };
 }
 
 /* ---------- Search ---------- */
@@ -419,6 +440,8 @@ export async function searchCatalog(rawQuery: string) {
           { name: contains },
           { slug: contains },
           { publisher: contains },
+          { shortDescription: contains },
+          { description: contains },
           { category: { name: contains } },
           { platforms: { some: { platform: { OR: [{ slug: contains }, { name: contains }] } } } },
           tagMatch,

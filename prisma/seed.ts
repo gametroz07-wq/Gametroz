@@ -98,6 +98,13 @@ async function seedTools() {
 }
 
 async function seedApps() {
+  // The "browser" platform became "web": rename it in place so its app joins survive.
+  const [legacy, renamed] = await Promise.all([
+    prisma.platform.findUnique({ where: { slug: "browser" } }),
+    prisma.platform.findUnique({ where: { slug: "web" } }),
+  ]);
+  if (legacy && !renamed) await prisma.platform.update({ where: { id: legacy.id }, data: { slug: "web" } });
+
   for (const [index, platform] of platforms.entries()) {
     const data = { name: platform.name, description: platform.description, iconKey: platform.iconKey, sortOrder: index };
     await prisma.platform.upsert({ where: { slug: platform.slug }, create: { slug: platform.slug, ...data }, update: data });
@@ -117,17 +124,17 @@ async function seedApps() {
       publisher: app.publisher,
       shortDescription: app.shortDescription,
       description: app.description,
-      version: app.version,
-      license: app.license,
+      version: null,
+      license: app.license || null,
       officialWebsite: app.officialWebsite,
-      iconUrl: app.iconUrl ?? null,
+      officialDownloadUrl: app.officialDownloadUrl,
+      iconUrl: null,
       features: app.features,
       requirements: app.requirements,
       status: PUBLISHED,
       featured: app.featured,
       sortOrder: index,
-      // Sample data: stays unverified until checked against the publisher (Phase 8).
-      lastVerifiedAt: null,
+      lastVerifiedAt: app.lastVerifiedAt ? new Date(app.lastVerifiedAt) : null,
       publishedAt: SEED_PUBLISHED_AT,
       category: { connect: { slug: app.category.slug } },
     };

@@ -8,7 +8,8 @@ const input = {
   toolSlugs: ["word-counter", "json-formatter"],
   games: [{ slug: "neon-drift", updatedAt: new Date("2026-09-30T10:00:00Z") }, { slug: "gem-match" }],
   gameCategorySlugs: ["racing", "puzzle"],
-  platformSlugs: ["windows", "browser"],
+  platformSlugs: ["windows", "web"],
+  appCategorySlugs: ["media", "browsers"],
   apps: [{ slug: "vlc-media-player", updatedAt: "2026-09-01T00:00:00Z" }],
   guideSectionSlugs: ["games"],
   guides: [{ slug: "how-to-play", updatedAt: new Date("2026-09-15T00:00:00Z") }],
@@ -38,7 +39,9 @@ describe("buildSitemapEntries", () => {
       "https://example.com/tool/word-counter",
       "https://example.com/tool/json-formatter",
       "https://example.com/apps/windows",
-      "https://example.com/apps/browser",
+      "https://example.com/apps/web",
+      "https://example.com/apps/category/media",
+      "https://example.com/apps/category/browsers",
       "https://example.com/app/vlc-media-player",
       "https://example.com/guides/games",
       "https://example.com/guide/how-to-play",
@@ -65,6 +68,10 @@ describe("buildSitemapEntries", () => {
     for (const slug of ["game/draft", "game/old", "game/wait", "app/hidden", "guide/wip"]) {
       assert.ok(!all.includes(`https://example.com/${slug}`), slug);
     }
+  });
+
+  it("never lists the retired /apps/browser URL", () => {
+    assert.ok(!urls().includes("https://example.com/apps/browser"));
   });
 
   it("has no duplicate URLs", () => {

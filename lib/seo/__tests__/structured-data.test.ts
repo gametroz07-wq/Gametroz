@@ -174,12 +174,17 @@ describe("softwareApplication", () => {
     assert.equal(category("Office suites"), "BusinessApplication");
     assert.equal(category("Security"), "SecurityApplication");
     assert.equal(category("Developer tools"), "DeveloperApplication");
+    assert.equal(category("Communication"), "CommunicationApplication");
+    assert.equal(category("Education"), "EducationalApplication");
+    assert.equal(category("Gaming"), "GameApplication");
+    assert.equal(category("Productivity"), "BusinessApplication");
+    assert.equal(category("Cloud"), "UtilitiesApplication");
     assert.equal(category("Something else"), "UtilitiesApplication");
   });
 
-  it("treats browser apps as web-based", () => {
-    const data = softwareApplication({ ...base, platforms: ["browser", "android"] });
-    assert.equal(data.operatingSystem, "Web browser, Android");
+  it("treats web apps as browser-based and names iOS", () => {
+    const data = softwareApplication({ ...base, platforms: ["web", "android", "ios"] });
+    assert.equal(data.operatingSystem, "Web browser, Android, iOS");
   });
 });
 

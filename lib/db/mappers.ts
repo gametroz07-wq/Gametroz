@@ -117,6 +117,7 @@ export function toApp(row: AppRow): App {
     version: row.version ?? "",
     license: row.license ?? "",
     officialWebsite: row.officialWebsite,
+    officialDownloadUrl: row.officialDownloadUrl,
     features: row.features,
     requirements: row.requirements,
     alternatives: row.alternatives.map(({ alternative }) => alternative.slug),

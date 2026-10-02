@@ -6,11 +6,12 @@ import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { CardGrid } from "@/components/shared/card-grid";
 import { ChipNav } from "@/components/shared/chip-nav";
 import { PageHeader } from "@/components/shared/page-header";
-import { getAppsByPlatform, getPlatform, getPlatforms } from "@/lib/catalog";
+import { getAppCategories, getAppsByPlatform, getPlatform, getPlatforms } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
-import { extendDescription, platformIntro } from "@/lib/seo/templates";
+import { extendDescription, platformIntro, platformTitle } from "@/lib/seo/templates";
 
-export const dynamicParams = false;
+// ISR: listings refresh every 10 minutes; a platform added later renders on first request.
+export const revalidate = 600;
 
 export async function generateStaticParams() {
   return (await getPlatforms()).map((platform) => ({ platform: platform.slug }));
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }: PageProps<"/apps/[platform]">
   const platform = await getPlatform((await params).platform);
   if (!platform) return {};
   return pageMetadata({
-    title: `Free ${platform.name} Apps — Official Downloads`,
+    title: platformTitle(platform.name, platform.slug),
     description: extendDescription(platform.description, [
       "Every listing links to the official publisher.",
       "Gametroz does not host any downloads.",
@@ -33,8 +34,8 @@ export default async function PlatformPage({ params }: PageProps<"/apps/[platfor
   const platform = await getPlatform((await params).platform);
   if (!platform) notFound();
 
-  const [apps, platforms] = await Promise.all([getAppsByPlatform(platform.slug), getPlatforms()]);
-  const title = platform.slug === "browser" ? "Browser apps" : `${platform.name} apps`;
+  const [apps, platforms, categories] = await Promise.all([getAppsByPlatform(platform.slug), getPlatforms(), getAppCategories()]);
+  const title = `${platform.name} apps`;
 
   return (
     <Container className="pb-10">
@@ -68,6 +69,12 @@ export default async function PlatformPage({ params }: PageProps<"/apps/[platfor
           ))}
         </CardGrid>
       </section>
+
+      <ChipNav
+        label="Browse apps by category"
+        layout="wrap"
+        items={categories.map((category) => ({ label: category.name, href: `/apps/category/${category.slug}`, iconKey: category.iconKey }))}
+      />
     </Container>
   );
 }

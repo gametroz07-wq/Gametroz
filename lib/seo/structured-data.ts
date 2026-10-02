@@ -98,7 +98,8 @@ const OPERATING_SYSTEMS: Record<PlatformSlug, string> = {
   mac: "macOS",
   linux: "Linux",
   android: "Android",
-  browser: "Web browser",
+  ios: "iOS",
+  web: "Web browser",
 };
 
 // First match wins. Schema.org application categories are a closed list.
@@ -109,6 +110,9 @@ const APPLICATION_CATEGORIES: [RegExp, string][] = [
   [/office|productiv|business/i, "BusinessApplication"],
   [/secur|privacy|password/i, "SecurityApplication"],
   [/develop|code|programming/i, "DeveloperApplication"],
+  [/communicat|messag/i, "CommunicationApplication"],
+  [/educat|learn/i, "EducationalApplication"],
+  [/gam(e|ing)/i, "GameApplication"],
 ];
 
 export function applicationCategory(categoryName: string) {

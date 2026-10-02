@@ -21,6 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     toolCategorySlugs: content.toolCategories.map((category) => category.slug),
     toolSlugs: content.tools.map((tool) => tool.slug),
     platformSlugs: content.platforms.map((platform) => platform.slug),
+    appCategorySlugs: content.appCategories.map((category) => category.slug),
     apps: content.apps,
     guideSectionSlugs: content.guideSections.map((section) => section.slug),
     guides: content.guides,

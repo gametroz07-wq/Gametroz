@@ -17,8 +17,45 @@ export function fitTitle(candidates: string[]) {
   return fits ?? candidates.reduce((shortest, candidate) => (candidate.length < shortest.length ? candidate : shortest));
 }
 
-export function appTitle(name: string) {
-  return fitTitle([`${name}: Free Download & Features`, `${name}: Free Download`, name]);
+const PLATFORM_TITLE_LABELS: Record<PlatformSlug, string> = {
+  windows: "Windows",
+  mac: "Mac",
+  linux: "Linux",
+  android: "Android",
+  ios: "iOS",
+  web: "Web",
+};
+
+/** "Windows", "Windows & Mac" or "Windows, Mac & More": short enough to keep the title within 60 characters. */
+function platformPhrase(platforms: PlatformSlug[]) {
+  const labels = platforms.map((platform) => PLATFORM_TITLE_LABELS[platform]);
+  if (labels.length <= 2) return labels.join(" & ");
+  return `${labels[0]}, ${labels[1]} & More`;
+}
+
+/** Targets the "{App} download" search intent; shortens until it fits 60 characters with the site suffix. */
+export function appTitle(name: string, platforms: PlatformSlug[] = []) {
+  const candidates = [`${name} Download (Official Link)`, `${name} Download`, name];
+  if (platforms.length > 0) candidates.unshift(`${name} Download for ${platformPhrase(platforms)}`);
+  return fitTitle(candidates);
+}
+
+export function platformTitle(name: string, slug: PlatformSlug) {
+  return slug === "web" ? "Web Apps That Run in Your Browser" : `${name} Apps: Official Download Links`;
+}
+
+export function appCategoryTitle(name: string) {
+  return fitTitle([`${name}: Software With Official Download Links`, `${name} Software: Official Links`, `${name} Software`]);
+}
+
+export function appCategoryDescription(base: string) {
+  return extendDescription(base, ["Every listing links to the publisher's official download page.", "Gametroz does not host any downloads."]);
+}
+
+/** Visible intro under the H1 of an app category page. Carries the real count and example names. */
+export function appCategoryIntro({ name, count, examples }: { name: string; count: number; examples: string[] }) {
+  const examplesSentence = examples.length > 0 ? ` Examples include ${joinNames(examples.slice(0, 3))}.` : "";
+  return `Browse ${count} ${plural(count, "app")} in the ${name} category, each linked to the publisher's official download page.${examplesSentence} Gametroz does not host or modify any files.`;
 }
 
 export function gameCategoryTitle(name: string) {
@@ -97,7 +134,7 @@ type PlatformIntroInput = { name: string; slug: PlatformSlug; count: number; exa
 export function platformIntro({ name, slug, count, examples }: PlatformIntroInput) {
   const apps = plural(count, "app");
   const examplesSentence = examples.length > 0 ? ` Examples include ${joinNames(examples.slice(0, 3))}.` : "";
-  if (slug === "browser") {
+  if (slug === "web") {
     return `Browse ${count} ${apps} you can use in your web browser. Each listing links to the publisher's official site, and Gametroz does not host any files.${examplesSentence}`;
   }
   return `Browse ${count} ${apps} for ${name}, each linked to the publisher's official download page. Gametroz does not host or modify any files.${examplesSentence}`;

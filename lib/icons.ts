@@ -5,6 +5,7 @@ import {
   Braces,
   Calculator,
   Car,
+  Cloud,
   Code,
   Crown,
   FileText,
@@ -67,4 +68,5 @@ export const contentIcons: Record<IconKey, LucideIcon> = {
   book: BookOpen,
   percent: Percent,
   wand: WandSparkles,
+  cloud: Cloud,
 };

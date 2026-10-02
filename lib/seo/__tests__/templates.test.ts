@@ -1,9 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
+  appCategoryDescription,
+  appCategoryIntro,
+  appCategoryTitle,
   appDescription,
   appIconAlt,
   appTitle,
+  platformTitle,
   extendDescription,
   fitTitle,
   gameCategoryDescription,
@@ -33,16 +37,20 @@ describe("fitTitle", () => {
 });
 
 describe("appTitle", () => {
-  it("keeps long app titles within 60 characters", () => {
-    const title = appTitle("VLC Media Player");
-    assert.equal(title, "VLC Media Player: Free Download & Features");
+  it("targets the download intent with the platforms when it fits 60 characters", () => {
+    const title = appTitle("VLC Media Player", ["windows", "mac", "linux", "android", "ios"]);
+    assert.equal(title, "VLC Media Player Download for Windows, Mac & More");
     assert.ok(title.length + SUFFIX.length <= 60);
+    assert.equal(appTitle("7-Zip", ["windows"]), "7-Zip Download for Windows");
+    assert.equal(appTitle("Signal", ["windows", "mac"]), "Signal Download for Windows & Mac");
+    assert.equal(appTitle("Photopea", ["web"]), "Photopea Download for Web");
   });
 
-  it("drops the extras for long names", () => {
-    const title = appTitle("Extremely Long Application Name");
-    assert.ok(title.length + SUFFIX.length <= 60);
-    assert.ok(title.startsWith("Extremely Long Application Name"));
+  it("falls back to shorter forms for long names or missing platforms", () => {
+    const long = appTitle("Extremely Long Application Name", ["windows", "mac", "linux"]);
+    assert.ok(long.length + SUFFIX.length <= 60);
+    assert.ok(long.startsWith("Extremely Long Application Name"));
+    assert.equal(appTitle("Git"), "Git Download (Official Link)");
   });
 });
 
@@ -139,12 +147,53 @@ describe("platformIntro", () => {
     assert.ok(text.includes("12 apps for Windows"));
     assert.ok(text.includes("official"));
     assert.ok(text.includes("VLC Media Player and 7-Zip"));
+    assert.ok(platformIntro({ name: "iOS", slug: "ios", count: 1, examples: [] }).includes("1 app for iOS"));
   });
 
-  it("describes browser apps differently", () => {
-    const text = platformIntro({ name: "Browser", slug: "browser", count: 2, examples: [] });
+  it("describes web apps differently", () => {
+    const text = platformIntro({ name: "Web", slug: "web", count: 2, examples: [] });
     assert.ok(text.includes("2 apps"));
     assert.ok(text.includes("web browser"));
+  });
+});
+
+describe("platformTitle", () => {
+  it("uses a platform specific title that fits 60 characters", () => {
+    assert.equal(platformTitle("Windows", "windows"), "Windows Apps: Official Download Links");
+    assert.equal(platformTitle("Web", "web"), "Web Apps That Run in Your Browser");
+    for (const [name, slug] of [["macOS", "mac"], ["Android", "android"], ["iOS", "ios"], ["Linux", "linux"]] as const) {
+      assert.ok(platformTitle(name, slug).length + SUFFIX.length <= 60, slug);
+    }
+  });
+});
+
+describe("appCategoryTitle", () => {
+  it("fits 60 characters with the suffix and falls back for long names", () => {
+    assert.equal(appCategoryTitle("Browsers"), "Browsers: Software With Official Download Links");
+    for (const name of ["Communication", "Productivity", "Development"]) {
+      assert.ok(appCategoryTitle(name).length + SUFFIX.length <= 60, name);
+    }
+    assert.equal(appCategoryTitle("Communication"), "Communication Software: Official Links");
+  });
+});
+
+describe("appCategoryDescription", () => {
+  it("extends the category description to 120-160 characters without passing 160", () => {
+    const text = appCategoryDescription("Short base text about browsers.");
+    assert.ok(text.length >= 120 && text.length <= 160, `${text.length}: ${text}`);
+    const long = "L".repeat(130);
+    assert.equal(appCategoryDescription(long), long);
+  });
+});
+
+describe("appCategoryIntro", () => {
+  it("is unique per category: real count and example names", () => {
+    const text = appCategoryIntro({ name: "Media", count: 12, examples: ["VLC Media Player", "Audacity", "OBS Studio"] });
+    assert.ok(text.includes("12 apps in the Media category"));
+    assert.ok(text.includes("VLC Media Player, Audacity and OBS Studio"));
+    assert.ok(text.includes("official"));
+    assert.notEqual(text, appCategoryIntro({ name: "Browsers", count: 8, examples: [] }));
+    assert.ok(appCategoryIntro({ name: "Cloud", count: 1, examples: [] }).includes("1 app in the Cloud category"));
   });
 });
 
