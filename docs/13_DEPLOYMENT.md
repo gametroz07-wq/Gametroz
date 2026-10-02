@@ -48,7 +48,7 @@ Why: Prisma 7 recommends routing app traffic through Neon's pooler and running m
 | `DATABASE_URL` | Neon pooled string (`-pooler`) | yes |
 | `DIRECT_URL` | **Optional.** Only when `DATABASE_URL` is a transaction-mode pooler: a direct/session URL for migrations. Leave it unset otherwise. Never localhost (the build fails fast if it is). | yes |
 | `NEXT_PUBLIC_SITE_URL` | `https://gametroz.online` | no |
-| `NEXT_PUBLIC_INDEXING_ENABLED` | `false` | no |
+| `NEXT_PUBLIC_INDEXING_ENABLED` | `true`/`false`, set in the Render dashboard (`sync: false`). **Build-time:** controls robots meta, X-Robots-Tag, `/robots.txt` and `/sitemap.xml`; redeploy after changing it. Unset = off. | no |
 | `GAMEMONETIZE_FEED_ENABLED` | `false` | no |
 | `GAME_EMBEDS_ENABLED` | `true`/`false`, set in the Render dashboard (`sync: false`). **Build-time:** see the note below. | no |
 | `REVALIDATE_SECRET` | Min 16 characters. Set it in Render. The endpoint returns 404 when it is unset. | yes |

@@ -26,8 +26,11 @@ services:
         value: "false"
       - key: NEXT_PUBLIC_SITE_URL
         value: https://gametroz.online
+      # Managed in the Render dashboard ("true"/"false"); Blueprint syncs never overwrite it.
+      # Read at BUILD time (robots meta, X-Robots-Tag, sitemap, robots.txt): change it, then redeploy.
+      # Unset means indexing is off.
       - key: NEXT_PUBLIC_INDEXING_ENABLED
-        value: "false"
+        sync: false
       - key: GAMEMONETIZE_FEED_ENABLED
         value: "false"
       # Managed in the Render dashboard ("true"/"false"); Blueprint syncs never overwrite it.
