@@ -25,16 +25,22 @@ popularity, quality and variety, using the existing sync → review → publish 
 - New Games: `publishedAt`; publish batches in ascending provider id so newer games get later timestamps.
 
 ## Tasks
-- [ ] T1 (delegated writer) Plan builder + snapshot script, plan-based sync with popularity metadata,
+- [x] T1 (delegated writer; mapping+writer triggers) — dc37c1a, plus brand lists 402ddc2, 08e1b9e. Plan builder + snapshot script, plan-based sync with popularity metadata,
       Fighting mapping, expanded brand/editorial checks, technical duplicate rejection. Tests first.
-- [ ] T2 (delegated writer) Home Action section; bound build-time prerender of game pages.
-- [ ] T3 Build snapshot plan (500), 5 batches of dry run + sync, verify counts.
-- [ ] T4 Classify (PUBLISHABLE / EDITORIAL_REVIEW_REQUIRED / REJECTED), top up if < 450 publishable.
-- [ ] T5 Publish PUBLISHABLE in ≤100 batches (ascending ids).
-- [ ] T6 Archive the 30 seed games once ≥ 400 real games are PUBLISHED (Halloween Fighters excluded).
+- [x] T2 (delegated writer) Home Action section; bound build-time prerender of game pages — cf8bc29 (NOT deployed yet).
+- [x] T3 Build snapshot plan (500), 5 batches of dry run + sync, verify counts.
+- [x] T4 Classify (PUBLISHABLE / EDITORIAL_REVIEW_REQUIRED / REJECTED), top up if < 450 publishable.
+- [x] T5 Publish PUBLISHABLE in ≤100 batches (ascending ids).
+- [x] T6 Archive the 30 seed games once ≥ 400 real games are PUBLISHED (Halloween Fighters excluded).
 - [ ] T7 Verify home, categories, search, 20 playable games, thumbnails; run full checks.
 
 ## Progress
 - Pre-change audit (prod): 40 games, 31 PUBLISHED (30 seed + halloween-fighters), 9 REVIEW, 0 ARCHIVED.
 - A 50-game sync (newest) ran before this plan: 40 created + 10 updated, all REVIEW, 0 rejected.
+- Plan 500 synced in 5 batches (466 created, 34 updated, 0 rejected); top-up 400 (best/hot/editors/trending, not already imported) in 4 batches (394 created, 6 rejected: THUMBNAIL_UNREACHABLE).
+- Classification: 910 provider games → 536 PUBLISHABLE, 374 EDITORIAL_REVIEW_REQUIRED (+6 rejected, not written).
+- Published 499 by explicit --ids in 5 commands (ascending ids) + Halloween Fighters = 500 real games. Held: 3 "Jeep" titles (trademark) and 33 lowest-popularity racing/puzzle/arcade/action games stay REVIEW.
+- Archived the 30 seed games (guarded script: providerId null + /mock thumbnail, Halloween excluded).
+- Revalidation skipped: REVALIDATE_SECRET is not in .env.production.local; ISR timers refreshed / and /games in ~6 min.
+- Native review (gentle-ai) unavailable: binary not executable.
 - Engram mirror: pending (Engram MCP unavailable this session).
