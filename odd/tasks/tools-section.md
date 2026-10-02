@@ -34,7 +34,7 @@ Turn /tools into a real, useful, SEO-ready section: 30 working tools, no mocks, 
 
 ## Tasks
 - [x] T1 Foundation: definitions + sync script + seed, routes ISR, registry, shared UI, JSON-LD, content blocks, /tools page, sitemap, search.
-- [ ] T2 Text tools (7).
+- [x] T2 Text tools (7): character-counter, case-converter, remove-duplicate-lines, remove-extra-spaces, text-sorter, slug-generator (word-counter from T1).
 - [ ] T3 Developer (5) + Generators (4).
 - [ ] T4 Calculators (6) + Converters (4).
 - [ ] T5 Image tools (4).
@@ -54,4 +54,11 @@ TDD: strict (session config), runner `npm test`. Per task: npm test, lint, typec
 - Not applied anywhere; apply only at T6 once the full catalog is defined (the 13 archives shrink as T2-T5 land).
 - Seed note: guides reference tools not yet defined (image-compressor, image-resizer, webp-to-jpg, base64-encoder-decoder,
   discount-calculator), so a seed on an empty DB fails until T3-T5 define them.
+- Engram mirror: still pending.
+
+### T2 evidence
+- RED: `npm test` showed 6 failing test files (missing modules character-count, case-convert, duplicate-lines, extra-spaces, text-sorter, slug) with 195 passing; GREEN: 250 tests pass (adds example-vs-logic tests and definitions invariants for the 7 text tools).
+- Verified: npm test (250 pass), npm run lint (clean), npm run typecheck (clean).
+- Route: delegated direct, single writer. Not committed (left for the orchestrator).
+- Decisions: Intl.Segmenter graphemes with code point fallback; "Ignore empty lines" in dedupe leaves blank lines untouched; slug drops non-Latin text and says so; shuffle uses crypto.getRandomValues (unbiased) and re-draws only on request.
 - Engram mirror: still pending.

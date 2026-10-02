@@ -1,7 +1,13 @@
 import type { ReactElement } from "react";
 import type { ImplementedToolSlug } from "@/lib/tools/implemented";
+import { CaseConverterWorkspace } from "./workspaces/case-converter";
+import { CharacterCounterWorkspace } from "./workspaces/character-counter";
 import { JsonFormatterWorkspace } from "./workspaces/json-formatter";
 import { PercentageCalculatorWorkspace } from "./workspaces/percentage-calculator";
+import { RemoveDuplicateLinesWorkspace } from "./workspaces/remove-duplicate-lines";
+import { RemoveExtraSpacesWorkspace } from "./workspaces/remove-extra-spaces";
+import { SlugGeneratorWorkspace } from "./workspaces/slug-generator";
+import { TextSorterWorkspace } from "./workspaces/text-sorter";
 import { WordCounterWorkspace } from "./workspaces/word-counter";
 
 /**
@@ -11,6 +17,12 @@ import { WordCounterWorkspace } from "./workspaces/word-counter";
  */
 export const toolWorkspaces: Record<ImplementedToolSlug, ReactElement> = {
   "word-counter": <WordCounterWorkspace />,
+  "character-counter": <CharacterCounterWorkspace />,
+  "case-converter": <CaseConverterWorkspace />,
+  "remove-duplicate-lines": <RemoveDuplicateLinesWorkspace />,
+  "remove-extra-spaces": <RemoveExtraSpacesWorkspace />,
+  "text-sorter": <TextSorterWorkspace />,
+  "slug-generator": <SlugGeneratorWorkspace />,
   "json-formatter": <JsonFormatterWorkspace />,
   "percentage-calculator": <PercentageCalculatorWorkspace />,
 };

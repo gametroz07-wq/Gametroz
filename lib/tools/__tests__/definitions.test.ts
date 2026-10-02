@@ -77,10 +77,12 @@ describe("tool definitions", () => {
     assert.equal(getToolDefinition("constructor"), undefined);
   });
 
-  it("defines the three foundation tools", () => {
+  it("defines the foundation tools and the seven text tools", () => {
+    const slugs = toolDefinitions.map((tool) => tool.slug);
+    for (const slug of ["json-formatter", "percentage-calculator"]) assert.ok(slugs.includes(slug), slug);
     assert.deepEqual(
-      toolDefinitions.map((tool) => tool.slug),
-      ["word-counter", "json-formatter", "percentage-calculator"],
+      toolDefinitions.filter((tool) => tool.categorySlug === "text").map((tool) => tool.slug),
+      ["word-counter", "character-counter", "case-converter", "remove-duplicate-lines", "remove-extra-spaces", "text-sorter", "slug-generator"],
     );
     assert.ok(toolDefinitions.every((tool) => tool.localOnly));
   });
