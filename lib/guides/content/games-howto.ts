@@ -47,7 +47,7 @@ export const lowEndGuide: GuideDefinition = {
         [game("repeat-pixel-arts"), "Puzzle", "Pick a color, click pixels", "Landscape"],
         [game("slpoing-path"), "Puzzle", "Draw lines with the mouse or touch", "Landscape"],
         [game("stickboys-hook"), "Arcade", "Click or tap to rope", "Landscape"],
-        [game("dandan-slime-unblocked"), "Arcade", "Left mouse button or tap to move", "Landscape"],
+        [game("neon-velocity"), "Arcade", "A/D or arrow keys to move, W or Up to jump", "Landscape"],
         [game("mini-switcher"), "Arcade", "X, Space or left click switches gravity", "Landscape"],
         [game("12-minibattles"), "Arcade", "Two players, one button each: A and L", "Landscape"],
         [game("bubbla-boing"), "Casual", "Arrow keys move the paddle, Space shoots the ball", "Landscape"],
@@ -65,10 +65,10 @@ export const lowEndGuide: GuideDefinition = {
     },
     {
       type: "p",
-      text: `For something quieter, ${game("repeat-pixel-arts")} asks you to copy a pixel pattern and ${game("slpoing-path")} has you draw lines so a ball can roll to a target. ${game("hamster-escape-prison")} mixes puzzles and reaction tests, and ${game("stickboys-hook")} and ${game("dandan-slime-unblocked")} cover swinging and horde survival.`,
+      text: `For something quieter, ${game("repeat-pixel-arts")} asks you to copy a pixel pattern and ${game("slpoing-path")} has you draw lines so a ball can roll to a target. ${game("hamster-escape-prison")} mixes puzzles and reaction tests, and ${game("stickboys-hook")} and ${game("neon-velocity")} cover swinging and precision platforming.`,
     },
     gameCards(
-      ["steel-directive-city-zero", "hellforge-demon-protocol", "space-shooter-boss", "arrow-survival-15-seconds", "repeat-pixel-arts", "slpoing-path", "stickboys-hook", "dandan-slime-unblocked", "mini-switcher", "12-minibattles", "bubbla-boing", "hamster-escape-prison"],
+      ["steel-directive-city-zero", "hellforge-demon-protocol", "space-shooter-boss", "arrow-survival-15-seconds", "repeat-pixel-arts", "slpoing-path", "stickboys-hook", "neon-velocity", "mini-switcher", "12-minibattles", "bubbla-boing", "hamster-escape-prison"],
       "2D games in this guide",
     ),
     { type: "h2", text: "Settings that can help" },

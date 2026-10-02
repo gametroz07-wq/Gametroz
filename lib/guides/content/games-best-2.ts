@@ -38,10 +38,10 @@ export const arcadeGuide: GuideDefinition = {
         [game("extreme-ball-balancer-3d"), "W A S D rolls the ball; mouse moves the camera", "Landscape"],
         [game("birdy-trip"), "One touch or click", "Portrait"],
         [game("stickboys-hook"), "Click or tap to rope", "Landscape"],
-        [game("dandan-slime-unblocked"), "Left mouse button or a finger tap to move the slime", "Landscape"],
+        [game("fish-super-io-eating"), "The fish follows the mouse pointer", "Landscape"],
         [game("clucknrun"), "A and D keys, or the mouse", "Landscape"],
         [game("mini-car-simulator"), "On-screen buttons on mobile, with boost and camera buttons", "Landscape"],
-        [game("island-idle-survival"), "Mouse click or tap", "Landscape"],
+        [game("zombies-4-weapon-merge"), "Mouse click or tap", "Portrait"],
         [game("1945-air-force-airplane"), "Mouse click or tap", "Portrait"],
       ],
     },
@@ -49,12 +49,12 @@ export const arcadeGuide: GuideDefinition = {
     { type: "h3", text: "Fighting and shooting" },
     {
       type: "p",
-      text: `${game("halloween-fighters")} lets you choose from 11 monsters and fight through 12 haunted arenas to reach three bosses. You combine ten directional punches and kicks, chain combos and break guards. ${game("1945-air-force-airplane")} is a portrait shooter in the sky where you upgrade your plane and defeat enemies. ${game("dandan-slime-unblocked")} is a 2D horde-survival game in which a slime dashes through waves of enemies and collects coins for power-ups.`,
+      text: `${game("halloween-fighters")} lets you choose from 11 monsters and fight through 12 haunted arenas to reach three bosses. You combine ten directional punches and kicks, chain combos and break guards. ${game("1945-air-force-airplane")} is a portrait shooter in the sky where you upgrade your plane and defeat enemies. ${game("fish-super-io-eating")} is a 2D underwater game in which you start as a small fish and grow by eating smaller ones.`,
     },
     { type: "h3", text: "Idle and management" },
     {
       type: "p",
-      text: `${game("heist-idle")} is a 3D idle game in which you rob stores, banks and museums, upgrade your character and recruit crew. ${game("haunted-house-idle")} has you build a haunted attraction, welcome visitors, earn cash and unlock new areas. ${game("island-idle-survival")} asks you to collect wood, stone and food, craft tools and upgrade a raft.`,
+      text: `${game("heist-idle")} is a 3D idle game in which you rob stores, banks and museums, upgrade your character and recruit crew. ${game("haunted-house-idle")} has you build a haunted attraction, welcome visitors, earn cash and unlock new areas. ${game("zombies-4-weapon-merge")} is a portrait shooting and strategy game in which you merge weapons to hold back waves of zombies.`,
     },
     { type: "h3", text: "Balance, swing and fly" },
     {
@@ -67,7 +67,7 @@ export const arcadeGuide: GuideDefinition = {
       text: `${game("mini-car-simulator")} has 40 levels across city streets, forests and beach roads, with a booster and camera button. In ${game("clucknrun")} you return lost chickens to their farm while collecting chickens and gasoline and avoiding barrels.`,
     },
     gameCards(
-      ["halloween-fighters", "heist-idle", "haunted-house-idle", "extreme-ball-balancer-3d", "birdy-trip", "stickboys-hook", "dandan-slime-unblocked", "clucknrun", "mini-car-simulator", "island-idle-survival", "1945-air-force-airplane"],
+      ["halloween-fighters", "heist-idle", "haunted-house-idle", "extreme-ball-balancer-3d", "birdy-trip", "stickboys-hook", "fish-super-io-eating", "clucknrun", "mini-car-simulator", "zombies-4-weapon-merge", "1945-air-force-airplane"],
       "Arcade games in this guide",
     ),
     { type: "h2", text: "Tips for quick arcade sessions" },

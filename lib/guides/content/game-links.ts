@@ -6,6 +6,10 @@ import type { GuideBlock, GuideItemRef } from "@/types/content";
  * a published game in the target database.
  */
 export const gameNames = {
+  // replacements for games archived before the release
+  "fish-super-io-eating": "Fish Super IO Eating",
+  "zombies-4-weapon-merge": "Zombies 4 Weapon Merge",
+  "neon-velocity": "Neon Velocity",
   // racing
   "drift-car-driving": "Drift Car Driving",
   "rapid-apex-rush": "Rapid Apex Rush",
@@ -51,10 +55,8 @@ export const gameNames = {
   "extreme-ball-balancer-3d": "Extreme Ball Balancer 3D",
   "birdy-trip": "Birdy Trip",
   "stickboys-hook": "StickBoys Hook",
-  "dandan-slime-unblocked": "DanDan Slime Unblocked",
   clucknrun: "CluckNRun",
   "mini-car-simulator": "Mini Car Simulator",
-  "island-idle-survival": "Island Idle Survival",
   "1945-air-force-airplane": "1945 Air Force Airplane",
   "mini-switcher": "Mini Switcher",
   "12-minibattles": "12 MiniBattles",
