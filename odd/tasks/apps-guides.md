@@ -38,7 +38,7 @@ Games, Tools and Apps. Local only: no push, no deploy, no production DB writes.
 - [x] B1 Guides infra + game guides (uncommitted, awaiting review/commit).
 - [x] B2 Tool guides (10; uncommitted).
 - [x] B3 Software guides (9; uncommitted).
-- [ ] E  Local integration: Docker DB with games copied read-only from production + tools/apps/guides sync; crawl, responsive, console/CSP, validations; report.
+- [x] E  Local integration: Docker DB with games copied read-only from production + tools/apps/guides sync; crawl, responsive, console/CSP, validations; report.
 
 ## A1 evidence (2026-10-02)
 - Defined (45): browsers 8 (firefox, google-chrome, brave, opera, microsoft-edge, vivaldi, tor-browser, duckduckgo-browser);
@@ -106,3 +106,11 @@ TDD strict, `npm test`; per task lint + typecheck; final prisma validate, build,
 ## Progress
 - Branch: feat/apps-guides (stacked on feat/seo-geo-aeo-audit 870ad92).
 - Engram mirror: pending (Engram MCP unavailable this session).
+
+## E evidence (2026-10-02)
+- Local Docker mirrors production games (read-only copy: 498 PUBLISHED, 30 ARCHIVED); tools/apps/guides syncs applied LOCALLY only (apps 89 create/16 update; guides 21 create/8 update/2 archive; 0 broken references).
+- Release crawl (Docker build): 1,061 URLs all 200; 0 duplicate titles/descriptions/canonicals; one H1 everywhere; titles ≤ 60; descriptions 70–160; JSON-LD on every page (0 invalid); og:image everywhere; 0 empty alt; no orphans; max depth 3.
+- Browser sample (10 hubs + 20 games + 15 tools + 15 apps + 10 guides at 375 and 1440): 0 console errors, 0 CSP violations, 0 overflow, 0 unnamed buttons/links/inputs, 0 broken images, lang=en.
+- Found and fixed: 40 published games carried promotional third-party URLs (look-alike portal domains) in provider text → sentences with URLs dropped at render and sync (ac16c2d); mobile overflow from long words fixed; "unblocked" and "Getting Over It" now flagged editorially. Two published games still use "unblocked" in their titles (dandan-slime-unblocked, getting-over-it-unblocked): recommend archiving at release.
+- npm test 631/631, prisma validate, lint, typecheck, build OK, npm audit 0 vulnerabilities.
+- Release order for production (after approval): migrate (none new) → tools:sync → apps:sync → guides:sync (all --apply) → deploy; nothing has been written to Supabase.
