@@ -249,12 +249,12 @@ export default async function DesignSystemPage() {
           {(["home-feed", "game-below-player", "content-inline"] as const).map((placement) => (
             <div key={placement} className="space-y-2">
               <p className="font-mono text-xs text-muted-foreground">{placement}</p>
-              <AdSlot placement={placement} />
+              <AdSlot placement={placement} preview />
             </div>
           ))}
           <div className="space-y-2">
             <p className="font-mono text-xs text-muted-foreground">sidebar (lg and up)</p>
-            <AdSlot placement="sidebar" className="mx-0" />
+            <AdSlot placement="sidebar" className="mx-0" preview />
           </div>
         </div>
       </Section>

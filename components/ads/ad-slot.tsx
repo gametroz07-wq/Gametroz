@@ -1,3 +1,4 @@
+import { adsEnabled } from "@/lib/ads/config";
 import { cn } from "@/lib/utils";
 
 export type AdPlacement = "home-feed" | "game-below-player" | "sidebar" | "content-inline";
@@ -17,9 +18,12 @@ type AdSlotProps = {
 
 /**
  * Placeholder only. No ad network or external script is loaded until the monetization
- * phase; the provider will render inside this reserved box.
+ * phase; the provider will render inside this reserved box. While ads are disabled nothing
+ * is rendered, so visitors never see empty "Advertisement" boxes. `preview` forces the
+ * box for the design system page.
  */
-export function AdSlot({ placement, className }: AdSlotProps) {
+export function AdSlot({ placement, className, preview = false }: AdSlotProps & { preview?: boolean }) {
+  if (!preview && !adsEnabled()) return null;
   return (
     <aside
       aria-label="Advertisement"
