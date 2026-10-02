@@ -8,7 +8,7 @@ export const siteConfig = {
   indexingEnabled: process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true",
   locale: "en_US",
   // Temporary public inbox; change here once the definitive address exists.
-  contactEmail: "contact@gametroz.online",
+  contactEmail: "gametroz07@gmail.com",
 } as const;
 
 // `detail` is the singular detail route (/game/[slug]) that should also mark the item active.
