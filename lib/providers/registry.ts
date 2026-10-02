@@ -1,5 +1,5 @@
-import type { GameMonetizeSource } from "./gamemonetize/client";
-import { createGameMonetizeProvider } from "./gamemonetize/provider";
+import type { PlanEntry } from "./gamemonetize/popularity-plan";
+import { createGameMonetizeProvider, type GameMonetizeProviderSource } from "./gamemonetize/provider";
 
 /**
  * Every provider plugs in here. To add GameDistribution later: create lib/providers/gamedistribution/
@@ -7,7 +7,8 @@ import { createGameMonetizeProvider } from "./gamemonetize/provider";
  * below. Nothing else (catalog, pages, sync service) has to change.
  */
 export const providerFactories = {
-  gamemonetize: (source: GameMonetizeSource = "fixture") => createGameMonetizeProvider(source),
+  gamemonetize: (source: GameMonetizeProviderSource = "fixture", planEntries?: PlanEntry[]) =>
+    createGameMonetizeProvider(source, planEntries),
 } as const;
 
 export type ProviderSlug = keyof typeof providerFactories;

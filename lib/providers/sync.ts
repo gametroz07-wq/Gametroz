@@ -115,6 +115,12 @@ export async function syncProviderGames<TRaw>(
     const raw = (await provider.getGames({ limit })).slice(0, limit);
     const { unique, duplicates } = dedupeByProviderGameId(raw, provider.getId);
 
+    const normalizeWithPopularity = (game: TRaw): NormalizedGame => {
+      const data = provider.normalize(game);
+      const popularity = provider.getPopularity?.(game);
+      return popularity ? { ...data, popularity } : data;
+    };
+
     for (const game of duplicates) {
       items.push({
         providerGameId: provider.getId(game),
@@ -125,11 +131,12 @@ export async function syncProviderGames<TRaw>(
       });
     }
 
-    const normalized = unique.map((game) => ({ game, data: provider.normalize(game) }));
+    const normalized = unique.map((game) => ({ game, data: normalizeWithPopularity(game) }));
     const ids = normalized.map(({ data }) => data.providerGameId).filter(Boolean);
     const slugs = normalized.map(({ data }) => data.slug).filter(Boolean);
+    const embeds = normalized.map(({ data }) => data.embedUrl.trim()).filter(Boolean);
 
-    const [existing, slugOwners, categories] = await Promise.all([
+    const [existing, slugOwners, embedOwners, categories] = await Promise.all([
       prisma.game.findMany({
         where: { providerId: providerRow.id, providerGameId: { in: ids } },
         select: { id: true, providerGameId: true, status: true },
@@ -138,12 +145,21 @@ export async function syncProviderGames<TRaw>(
         where: { slug: { in: slugs } },
         select: { slug: true, providerId: true, providerGameId: true },
       }),
+      prisma.game.findMany({
+        where: { embedUrl: { in: embeds } },
+        select: { embedUrl: true, providerId: true, providerGameId: true },
+      }),
       prisma.gameCategory.findMany({ select: { id: true, slug: true } }),
     ]);
     const existingById = new Map(existing.map((row) => [row.providerGameId!, { id: row.id, status: row.status }]));
     const ownerBySlug = new Map(slugOwners.map((row) => [row.slug, row]));
+    const ownersByEmbed = new Map<string, typeof embedOwners>();
+    for (const row of embedOwners) {
+      if (row.embedUrl) ownersByEmbed.set(row.embedUrl, [...(ownersByEmbed.get(row.embedUrl) ?? []), row]);
+    }
     const categoryIdBySlug = new Map(categories.map((row) => [row.slug, row.id]));
     const batchSlugs = new Map<string, string>();
+    const batchEmbeds = new Map<string, string>();
     const probes = checkImages
       ? await mapWithConcurrency(normalized, IMAGE_PROBE_CONCURRENCY, ({ data }) => probeImage(data.thumbnailUrl))
       : [];
@@ -155,8 +171,15 @@ export async function syncProviderGames<TRaw>(
       return batchOwner !== undefined && batchOwner !== providerGameId;
     };
 
+    const isEmbedTaken = (embedUrl: string, providerGameId: string) => {
+      const owners = ownersByEmbed.get(embedUrl) ?? [];
+      if (owners.some((owner) => !(owner.providerId === providerRow.id && owner.providerGameId === providerGameId))) return true;
+      const batchOwner = batchEmbeds.get(embedUrl);
+      return batchOwner !== undefined && batchOwner !== providerGameId;
+    };
+
     for (const [index, { game, data }] of normalized.entries()) {
-      let validation = provider.validate(game, { isSlugTaken });
+      let validation = provider.validate(game, { isSlugTaken, isEmbedTaken });
       const probe = probes[index];
       if (probe && validation.status !== "REJECTED") {
         if (!probe.ok) {
@@ -179,7 +202,10 @@ export async function syncProviderGames<TRaw>(
           severity: "error",
         });
       }
-      if (validation.status !== "REJECTED") batchSlugs.set(data.slug, data.providerGameId);
+      if (validation.status !== "REJECTED") {
+        batchSlugs.set(data.slug, data.providerGameId);
+        batchEmbeds.set(data.embedUrl.trim(), data.providerGameId);
+      }
 
       const existingId = existingById.get(data.providerGameId);
       const report: SyncItemReport = {
@@ -188,6 +214,7 @@ export async function syncProviderGames<TRaw>(
         outcome: validation.status === "REJECTED" ? "reject" : existingId ? "update" : "create",
         validation: validation.status,
         issues: validation.issues,
+        ...(data.popularity ? { source: data.popularity.source } : {}),
       };
 
       if (!dryRun) {
@@ -246,6 +273,12 @@ export async function syncProviderGames<TRaw>(
   return result;
 }
 
+const popularityFields = (popularity: NonNullable<NormalizedGame["popularity"]>) => ({
+  popularity: popularity.score,
+  trending: popularity.trending,
+  featured: popularity.featured,
+});
+
 async function writeGame({
   prisma,
   providerId,
@@ -280,6 +313,9 @@ async function writeGame({
       height: data.height,
       orientation: data.orientation,
     };
+    // Popularity is catalog ranking, not editorial content, so it also refreshes published games.
+    const ranking =
+      data.popularity && (existing.status === "REVIEW" || existing.status === "PUBLISHED") ? popularityFields(data.popularity) : {};
     // Games still in REVIEW were never edited or published, so they take the full provider data
     // (except the slug). Published or archived games only get technical fields refreshed.
     const content =
@@ -295,7 +331,7 @@ async function writeGame({
             tags: { set: [], ...tagsInput(data.tags) },
           }
         : {};
-    await prisma.game.update({ where: { id: existing.id }, data: { ...validationFields, ...technical, ...content } });
+    await prisma.game.update({ where: { id: existing.id }, data: { ...validationFields, ...technical, ...ranking, ...content } });
     return;
   }
 
@@ -320,6 +356,7 @@ async function writeGame({
       provider: { connect: { id: providerId } },
       category: { connect: { id: categoryIdBySlug.get(data.category!)! } },
       tags: tagsInput(data.tags),
+      ...(data.popularity ? popularityFields(data.popularity) : {}),
       ...validationFields,
     },
   });

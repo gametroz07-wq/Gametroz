@@ -22,7 +22,18 @@ export type GameMonetizeGame = {
 /** Query parameters documented by the GameMonetize RSS builder (https://gamemonetize.com/rss-builder). */
 export type GameMonetizeFeedQuery = {
   category?: string;
-  popularity?: "newest" | "most popular" | "hot games" | "best games" | "exclusive games" | "editor picks";
+  popularity?:
+    | "newest"
+    | "most popular"
+    | "hot games"
+    | "best games"
+    | "exclusive games"
+    | "editor picks"
+    // Values the live feed documents and accepts (verified 2026-10-01).
+    | "mostplayed"
+    | "bestgames"
+    | "hotgames"
+    | "editorpicks";
   company?: string;
-  amount?: 10 | 20 | 30 | 40 | 100;
+  amount?: 10 | 20 | 30 | 40 | 100 | "All";
 };

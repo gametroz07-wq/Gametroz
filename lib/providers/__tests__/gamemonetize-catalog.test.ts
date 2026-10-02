@@ -5,7 +5,7 @@ import { planFeedQueries } from "../gamemonetize/feed-plan";
 
 describe("mapGameMonetizeCategory", () => {
   it("maps genre categories exactly", () => {
-    for (const [raw, slug] of [["Arcade", "arcade"], ["Puzzles", "puzzle"], ["Racing", "racing"], ["Soccer", "sports"], ["Shooting", "action"], ["Hypercasual", "casual"], ["Bejeweled", "puzzle"]] as const) {
+    for (const [raw, slug] of [["Arcade", "arcade"], ["Puzzles", "puzzle"], ["Racing", "racing"], ["Soccer", "sports"], ["Shooting", "action"], ["Hypercasual", "casual"], ["Bejeweled", "puzzle"], ["Fighting", "action"]] as const) {
       assert.deepEqual(mapGameMonetizeCategory(raw), { slug, match: "exact" }, raw);
     }
   });

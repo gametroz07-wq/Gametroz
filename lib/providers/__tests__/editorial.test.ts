@@ -37,6 +37,58 @@ describe("editorial review rules", () => {
     assert.match(messages({ instructions: "Tap to play" }), /instructions/i);
   });
 
+  it("flags the expanded brand list with word-boundary matching", () => {
+    for (const [title, brand] of [
+      ["Half-Life Escape", "half-life"],
+      ["Halo Runner", "halo"],
+      ["Terminator Dash", "terminator"],
+      ["Star Wars Defender", "star wars"],
+      ["Harry Potter Quest", "harry potter"],
+      ["Spongebob Jump", "spongebob"],
+      ["Naruto Fighters", "naruto"],
+      ["Dragon Ball Clash", "dragon ball"],
+      ["Shrek Swamp Run", "shrek"],
+      ["Minions Rush", "minions"],
+      ["Bluey Adventure", "bluey"],
+      ["NBA Shootout", "nba"],
+      ["WWE Smash", "wwe"],
+      ["Transformers Battle", "transformers"],
+      ["Valorant Aim Trainer", "valorant"],
+      ["Counter-Strike Online", "counter-strike"],
+      ["Temple Run Remix", "temple run"],
+      ["Cut the Rope Deluxe", "cut the rope"],
+    ] as const) {
+      assert.match(messages({ title }), new RegExp(`brand.*${brand}`, "i"), title);
+    }
+  });
+
+  it("does not flag generic words or look-alikes as brands", () => {
+    for (const title of ["Sims Of Mine", "Cars And Trucks Rally", "Halloween Heroes", "Halogen Lamp Puzzle", "Banana Run"]) {
+      assert.doesNotMatch(messages({ title }), /brand/i, title);
+    }
+  });
+
+  it("flags descriptions shorter than 60 characters for editorial review", () => {
+    const description = "A short description of fifty characters, roughly.";
+    assert.match(messages({ description }), /description.*short/i);
+    assert.doesNotMatch(messages({}), /description/i);
+    const result = validateGameMonetizeGame({ ...validGame, description });
+    assert.ok(result.issues.some((issue) => issue.code === "EDITORIAL_REVIEW_REQUIRED" && /description/i.test(issue.message)));
+  });
+
+  it("flags unusual characters and punctuation runs in titles", () => {
+    assert.match(messages({ title: "Super Racer 🚗" }), /unusual characters/i);
+    assert.match(messages({ title: "Cool Game ★ Deluxe" }), /unusual characters/i);
+    assert.match(messages({ title: "Wow!!! Racer" }), /unusual characters/i);
+    assert.match(messages({ title: "Dash ... Go" }), /unusual characters/i);
+  });
+
+  it("accepts accented letters, digits and ordinary punctuation in titles", () => {
+    for (const title of ["Café Rush 2", "Mini-Golf: The Return!", "Jack's Big Day (Remastered)", "Niño Sprint & Co."]) {
+      assert.doesNotMatch(messages({ title }), /unusual characters/i, title);
+    }
+  });
+
   it("flags approximate category mappings for confirmation", () => {
     assert.match(messages({ category: "Girls" }), /category/i);
   });

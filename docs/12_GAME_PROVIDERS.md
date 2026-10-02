@@ -132,6 +132,36 @@ lib/providers/
 - Any batch above 100 also needs `--confirm-large`.
 - Above 100 the client fans out: the newest list plus one query of 100 per category, deduplicated by id. The feed ignores `page` and `amount=all` is broken, so this is the only way to get more than one page.
 
+## Popularity feeds and the plan workflow
+
+The feed documents `popularity` = `newest`, `mostplayed`, `hotgames`, `bestgames`, `exclusivegames`, `editorpicks`, `branding`; there is no "trending" value, so `mostplayed` stands in for Trending. `amount=All` returns the whole feed (mostplayed and editorpicks ~5000 items, bestgames ~1700, hotgames ~2200).
+
+The initial catalog is built from a snapshot, on the operator machine only:
+
+```bash
+GAMEMONETIZE_FEED_ENABLED=true npm run provider:plan:gamemonetize -- --target 500 --out plan.json   # no DB access
+npm run provider:dryrun:gamemonetize -- --source plan --plan-file plan.json --offset 0 --limit 100
+npm run provider:sync:gamemonetize   -- --source plan --plan-file plan.json --offset 0 --limit 100
+```
+
+- `--target` is 1-1000 (default 500). Groups, in priority order: trending ← mostplayed (30%), best ← bestgames (30%), hot ← hotgames (20%), editors_pick ← editorpicks (20%). Each takes items in feed order, skipping ids and slugs already taken; the remainder is filled from mostplayed, bestgames, hotgames, editorpicks.
+- `--source plan` syncs exactly entries [offset, offset + limit) through the normal pipeline. `--offset` is required (non-negative integer); limits, thumbnail probing and `--confirm-large` rules are unchanged.
+- The snapshot prints counts per source and per provider category. The sync table adds a `source` column.
+
+### Popularity storage (existing fields only)
+
+| Field | Value |
+|---|---|
+| `trending` | the game is in the trending group |
+| `featured` | the game is in the editorpicks feed |
+| `popularity` | band by primary source (best 4000, hot 3000, trending 2000, editors_pick 1000) + `999 - (rank - 1)` |
+
+A plan sync writes these for new and REVIEW games and also refreshes them on already PUBLISHED provider games (ranking is catalog metadata, not editorial content); name, slug, description and status are still never touched. Without plan metadata nothing changes.
+
+## Technical duplicates
+
+Slug or embed URL already owned by a different game (in the database or earlier in the same run) → `DUPLICATE_SLUG` / `DUPLICATE_EMBED`, severity error: the game is REJECTED, not written, and listed in the output.
+
 ## Thumbnail check (live sync)
 
 - Checks HTTPS, allowed host, then a `GET` with `Range`: status 200/206, `image/*` content type and decodable dimensions.
@@ -148,7 +178,11 @@ Entries in `gamemonetize/config.ts` are either exact or approximate. An unknown 
 - brand names in the title or tags;
 - SEO-spam titles;
 - instructions shorter than 25 characters;
-- an approximate category.
+- an approximate category;
+- a description shorter than 60 characters;
+- a title with unusual characters (emoji, symbols, repeated punctuation).
+
+The brand list (`KNOWN_BRANDS`) matches whole words and avoids generic words (frozen, cars, sims).
 
 Games are never auto-rejected by these filters. Publishing a game that carries them requires `--ack-editorial` after a human review.
 
@@ -177,6 +211,8 @@ npm run provider:archive -- --slug <slug> | --id <n> | --ids a,b                
 |---|---|
 | `npm run provider:dryrun:gamemonetize` | Dry run, fixtures, limit 20 |
 | `npm run provider:sync:gamemonetize` | Sync fixtures into REVIEW (`-- --limit N`) |
+| `npm run provider:plan:gamemonetize -- --target 500 --out plan.json` | Build a popularity snapshot (live feed, no DB) |
+| `... -- --source plan --plan-file plan.json --offset N` | Sync a slice of the snapshot |
 | `... -- --source live` | Use the real feed (requires `GAMEMONETIZE_FEED_ENABLED=true`) |
 | `npm run provider:review` | Read-only review table |
 | `npm run provider:publish -- --slug <slug>` | Publish reviewed games (`--slug`, `--id`, `--ids`; `--ack-editorial`) |

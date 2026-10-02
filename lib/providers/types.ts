@@ -20,6 +20,7 @@ export type ValidationCode =
   | "INSTRUCTIONS_MISSING"
   | "DUPLICATE_IN_FEED"
   | "DUPLICATE_SLUG"
+  | "DUPLICATE_EMBED"
   | "THUMBNAIL_UNREACHABLE"
   | "THUMBNAIL_SMALL"
   | "EDITORIAL_REVIEW_REQUIRED"
@@ -61,11 +62,18 @@ export type NormalizedGame = {
   providerCategory: string;
   tags: string[];
   status: "REVIEW";
+  /**
+   * Catalog ranking metadata from a popularity plan. Optional: without it a sync behaves exactly as
+   * before. Written to `popularity`, `trending` and `featured` (ranking, not editorial content).
+   */
+  popularity?: { source: string; rank: number; score: number; trending: boolean; featured: boolean };
 };
 
 export type ValidationContext = {
   /** Returns true when the slug already belongs to a different game. */
   isSlugTaken?: (slug: string, providerGameId: string) => boolean;
+  /** Returns true when the embed URL already belongs to a different game. */
+  isEmbedTaken?: (embedUrl: string, providerGameId: string) => boolean;
 };
 
 export type FetchOptions = {
@@ -84,6 +92,8 @@ export interface GameProvider<TRaw> {
   getGames(options: FetchOptions): Promise<TRaw[]>;
   getGame(id: string): Promise<TRaw | null>;
   getId(game: TRaw): string;
+  /** Optional ranking metadata for a raw game (set by plan-based sources). */
+  getPopularity?(game: TRaw): NormalizedGame["popularity"];
   normalize(game: TRaw): NormalizedGame;
   validate(game: TRaw, context?: ValidationContext): ValidationResult;
 }
@@ -96,6 +106,8 @@ export type SyncItemReport = {
   outcome: SyncItemOutcome;
   validation: ValidationStatus;
   issues: ValidationIssue[];
+  /** Popularity source (trending, best, hot, editors_pick) when the game came from a plan. */
+  source?: string;
 };
 
 export type SyncResult = {

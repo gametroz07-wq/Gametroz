@@ -50,6 +50,8 @@ export function validateNormalizedGame(
   else if (embed === "not-https") issues.push(error("EMBED_NOT_HTTPS", "Embed URL must use HTTPS."));
   else if (embed === "host-not-allowed") {
     issues.push(error("EMBED_HOST_NOT_ALLOWED", "Embed host is not in the provider allowlist."));
+  } else if (context.isEmbedTaken?.(game.embedUrl.trim(), game.providerGameId)) {
+    issues.push(error("DUPLICATE_EMBED", "Embed URL already belongs to another game (possible duplicate)."));
   }
 
   if (game.categoryMatch === "fallback") {

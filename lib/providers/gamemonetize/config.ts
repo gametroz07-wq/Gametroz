@@ -48,6 +48,8 @@ export const FALLBACK_CATEGORY = "casual";
 const CATEGORY_MAP: Record<string, { slug: string; match: Exclude<CategoryMatch, "fallback"> }> = {
   action: { slug: "action", match: "exact" },
   shooting: { slug: "action", match: "exact" },
+  // The live feed sends "Fighting"; it is not listed by the RSS builder.
+  fighting: { slug: "action", match: "exact" },
   stickman: { slug: "action", match: "approximate" },
   adventure: { slug: "adventure", match: "exact" },
   arcade: { slug: "arcade", match: "exact" },

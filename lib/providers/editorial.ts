@@ -50,11 +50,58 @@ export const KNOWN_BRANDS = [
   "pubg",
   "free fire",
   "brawl stars",
+  "half-life",
+  "half life",
+  "halo",
+  "terminator",
+  "star wars",
+  "harry potter",
+  "temple run",
+  "cut the rope",
+  "spongebob",
+  "naruto",
+  "dragon ball",
+  "shrek",
+  "minions",
+  "bluey",
+  "nba",
+  "nfl",
+  "ufc",
+  "wwe",
+  "transformers",
+  "valorant",
+  "counter-strike",
+  "counter strike",
+  "toy story",
+  "kung fu panda",
+  "ninja turtles",
+  "power rangers",
+  "ghostbusters",
+  "jurassic park",
+  "mickey mouse",
+  "tom and jerry",
+  "need for speed",
+  "fall guys",
+  "rocket league",
+  "league of legends",
+  "poppy playtime",
+  "huggy wuggy",
+  "sprunki",
+  "cocomelon",
+  "genshin impact",
+  "tekken",
+  "pikachu",
+  "ben 10",
+  "the simpsons",
 ] as const;
 
 const SEO_KEYWORDS = new Set(["game", "games", "online", "free", "play", "simulator", "unblocked", "io", "2024", "2025", "2026"]);
 const MIN_INSTRUCTIONS_LENGTH = 25;
 const MAX_TITLE_WORDS = 6;
+const MIN_DESCRIPTION_LENGTH = 60;
+/** Letters (any language, accents included), digits, spaces and ordinary title punctuation. */
+const USUAL_TITLE_CHARACTERS = /^[\p{L}\p{N}\p{M}\s.,:;!?'"’‘“”&\-–—_()+#/@%*$]+$/u;
+const PUNCTUATION_RUN = /[^\p{L}\p{N}\p{M}\s]{3,}/u;
 
 const escape = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const containsTerm = (text: string, term: string) => new RegExp(`(^|[^a-z0-9])${escape(term)}($|[^a-z0-9])`, "i").test(text);
@@ -75,6 +122,14 @@ export function editorialIssues(game: NormalizedGame): ValidationIssue[] {
   const shouting = game.name.length > 12 && game.name === game.name.toUpperCase() && /[A-Z]/.test(game.name);
   if (words.length > MAX_TITLE_WORDS || keywordHits >= 2 || repeated || shouting) {
     issues.push(issue("Title looks like SEO spam (keyword stuffing, too long or all caps). Consider a clean title."));
+  }
+
+  if (!USUAL_TITLE_CHARACTERS.test(game.name) || PUNCTUATION_RUN.test(game.name)) {
+    issues.push(issue("Title has unusual characters (emoji, symbols or repeated punctuation). Consider a clean title."));
+  }
+
+  if (game.description.trim().length < MIN_DESCRIPTION_LENGTH) {
+    issues.push(issue(`Description is short (${game.description.trim().length} characters, under ${MIN_DESCRIPTION_LENGTH}). Expand it before publishing.`));
   }
 
   if (game.instructions.trim().length > 0 && game.instructions.trim().length < MIN_INSTRUCTIONS_LENGTH) {

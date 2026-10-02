@@ -17,6 +17,7 @@
     "test": "tsx --test \"lib/**/*.test.ts\"",
     "provider:dryrun:gamemonetize": "tsx scripts/provider-sync.ts --provider gamemonetize --dry-run",
     "provider:sync:gamemonetize": "tsx scripts/provider-sync.ts --provider gamemonetize",
+    "provider:plan:gamemonetize": "tsx scripts/provider-plan.ts",
     "provider:review": "tsx scripts/provider-review.ts",
     "provider:publish": "tsx scripts/provider-publish.ts",
     "db:seed:deploy": "node scripts/deploy-seed.mjs",

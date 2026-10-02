@@ -57,7 +57,8 @@ describe("GameMonetize validator", () => {
   it("flags a short description for review", () => {
     const result = validateGameMonetizeGame(gameWithShortDescription);
     assert.equal(result.status, "NEEDS_REVIEW");
-    assert.deepEqual(codes(result), ["DESCRIPTION_TOO_SHORT"]);
+    // Under 40 characters the validator warns, and the editorial rule (under 60) adds its own warning.
+    assert.deepEqual(codes(result), ["DESCRIPTION_TOO_SHORT", "EDITORIAL_REVIEW_REQUIRED"]);
   });
 
   it("flags unreasonable sizes for review", () => {
