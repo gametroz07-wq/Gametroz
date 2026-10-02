@@ -79,6 +79,7 @@ export default function PrivacyPage() {
   return (
     <LegalDocument
       title="Privacy Policy"
+      path="/privacy"
       intro="This policy explains, in plain language, what information Gametroz processes when you use the site and how third-party services may be involved."
       updatedAt="2026-10-01"
       blocks={blocks}

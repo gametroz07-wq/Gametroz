@@ -7,6 +7,8 @@ export function TagList({ tags, label = "Tags" }: { tags: string[]; label?: stri
         <li key={tag}>
           <Link
             href={`/search?q=${encodeURIComponent(tag)}`}
+            // The target is a noindex internal search page: do not pass link signals to it.
+            rel="nofollow"
             className="inline-flex rounded-full bg-surface-2 px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
           >
             #{tag}

@@ -2,6 +2,7 @@ import { Play } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
+import { gameImageAlt } from "@/lib/seo/templates";
 import { cn } from "@/lib/utils";
 import type { GameSummary } from "@/types/content";
 
@@ -31,7 +32,7 @@ export function GameCard({ game, priority = false, sizes = GAME_CARD_SIZES, clas
       <Link href={`/game/${game.slug}`} className="block size-full outline-none">
         <Image
           src={game.thumbnailUrl}
-          alt=""
+          alt={gameImageAlt(game.name)}
           fill
           sizes={sizes}
           priority={priority}

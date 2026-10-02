@@ -1,5 +1,6 @@
 import { Gamepad2 } from "lucide-react";
 import Image from "next/image";
+import { gameImageAlt } from "@/lib/seo/templates";
 import { cn } from "@/lib/utils";
 import type { Game } from "@/types/content";
 
@@ -26,7 +27,7 @@ export function GamePlayerPlaceholder({ game }: { game: Pick<Game, "name" | "thu
         )}
         <Image
           src={game.thumbnailUrl}
-          alt={`${game.name} artwork`}
+          alt={gameImageAlt(game.name)}
           fill
           priority
           sizes={portrait ? "360px" : "(min-width: 1024px) 70vw, 100vw"}

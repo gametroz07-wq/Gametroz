@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { appIconAlt } from "@/lib/seo/templates";
 import { cn } from "@/lib/utils";
 import type { AppSummary } from "@/types/content";
 
@@ -7,7 +8,7 @@ export function AppIcon({ app, size = 44, className }: { app: AppSummary; size?:
     return (
       <Image
         src={app.iconUrl}
-        alt=""
+        alt={appIconAlt(app.name)}
         width={size}
         height={size}
         style={{ width: size, height: size }}

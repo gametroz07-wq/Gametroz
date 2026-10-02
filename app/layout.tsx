@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Orbitron } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
+import { defaultOgImage } from "@/lib/seo/metadata";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -35,11 +36,13 @@ export const metadata: Metadata = {
     title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
     locale: siteConfig.locale,
+    images: [defaultOgImage],
   },
   twitter: {
     card: "summary_large_image",
     title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
+    images: [defaultOgImage.url],
   },
   robots: siteConfig.indexingEnabled
     ? { index: true, follow: true }

@@ -79,6 +79,7 @@ export default function TermsPage() {
   return (
     <LegalDocument
       title="Terms of Use"
+      path="/terms"
       intro="These terms explain how you may use Gametroz and how third-party games, software links and online tools fit in."
       updatedAt="2026-10-01"
       blocks={blocks}

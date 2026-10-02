@@ -1,6 +1,7 @@
 import { Play, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { gameImageAlt } from "@/lib/seo/templates";
 import type { Game } from "@/types/content";
 
 /** Featured game spotlight: the largest image on the page, with one clear Play call to action. */
@@ -9,7 +10,7 @@ export function GameHero({ game, label = "Featured" }: { game: Game; label?: str
     <article className="group/hero relative isolate flex min-h-64 overflow-hidden rounded-2xl bg-surface-2 ring-1 ring-white/5 sm:min-h-80 lg:h-full has-[a:focus-visible]:ring-3 has-[a:focus-visible]:ring-ring/70">
       <Image
         src={game.thumbnailUrl}
-        alt=""
+        alt={gameImageAlt(game.name)}
         fill
         priority
         sizes="(min-width: 1024px) 66vw, 100vw"

@@ -383,6 +383,25 @@ export async function getGuideRelatedContent(guide: Guide) {
   return { games, tools, apps };
 }
 
+/* ---------- Sitemap ---------- */
+
+const sitemapSelect = { slug: true, updatedAt: true, status: true } as const;
+
+/** Slugs, update times and statuses of everything public, for app/sitemap.ts. PUBLISHED only. */
+export async function getSitemapContent() {
+  const [games, tools, apps, guides, gameCategories, toolCategories, platforms, guideSections] = await Promise.all([
+    prisma.game.findMany({ where: PUBLISHED, select: sitemapSelect, orderBy: [...byPopularity] }),
+    prisma.tool.findMany({ where: PUBLISHED, select: sitemapSelect, orderBy: [...bySortOrder] }),
+    prisma.app.findMany({ where: PUBLISHED, select: sitemapSelect, orderBy: [...bySortOrder] }),
+    prisma.guide.findMany({ where: PUBLISHED, select: sitemapSelect, orderBy: [...byNewest] }),
+    getGameCategories(),
+    getToolCategories(),
+    getPlatforms(),
+    getGuideSections(),
+  ]);
+  return { games, tools, apps, guides, gameCategories, toolCategories, platforms, guideSections };
+}
+
 /* ---------- Search ---------- */
 
 /** Case-insensitive "contains" search in PostgreSQL. A dedicated engine can replace it later (Phase 6). */

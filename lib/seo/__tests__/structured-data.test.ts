@@ -1,7 +1,19 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { siteConfig } from "../../site";
-import { absoluteUrl, breadcrumbList, faqPage, serializeJsonLd, webApplication } from "../structured-data";
+import {
+  absoluteUrl,
+  article,
+  breadcrumbList,
+  breadcrumbTrail,
+  faqPage,
+  organization,
+  serializeJsonLd,
+  softwareApplication,
+  videoGame,
+  webApplication,
+  webSite,
+} from "../structured-data";
 
 describe("absoluteUrl", () => {
   it("joins the site URL and a path exactly once", () => {
@@ -75,5 +87,146 @@ describe("serializeJsonLd", () => {
     assert.ok(!json.includes("<"));
     assert.ok(!json.includes(" "));
     assert.deepEqual(JSON.parse(json), { name: "</script><script>alert(1)</script>", note: "a b" });
+  });
+});
+
+describe("breadcrumbTrail", () => {
+  it("mirrors the visible trail: Home first, the last item uses the current path", () => {
+    const data = breadcrumbTrail([{ label: "Games", href: "/games" }, { label: "Racing" }], "/games/racing");
+    assert.deepEqual(
+      data.itemListElement.map((item) => [item.position, item.name, item.item]),
+      [
+        [1, "Home", `${siteConfig.url}/`],
+        [2, "Games", `${siteConfig.url}/games`],
+        [3, "Racing", `${siteConfig.url}/games/racing`],
+      ],
+    );
+  });
+
+  it("handles a single-item trail", () => {
+    const data = breadcrumbTrail([{ label: "Contact" }], "/contact");
+    assert.equal(data.itemListElement.length, 2);
+    assert.equal(data.itemListElement[1].item, `${siteConfig.url}/contact`);
+  });
+});
+
+describe("webSite", () => {
+  const data = webSite();
+
+  it("describes the site with a sitelinks search box that targets /search?q=", () => {
+    assert.equal(data["@type"], "WebSite");
+    assert.equal(data.name, siteConfig.name);
+    assert.equal(data.url, `${siteConfig.url}/`);
+    assert.equal(data.potentialAction["@type"], "SearchAction");
+    assert.equal(data.potentialAction.target.urlTemplate, `${siteConfig.url}/search?q={search_term_string}`);
+    assert.equal(data.potentialAction["query-input"], "required name=search_term_string");
+  });
+});
+
+describe("organization", () => {
+  const data = organization();
+
+  it("only states facts the site publishes", () => {
+    assert.equal(data["@type"], "Organization");
+    assert.equal(data.name, siteConfig.name);
+    assert.equal(data.url, `${siteConfig.url}/`);
+    assert.equal(data.logo, `${siteConfig.url}/icon.svg`);
+    assert.equal(data.email, siteConfig.contactEmail);
+    assert.ok(!("sameAs" in data));
+  });
+});
+
+describe("softwareApplication", () => {
+  const base = {
+    name: "VLC Media Player",
+    description: "Plays almost any media file.",
+    path: "/app/vlc-media-player",
+    platforms: ["windows", "mac", "android"] as const,
+    categoryName: "Media players",
+  };
+
+  it("uses only visible facts and no offers, ratings or reviews by default", () => {
+    const data = softwareApplication({ ...base, platforms: [...base.platforms] });
+    assert.equal(data["@type"], "SoftwareApplication");
+    assert.equal(data.url, `${siteConfig.url}/app/vlc-media-player`);
+    assert.equal(data.operatingSystem, "Windows, macOS, Android");
+    assert.equal(data.applicationCategory, "MultimediaApplication");
+    for (const key of ["offers", "aggregateRating", "review", "downloadUrl"]) assert.ok(!(key in data), key);
+  });
+
+  it("adds a free offer and download URL only when asked to", () => {
+    const data = softwareApplication({
+      ...base,
+      platforms: [...base.platforms],
+      free: true,
+      downloadUrl: "https://www.videolan.org/vlc/",
+    });
+    assert.deepEqual(data.offers, { "@type": "Offer", price: "0", priceCurrency: "USD" });
+    assert.equal(data.downloadUrl, "https://www.videolan.org/vlc/");
+  });
+
+  it("maps categories sensibly and falls back to UtilitiesApplication", () => {
+    const category = (categoryName: string) =>
+      softwareApplication({ ...base, platforms: ["windows"], categoryName }).applicationCategory;
+    assert.equal(category("Web browsers"), "BrowserApplication");
+    assert.equal(category("Image editors"), "DesignApplication");
+    assert.equal(category("Media"), "MultimediaApplication");
+    assert.equal(category("Office suites"), "BusinessApplication");
+    assert.equal(category("Security"), "SecurityApplication");
+    assert.equal(category("Developer tools"), "DeveloperApplication");
+    assert.equal(category("Something else"), "UtilitiesApplication");
+  });
+
+  it("treats browser apps as web-based", () => {
+    const data = softwareApplication({ ...base, platforms: ["browser", "android"] });
+    assert.equal(data.operatingSystem, "Web browser, Android");
+  });
+});
+
+describe("article", () => {
+  it("includes only visible fields and the Gametroz publisher", () => {
+    const data = article({
+      headline: "How to play",
+      description: "A guide.",
+      path: "/guide/how-to-play",
+      datePublished: "2026-09-01",
+    });
+    assert.equal(data["@type"], "Article");
+    assert.equal(data.headline, "How to play");
+    assert.equal(data.datePublished, "2026-09-01");
+    assert.equal(data.mainEntityOfPage, `${siteConfig.url}/guide/how-to-play`);
+    assert.deepEqual(data.publisher, { "@type": "Organization", name: siteConfig.name, url: `${siteConfig.url}/` });
+    for (const key of ["author", "dateModified", "aggregateRating"]) assert.ok(!(key in data), key);
+  });
+
+  it("omits dates that are not provided", () => {
+    const data = article({ headline: "h", description: "d", path: "/guide/x" });
+    assert.ok(!("datePublished" in data));
+  });
+});
+
+describe("videoGame", () => {
+  const data = videoGame({
+    name: "Neon Drift",
+    description: "Drift through neon-lit city circuits.",
+    path: "/game/neon-drift",
+    image: "https://img.example.com/neon.jpg",
+    categoryName: "Racing",
+  });
+
+  it("describes a free browser game", () => {
+    assert.equal(data["@type"], "VideoGame");
+    assert.equal(data.name, "Neon Drift");
+    assert.equal(data.url, `${siteConfig.url}/game/neon-drift`);
+    assert.equal(data.image, "https://img.example.com/neon.jpg");
+    assert.equal(data.genre, "Racing");
+    assert.equal(data.gamePlatform, "Web browser");
+    assert.equal(data.applicationCategory, "Game");
+    assert.equal(data.operatingSystem, "Any");
+    assert.equal(data.isAccessibleForFree, true);
+  });
+
+  it("never includes ratings or reviews", () => {
+    for (const key of ["aggregateRating", "review", "author"]) assert.ok(!(key in data), key);
   });
 });

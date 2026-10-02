@@ -8,6 +8,7 @@ import { ChipNav } from "@/components/shared/chip-nav";
 import { PageHeader } from "@/components/shared/page-header";
 import { getAppsByPlatform, getPlatform, getPlatforms } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { extendDescription, platformIntro } from "@/lib/seo/templates";
 
 export const dynamicParams = false;
 
@@ -20,7 +21,10 @@ export async function generateMetadata({ params }: PageProps<"/apps/[platform]">
   if (!platform) return {};
   return pageMetadata({
     title: `Free ${platform.name} Apps — Official Downloads`,
-    description: platform.description,
+    description: extendDescription(platform.description, [
+      "Every listing links to the official publisher.",
+      "Gametroz does not host any downloads.",
+    ]),
     path: `/apps/${platform.slug}`,
   });
 }
@@ -34,8 +38,17 @@ export default async function PlatformPage({ params }: PageProps<"/apps/[platfor
 
   return (
     <Container className="pb-10">
-      <Breadcrumbs items={[{ label: "Apps", href: "/apps" }, { label: platform.name }]} className="pt-3" />
-      <PageHeader title={title} description={platform.description} />
+      <Breadcrumbs items={[{ label: "Apps", href: "/apps" }, { label: platform.name }]} path={`/apps/${platform.slug}`} className="pt-3" />
+      <PageHeader title={title} description={platform.description}>
+        <p className="type-muted max-w-2xl pt-1 sm:text-[15px]">
+          {platformIntro({
+            name: platform.name,
+            slug: platform.slug,
+            count: apps.length,
+            examples: apps.slice(0, 3).map((app) => app.name),
+          })}
+        </p>
+      </PageHeader>
 
       <ChipNav
         label="Platforms"

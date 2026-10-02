@@ -1,0 +1,57 @@
+# SEO + AEO + GEO audit (executable)
+
+## Objective
+Audit gametroz.online for organic growth (English, US priority), apply safe P0/P1 fixes, document the rest.
+Indexing stays OFF, no Search Console, no Adsterra, no deploy.
+
+## Evidence collected (2026-10-02)
+- Production crawl (main 1db519c): 974 URLs, 973×200, 1×404 (/cdn-cgi/l/email-protection, Cloudflare email obfuscation).
+  0 duplicate titles; 1 canonical per page (query strings canonicalize to the clean URL); exactly 1 H1 per page;
+  max click depth 3 (games at depth 1–2, median 14 inlinks per game).
+  0 JSON-LD on the whole site; 14,454/14,454 images with alt=""; 475 pages without og:image;
+  game meta descriptions: 430 under 70 chars, 170 over 160; 14 titles over 60 chars;
+  403 crawlable /search?q=… URLs (tag links), all noindex + canonical /search.
+- Redirects OK: www→apex 301, http→https 301, trailing slash 308; uppercase paths 404.
+- robots.txt is only Cloudflare's content-signals preamble (no rules, no Sitemap line); /llms.txt 404; /about 404.
+- Game content (498 published, read-only DB query): 100% provider text verbatim, 0 duplicate descriptions,
+  description median 61 words (63 under 40), instructions median 12 words, 134× "Mouse click or tap to play",
+  bare entity words from the feed (uarr/rarr/larr/darr) shown as text on ~24 games, 4 near-duplicate title pairs.
+  Game page order: player → Play next → Related → About → How to play → empty "Controls" heading → Tags.
+- Keyword research: search tool returned low-quality SERPs; all difficulty/traffic values are labeled estimates.
+
+## Tasks
+- [x] A1 (delegated, done 2026-10-02, uncommitted) Site-wide SEO infra: JSON-LD (WebSite, Organization, BreadcrumbList everywhere, VideoGame,
+      SoftwareApplication, Article only when visible), alt text, default OG image, title/description templates,
+      sitemap for all published content, robots.ts (gated), llms.txt, /about + /editorial-policy, decorative logo text.
+- [ ] A2 (delegated) Game page template: quick facts (category, controls derived from instructions, orientation,
+      browser/no download), content order, empty sections hidden, similar games, feed entity repair, category intros.
+- [ ] A3 Core Web Vitals lab audit (local production build) and obvious fixes.
+- [ ] A4 Internal crawl of the branch build + validations; docs/SEO-GEO-AEO-AUDIT.md.
+
+## A1 evidence and decisions
+- RED: new tests for structured-data (breadcrumbTrail, webSite, organization, softwareApplication, article, videoGame),
+  templates, robots, llms, metadata and the extended sitemap failed first (TypeErrors; "Cannot find module" for
+  ../templates, ../robots, ../llms; old sitemap test no longer matched). GREEN: npm test 508/508 pass, lint and typecheck clean.
+- JSON-LD: Breadcrumbs takes an optional path prop and emits BreadcrumbList from the same visible items (games, game
+  categories, apps, platforms, app detail, guides, sections, guide detail, privacy, terms, contact, about, editorial policy).
+  Tool pages keep their own JsonLd. Home emits WebSite (+SearchAction to /search?q=) and Organization (logo /icon.svg, contact
+  email shown on /contact, no sameAs). App detail: SoftwareApplication with downloadUrl (the visible official link), NO offers
+  (the page never states "free", only <title> did). Guide detail: Article with headline, description, datePublished (visible date),
+  publisher Organization; no author, no dateModified. videoGame() builder exists for A2; the game page was not touched.
+- Alt: GameCard, GameRankCard, GameFeatureCard, GameHero and the player placeholder use "<name> online game"; AppIcon uses
+  "<name> icon". App screenshots are text placeholders (no <img>) so nothing to change. LCP priority now only on the hero image
+  on / and /games (cards and side feature cards no longer preload).
+- Default OG image: route handler app/og/default/route.tsx (ImageResponse, force-static), referenced explicitly from
+  pageMetadata and the root layout. The app/opengraph-image file convention was rejected: pageMetadata replaces the whole
+  openGraph object, which drops the root layout file-based image.
+- Titles/descriptions: lib/seo/templates.ts (fitTitle, appTitle, gameCategoryTitle/Description/Intro, platformIntro,
+  extendDescription, limitDescription). pageMetadata no longer appends " | Gametroz" to titles that already name the site.
+- Sitemap: games, game categories, tools, apps, platforms, guides, sections, /about, /editorial-policy, /contact, /privacy,
+  /terms; published only, deduped, no /search, lastModified from updatedAt. Still [] while indexing is off.
+  app/robots.ts allows / (no Sitemap) while off; on: Disallow /api/ and /search plus Sitemap. /llms.txt via route handler.
+- Not done: tag links in ChipNav on /apps (category chips to /search?q=...) keep follow; game page JSON-LD, breadcrumb path
+  and metadata remain for A2 (pass path to Breadcrumbs there).
+
+## Progress
+- Branch: feat/seo-geo-aeo-audit (stacked on feat/tools-section 221deac).
+- Engram mirror: pending (Engram MCP unavailable this session).

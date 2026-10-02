@@ -6,6 +6,7 @@ import { GameCard } from "@/components/games/game-card";
 import { GuideBody } from "@/components/guides/guide-body";
 import { GuideCard } from "@/components/guides/guide-card";
 import { Container } from "@/components/layout/container";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { CardGrid } from "@/components/shared/card-grid";
 import { PageSection } from "@/components/shared/page-section";
@@ -19,6 +20,7 @@ import {
 } from "@/lib/catalog";
 import { formatDate } from "@/lib/format";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { article } from "@/lib/seo/structured-data";
 
 export const dynamicParams = false;
 
@@ -44,12 +46,22 @@ export default async function GuidePage({ params }: PageProps<"/guide/[slug]">) 
 
   return (
     <Container className="pb-12">
+      {/* Only fields the page shows: the title, summary and publication date. No author or modified date. */}
+      <JsonLd
+        data={article({
+          headline: guide.title,
+          description: guide.excerpt,
+          path: `/guide/${guide.slug}`,
+          datePublished: guide.publishedAt,
+        })}
+      />
       <Breadcrumbs
         items={[
           { label: "Guides", href: "/guides" },
           ...(section ? [{ label: section.name, href: `/guides/${section.slug}` }] : []),
           { label: guide.title },
         ]}
+        path={`/guide/${guide.slug}`}
         className="pt-4 sm:pt-6"
       />
 

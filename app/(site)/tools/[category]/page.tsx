@@ -9,6 +9,7 @@ import { ToolCard } from "@/components/tools/tool-card";
 import { ToolCategoryTile } from "@/components/tools/tool-category-tile";
 import { getToolCategories, getToolCategory, getToolCategorySummaries, getToolsByCategory } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { extendDescription } from "@/lib/seo/templates";
 import { breadcrumbList } from "@/lib/seo/structured-data";
 
 // ISR: categories refresh every 10 minutes; a category added later renders on first request.
@@ -23,7 +24,10 @@ export async function generateMetadata({ params }: PageProps<"/tools/[category]"
   if (!category) return {};
   return pageMetadata({
     title: `Free ${category.name} Tools Online`,
-    description: category.description,
+    description: extendDescription(category.description, [
+      "Free to use in your browser, with no sign-up.",
+      "Your data stays on your device.",
+    ]),
     path: `/tools/${category.slug}`,
   });
 }

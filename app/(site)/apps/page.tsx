@@ -9,10 +9,14 @@ import { PageHeader } from "@/components/shared/page-header";
 import { PageSection } from "@/components/shared/page-section";
 import { getAppCategories, getApps, getAppsByPlatform, getFeaturedApps, getPlatforms } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { extendDescription } from "@/lib/seo/templates";
 
 export const metadata = pageMetadata({
   title: "Free Apps and Software — Official Downloads",
-  description: "Discover useful free software for Windows, macOS, Linux, Android and your browser, always linked to the official publisher.",
+  description: extendDescription(
+    "Discover useful free software for Windows, macOS, Linux, Android and your browser, always linked to the official publisher.",
+    ["Gametroz does not host any downloads."],
+  ),
   path: "/apps",
 });
 
@@ -29,7 +33,7 @@ export default async function AppsPage() {
 
   return (
     <Container className="pb-10">
-      <Breadcrumbs items={[{ label: "Apps" }]} className="pt-3" />
+      <Breadcrumbs items={[{ label: "Apps" }]} path="/apps" className="pt-3" />
       <PageHeader
         title="Apps & software"
         description={`${allApps.length} trusted apps. Every download button goes to the official publisher.`}

@@ -8,6 +8,7 @@ import { ChipNav } from "@/components/shared/chip-nav";
 import { PageHeader } from "@/components/shared/page-header";
 import { getGuideSection, getGuideSections, getGuidesBySection } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { extendDescription } from "@/lib/seo/templates";
 
 export const dynamicParams = false;
 
@@ -20,7 +21,10 @@ export async function generateMetadata({ params }: PageProps<"/guides/[section]"
   if (!section) return {};
   return pageMetadata({
     title: `${section.name} Guides`,
-    description: section.description,
+    description: extendDescription(section.description, [
+      "Practical, step-by-step articles from the Gametroz library.",
+      "New guides are added as the catalog grows.",
+    ]),
     path: `/guides/${section.slug}`,
   });
 }
@@ -33,7 +37,7 @@ export default async function GuideSectionPage({ params }: PageProps<"/guides/[s
 
   return (
     <Container className="pb-12">
-      <Breadcrumbs items={[{ label: "Guides", href: "/guides" }, { label: section.name }]} className="pt-6" />
+      <Breadcrumbs items={[{ label: "Guides", href: "/guides" }, { label: section.name }]} path={`/guides/${section.slug}`} className="pt-6" />
       <PageHeader title={`${section.name} guides`} description={section.description} />
 
       <ChipNav

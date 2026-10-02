@@ -19,32 +19,36 @@ const TEXT_LENGTH = 572;
  * Layers (back to front): halo → neon glow → 3D extrusion → chrome fill → retro bands → gloss → edge.
  * Pure SVG + the self-hosted Orbitron font (--font-logo), so it stays sharp at any size and needs
  * no external assets.
+ *
+ * The word exists once, as a <text> in <defs>; every layer is a <use> of it. Text extraction and
+ * screen readers therefore see one "GAMETROZ", not one per layer, and the whole SVG has one
+ * accessible name ("Gametroz") with the layers hidden from assistive technology.
  */
 export function GametrozLogo({ id, halo = false, className }: GametrozLogoProps) {
   const ref = (name: string) => `${id}-${name}`;
   const url = (name: string) => `url(#${ref(name)})`;
 
-  const text = (props: React.SVGProps<SVGTextElement>) => (
-    <text
-      x={TEXT_X}
-      y={BASELINE}
-      textLength={TEXT_LENGTH}
-      lengthAdjust="spacingAndGlyphs"
-      style={{ fontFamily: "var(--font-logo), 'Arial Black', sans-serif", fontWeight: 900, fontSize: 104, letterSpacing: "0.02em" }}
-      {...props}
-    >
-      GAMETROZ
-    </text>
-  );
+  // One layer of the wordmark. Paint (fill, stroke) is inherited by the referenced <text>.
+  const text = (props: React.SVGProps<SVGUseElement>) => <use href={`#${ref("word")}`} {...props} />;
 
   return (
     <svg
       viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
       role="img"
-      aria-label="GAMETROZ"
+      aria-label="Gametroz"
       className={cn("h-auto overflow-visible", className)}
     >
       <defs>
+        <text
+          id={ref("word")}
+          x={TEXT_X}
+          y={BASELINE}
+          textLength={TEXT_LENGTH}
+          lengthAdjust="spacingAndGlyphs"
+          style={{ fontFamily: "var(--font-logo), 'Arial Black', sans-serif", fontWeight: 900, fontSize: 104, letterSpacing: "0.02em" }}
+        >
+          GAMETROZ
+        </text>
         {/* Chrome: electric cyan sky → bright horizon glint → magenta/purple floor. */}
         <linearGradient id={ref("chrome")} x1="0" y1="34" x2="0" y2="120" gradientUnits="userSpaceOnUse">
           <stop offset="0" stopColor="#f0feff" />

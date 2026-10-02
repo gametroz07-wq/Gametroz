@@ -23,6 +23,8 @@ export const legalNav = [
   { label: "Privacy", href: "/privacy" },
   { label: "Terms", href: "/terms" },
   { label: "Contact", href: "/contact" },
+  { label: "About", href: "/about" },
+  { label: "Editorial policy", href: "/editorial-policy" },
 ] as const;
 
 // Quick searches shown in the search dialog and the empty search page.

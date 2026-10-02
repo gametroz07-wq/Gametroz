@@ -10,6 +10,7 @@ import { OfficialDownloadButton } from "@/components/apps/official-download-butt
 import { OpenSourceBadge } from "@/components/apps/platform-badges";
 import { GuideCard } from "@/components/guides/guide-card";
 import { Container } from "@/components/layout/container";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { CardGrid } from "@/components/shared/card-grid";
 import { PageSection } from "@/components/shared/page-section";
@@ -17,6 +18,8 @@ import { isOpenSourceLicense } from "@/lib/app-license";
 import { getAlternatives, getAppBySlug, getApps, getGuidesFor } from "@/lib/catalog";
 import { formatDate } from "@/lib/format";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { softwareApplication } from "@/lib/seo/structured-data";
+import { appDescription, appTitle } from "@/lib/seo/templates";
 
 export const dynamicParams = false;
 
@@ -27,10 +30,9 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/app/[slug]">): Promise<Metadata> {
   const app = await getAppBySlug((await params).slug);
   if (!app) return {};
-  const platformList = app.platforms.map((platform) => platformLabels[platform]).join(", ");
   return pageMetadata({
-    title: `${app.name} — Free for ${platformList}`,
-    description: `${app.shortDescription} Official download link, features, requirements and alternatives.`,
+    title: appTitle(app.name),
+    description: appDescription(app.shortDescription),
     path: `/app/${app.slug}`,
   });
 }
@@ -59,7 +61,17 @@ export default async function AppPage({ params }: PageProps<"/app/[slug]">) {
 
   return (
     <Container className="pb-10">
-      <Breadcrumbs items={[{ label: "Apps", href: "/apps" }, { label: app.name }]} className="pt-3" />
+      <JsonLd
+        data={softwareApplication({
+          name: app.name,
+          description: app.description,
+          path: `/app/${app.slug}`,
+          platforms: app.platforms,
+          categoryName: app.category.name,
+          downloadUrl: app.officialWebsite,
+        })}
+      />
+      <Breadcrumbs items={[{ label: "Apps", href: "/apps" }, { label: app.name }]} path={`/app/${app.slug}`} className="pt-3" />
 
       <section aria-labelledby="app-heading" className="mt-3 overflow-hidden rounded-2xl bg-surface ring-1 ring-white/5">
         <div className="flex flex-col gap-5 p-4 sm:p-6 md:flex-row md:items-center md:justify-between">

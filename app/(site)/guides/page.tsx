@@ -7,10 +7,14 @@ import { PageHeader } from "@/components/shared/page-header";
 import { PageSection } from "@/components/shared/page-section";
 import { getFeaturedGuides, getGuideSections, getGuidesBySection } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { extendDescription } from "@/lib/seo/templates";
 
 export const metadata = pageMetadata({
   title: "Guides — Games, Tools and Apps",
-  description: "Step-by-step guides, rankings and how-tos for free games, online tools and useful apps.",
+  description: extendDescription(
+    "Step-by-step guides, rankings and how-tos for free games, online tools and useful apps.",
+    ["Browse guides by section: games, tools and apps."],
+  ),
   path: "/guides",
 });
 
@@ -22,7 +26,7 @@ export default async function GuidesPage() {
 
   return (
     <Container className="pb-12">
-      <Breadcrumbs items={[{ label: "Guides" }]} className="pt-6" />
+      <Breadcrumbs items={[{ label: "Guides" }]} path="/guides" className="pt-6" />
       <PageHeader title="Guides" description="Learn to get more out of games, tools and apps." />
 
       <ChipNav

@@ -12,7 +12,7 @@ import { breadcrumbList } from "@/lib/seo/structured-data";
 export const revalidate = 600;
 
 export const metadata = pageMetadata({
-  title: "Free Online Tools for Text, Developers, Images and More",
+  title: "Free Online Tools for Text, Images and Code",
   description:
     "Free online tools that run in your browser: count words, format JSON, calculate percentages and more. No sign-up, and your data stays on your device.",
   path: "/tools",

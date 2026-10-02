@@ -20,13 +20,17 @@ import {
   getTrendingGames,
 } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { extendDescription } from "@/lib/seo/templates";
 
 // ISR: refreshed every 10 minutes and on demand via POST /api/revalidate.
 export const revalidate = 600;
 
 export const metadata = pageMetadata({
   title: "Free Online Games — Play Instantly",
-  description: "Play free HTML5 games in your browser: racing, puzzle, action, sports and more. No downloads, no sign-up.",
+  description: extendDescription(
+    "Play free HTML5 games in your browser: racing, puzzle, action, sports and more. No downloads, no sign-up.",
+    ["Browse trending, new and most played titles."],
+  ),
   path: "/games",
 });
 
@@ -45,7 +49,7 @@ export default async function GamesPage() {
 
   return (
     <Container className="pb-10">
-      <Breadcrumbs items={[{ label: "Games" }]} className="pt-3" />
+      <Breadcrumbs items={[{ label: "Games" }]} path="/games" className="pt-3" />
       <PageHeader
         title="Games"
         description={`${popular.length} free games you can play instantly. No downloads, no sign-up.`}
@@ -70,7 +74,7 @@ export default async function GamesPage() {
           {hero && <GameHero game={hero} />}
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-1 lg:grid-rows-2">
             {sideFeatured.map((game) => (
-              <GameFeatureCard key={game.slug} game={game} priority />
+              <GameFeatureCard key={game.slug} game={game} />
             ))}
           </div>
         </div>
@@ -78,8 +82,8 @@ export default async function GamesPage() {
 
       <PageSection id="trending" title="Trending">
         <CardGrid variant="games">
-          {trending.map((game, index) => (
-            <GameCard key={game.slug} game={game} priority={index < 5} />
+          {trending.map((game) => (
+            <GameCard key={game.slug} game={game} />
           ))}
         </CardGrid>
       </PageSection>

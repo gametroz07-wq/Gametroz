@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { gameImageAlt } from "@/lib/seo/templates";
 import type { GameSummary } from "@/types/content";
 
 /**
@@ -20,7 +21,7 @@ export function GameRankCard({ game, rank }: { game: GameSummary; rank: number }
         <div className="relative aspect-[3/4] min-w-0 flex-1 overflow-hidden rounded-xl bg-surface-2 ring-1 ring-white/5">
           <Image
             src={game.thumbnailUrl}
-            alt=""
+            alt={gameImageAlt(game.name)}
             fill
             sizes="(min-width: 1024px) 14vw, 30vw"
             className="object-cover transition-transform duration-300 group-hover/rank:scale-[1.05]"

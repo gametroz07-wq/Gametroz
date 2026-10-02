@@ -1,6 +1,7 @@
 import { Play } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { gameImageAlt } from "@/lib/seo/templates";
 import type { Game } from "@/types/content";
 
 /** Medium spotlight card for secondary featured slots. */
@@ -9,7 +10,7 @@ export function GameFeatureCard({ game, priority = false }: { game: Game; priori
     <article className="group/feature relative isolate flex aspect-[16/9] overflow-hidden rounded-2xl bg-surface-2 ring-1 ring-white/5 lg:aspect-auto lg:h-full has-[a:focus-visible]:ring-3 has-[a:focus-visible]:ring-ring/70">
       <Image
         src={game.thumbnailUrl}
-        alt=""
+        alt={gameImageAlt(game.name)}
         fill
         priority={priority}
         sizes="(min-width: 1024px) 33vw, 100vw"

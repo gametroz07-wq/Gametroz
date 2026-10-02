@@ -28,7 +28,7 @@ function mailto(subject: string) {
 export default function ContactPage() {
   return (
     <Container className="pb-16">
-      <Breadcrumbs items={[{ label: "Contact" }]} className="pt-6" />
+      <Breadcrumbs items={[{ label: "Contact" }]} path="/contact" className="pt-6" />
       <PageHeader
         title="Contact"
         description="We read every message. Pick the topic that fits best so your email reaches the right place."

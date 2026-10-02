@@ -7,6 +7,7 @@ import { GameHero } from "@/components/games/game-hero";
 import { GameRankCard } from "@/components/games/game-rank-card";
 import { GuideCard } from "@/components/guides/guide-card";
 import { Container } from "@/components/layout/container";
+import { JsonLd } from "@/components/seo/json-ld";
 import { CardGrid } from "@/components/shared/card-grid";
 import { ChipNav } from "@/components/shared/chip-nav";
 import { PageSection } from "@/components/shared/page-section";
@@ -24,6 +25,7 @@ import {
   getTrendingGames,
 } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { organization, webSite } from "@/lib/seo/structured-data";
 import { siteConfig } from "@/lib/site";
 
 // ISR: refreshed every 10 minutes and on demand via POST /api/revalidate.
@@ -61,6 +63,8 @@ export default async function HomePage() {
 
   return (
     <Container className="pt-3 pb-10">
+      <JsonLd data={webSite()} />
+      <JsonLd data={organization()} />
       <h1 className="sr-only">{siteConfig.name} — free games, online tools and apps</h1>
 
       <ChipNav
@@ -83,7 +87,7 @@ export default async function HomePage() {
           {hero && <GameHero game={hero} label="Trending now" />}
           <div className="hidden gap-3 lg:grid lg:grid-rows-2">
             {sideFeatured.map((game) => (
-              <GameFeatureCard key={game.slug} game={game} priority />
+              <GameFeatureCard key={game.slug} game={game} />
             ))}
           </div>
         </div>
@@ -96,8 +100,8 @@ export default async function HomePage() {
         action={{ label: "All games", href: "/games" }}
       >
         <CardGrid variant="games">
-          {trending.map((game, index) => (
-            <GameCard key={game.slug} game={game} priority={index < 6} />
+          {trending.map((game) => (
+            <GameCard key={game.slug} game={game} />
           ))}
         </CardGrid>
       </PageSection>
