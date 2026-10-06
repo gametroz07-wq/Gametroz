@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import { buildContentSecurityPolicy, buildPermissionsPolicy, buildSecurityHeaders } from "../security/headers";
 
 const GM = "https://html5.gamemonetize.co";
-const base = { isDev: false, indexingEnabled: false, frameOrigins: [GM] };
+const base = { isDev: false, indexingEnabled: false, adsEnabled: false, frameOrigins: [GM] };
 
 describe("Content-Security-Policy", () => {
   it("blocks all frames while embeds are disabled", () => {
@@ -30,6 +30,39 @@ describe("Content-Security-Policy", () => {
     const csp = buildContentSecurityPolicy({ ...base, isDev: true, embedsEnabled: false });
     assert.ok(csp.includes("'unsafe-eval'"));
     assert.ok(csp.includes("ws:"));
+  });
+
+  it("allows no third-party origin while ads are disabled", () => {
+    const csp = buildContentSecurityPolicy({ ...base, embedsEnabled: false });
+    assert.ok(csp.includes("script-src 'self' 'unsafe-inline';"));
+    assert.ok(csp.includes("connect-src 'self';"));
+    assert.ok(!csp.includes("https:"));
+  });
+
+  it("opens the ad directives to any https origin when ads are enabled", () => {
+    const csp = buildContentSecurityPolicy({ ...base, embedsEnabled: true, adsEnabled: true });
+    for (const directive of [
+      "script-src 'self' 'unsafe-inline' https:",
+      "img-src 'self' blob: data: https:",
+      "media-src 'self' https:",
+      "connect-src 'self' https:",
+      "frame-src https:",
+    ]) {
+      assert.ok(csp.includes(`${directive};`), directive);
+    }
+    assert.ok(!/\*/.test(csp), "no wildcard sources");
+  });
+
+  it("allows ad frames even while game embeds are disabled", () => {
+    const csp = buildContentSecurityPolicy({ ...base, embedsEnabled: false, adsEnabled: true });
+    assert.ok(csp.includes("frame-src https:;"));
+  });
+
+  it("keeps the non-ad directives locked down when ads are enabled", () => {
+    const csp = buildContentSecurityPolicy({ ...base, embedsEnabled: true, adsEnabled: true });
+    for (const directive of ["default-src 'self'", "font-src 'self'", "object-src 'none'", "base-uri 'self'", "frame-ancestors 'none'", "form-action 'self'"]) {
+      assert.ok(csp.includes(`${directive};`), directive);
+    }
   });
 });
 

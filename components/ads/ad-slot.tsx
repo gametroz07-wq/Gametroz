@@ -1,14 +1,17 @@
+import { AdsterraFrame } from "@/components/ads/adsterra-frame";
+import { type AdPlacement, buildAdsterraSrcDoc, placementUnits } from "@/lib/ads/adsterra";
 import { adsEnabled } from "@/lib/ads/config";
 import { cn } from "@/lib/utils";
 
-export type AdPlacement = "home-feed" | "game-below-player" | "sidebar" | "content-inline";
+export type { AdPlacement };
 
 // Fixed dimensions per placement reserve the space up front, so filling a slot later causes no CLS.
+// They mirror the unit sizes in lib/ads/adsterra.ts.
 const placementStyles: Record<AdPlacement, string> = {
-  "home-feed": "h-[100px] w-full max-w-[728px] md:h-[90px]",
-  "game-below-player": "h-[100px] w-full max-w-[728px] md:h-[90px]",
-  "content-inline": "h-[280px] w-full max-w-[336px]",
-  sidebar: "hidden h-[600px] w-[300px] lg:flex",
+  "home-feed": "h-[50px] w-full max-w-[320px] md:h-[90px] md:max-w-[728px]",
+  "game-below-player": "h-[50px] w-full max-w-[320px] md:h-[90px] md:max-w-[728px]",
+  "content-inline": "h-[250px] w-full max-w-[300px]",
+  sidebar: "hidden h-[300px] w-[160px] lg:flex",
 };
 
 type AdSlotProps = {
@@ -17,10 +20,9 @@ type AdSlotProps = {
 };
 
 /**
- * Placeholder only. No ad network or external script is loaded until the monetization
- * phase; the provider will render inside this reserved box. While ads are disabled nothing
- * is rendered, so visitors never see empty "Advertisement" boxes. `preview` forces the
- * box for the design system page.
+ * Reserved box for one Adsterra banner. While ads are disabled nothing is rendered, so visitors
+ * never see empty "Advertisement" boxes and no external script is loaded. `preview` forces a
+ * labelled placeholder (no ad request) for the design system page.
  */
 export function AdSlot({ placement, className, preview = false }: AdSlotProps & { preview?: boolean }) {
   if (!preview && !adsEnabled()) return null;
@@ -29,14 +31,26 @@ export function AdSlot({ placement, className, preview = false }: AdSlotProps & 
       aria-label="Advertisement"
       data-ad-placement={placement}
       className={cn(
-        "mx-auto flex items-center justify-center rounded-xl border border-dashed bg-surface/50",
+        "mx-auto flex items-center justify-center overflow-hidden",
+        preview && "rounded-xl border border-dashed bg-surface/50",
         placementStyles[placement],
         className,
       )}
     >
-      <span className="text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
-        Advertisement
-      </span>
+      {preview ? (
+        <span className="text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+          Advertisement
+        </span>
+      ) : (
+        <AdsterraFrame
+          candidates={placementUnits[placement].map(({ media, unit }) => ({
+            media,
+            width: unit.width,
+            height: unit.height,
+            srcDoc: buildAdsterraSrcDoc(unit),
+          }))}
+        />
+      )}
     </aside>
   );
 }

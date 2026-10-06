@@ -54,7 +54,8 @@ Why: Prisma 7 recommends routing app traffic through Neon's pooler and running m
 | `REVALIDATE_SECRET` | Min 16 characters. Set it in Render. The endpoint returns 404 when it is unset. | yes |
 | `REVALIDATE_ENDPOINT` | Used only by the CLI on the operator machine, e.g. `https://gametroz.online/api/revalidate`. Not needed in Render. | no |
 | `PROVIDER_SYNC_MAX` | **Optional.** Default 100, absolute max 500. | no |
-| `ADSTERRA_ENABLED` | `false` | no |
+| `ADSTERRA_ENABLED` | `true`/`false`, set in the Render dashboard (`sync: false`). **Build-time:** renders the Adsterra banner slots (`lib/ads/adsterra.ts`) and relaxes the CSP (section 4); redeploy after changing it. Unset = off. | no |
+| `MONETAG_ENABLED` | `true`/`false`, set in the Render dashboard (`sync: false`). **Build-time:** loads the Monetag In-Page Push tag on every page and relaxes the CSP (section 4); redeploy after changing it. Unset = off. | no |
 | `SEED_ON_DEPLOY` | `true` on the first deploy, then `false` | no |
 | `GAMEMONETIZE_API_KEY` | empty | yes |
 | `GAMEDISTRIBUTION_API_KEY` | empty | yes |
@@ -99,6 +100,8 @@ URL resolution lives in `lib/db/database-url.ts`: the Prisma CLI uses `DIRECT_UR
 
 - `'unsafe-inline'` follows the Next.js "CSP without nonces" guide and keeps every page static. A nonce-based CSP would make every page dynamic.
 - `frame-src` only lists provider hosts when `GAME_EMBEDS_ENABLED=true` (`https://html5.gamemonetize.co`); otherwise it is `'none'`. With embeds on, `Permissions-Policy` also delegates `fullscreen`, `autoplay` and `gamepad` to that host. Details: `docs/12_GAME_PROVIDERS.md`.
+- With any ad network on (`MONETAG_ENABLED=true` or `ADSTERRA_ENABLED=true`), `script-src`, `img-src`, `media-src` and `connect-src` also accept `https:` and `frame-src` becomes `https:`. Ad networks rotate their serving domains, so an exact allowlist cannot hold. `default-src`, `font-src`, `object-src`, `base-uri`, `form-action` and `frame-ancestors` do not change. Turning both variables off restores the strict policy above.
+- `public/sw.js` is the Monetag service worker and verification file. Monetag requires it to stay at the site root.
 
 # 5. Health check
 

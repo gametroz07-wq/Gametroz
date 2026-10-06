@@ -5,6 +5,8 @@ export type SecurityHeaderOptions = {
   isDev: boolean;
   embedsEnabled: boolean;
   indexingEnabled: boolean;
+  /** Any ad network on (lib/ads/config.ts). */
+  adsEnabled: boolean;
   /** Exact https origins of allowlisted game providers (no wildcards). */
   frameOrigins: string[];
 };
@@ -14,17 +16,24 @@ export type SecurityHeaderOptions = {
  * runtime payload and the theme script. Only frame-src changes with embeds: the game iframe is a
  * cross-origin document, so its own scripts, ads, images and connections are governed by the
  * provider's policy, not ours. Our page loads images through /_next/image (same origin).
+ *
+ * Ad networks serve scripts, creatives and beacons from rotating domains, so an exact allowlist
+ * cannot hold: with ads on, the directives an ad needs accept any https origin (this also governs
+ * importScripts in public/sw.js). The rest of the policy stays locked either way.
  */
-export function buildContentSecurityPolicy({ isDev, embedsEnabled, frameOrigins }: SecurityHeaderOptions) {
-  const frames = embedsEnabled && frameOrigins.length ? frameOrigins.join(" ") : "'none'";
+export function buildContentSecurityPolicy({ isDev, embedsEnabled, adsEnabled, frameOrigins }: SecurityHeaderOptions) {
+  const ads = adsEnabled ? " https:" : "";
+  const gameFrames = embedsEnabled && frameOrigins.length ? frameOrigins.join(" ") : "'none'";
+  // https: already covers the game origins.
+  const frames = adsEnabled ? "https:" : gameFrames;
   return [
     "default-src 'self'",
-    `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+    `script-src 'self' 'unsafe-inline'${ads}${isDev ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' blob: data:",
+    `img-src 'self' blob: data:${ads}`,
     "font-src 'self'",
-    "media-src 'self'",
-    `connect-src 'self'${isDev ? " ws:" : ""}`,
+    `media-src 'self'${ads}`,
+    `connect-src 'self'${ads}${isDev ? " ws:" : ""}`,
     `frame-src ${frames}`,
     "object-src 'none'",
     "base-uri 'self'",

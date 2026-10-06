@@ -126,7 +126,7 @@ export default async function GamePage({ params }: PageProps<"/game/[slug]">) {
       </header>
 
       {/* No empty sidebar column while ad slots render nothing: the content takes the full width. */}
-      <div className={withSidebar ? "grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]" : undefined}>
+      <div className={withSidebar ? "grid gap-4 lg:grid-cols-[minmax(0,1fr)_160px]" : undefined}>
         <div className="min-w-0 space-y-3">
           {/* Without a sidebar the player would span the whole container (1232px), which feels oversized on
               desktop: from lg up it is capped at 90% of the content width and centered. Mobile/tablet unchanged. */}

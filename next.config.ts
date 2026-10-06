@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { thirdPartyAdsEnabled } from "./lib/ads/config";
 import { appRedirects } from "./lib/apps/redirects";
 import { embedFrameOrigins } from "./lib/providers/embed";
 import { buildSecurityHeaders } from "./lib/security/headers";
@@ -8,6 +9,7 @@ const securityHeaders = buildSecurityHeaders({
   isDev: process.env.NODE_ENV === "development",
   embedsEnabled: process.env.GAME_EMBEDS_ENABLED === "true",
   indexingEnabled: process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true",
+  adsEnabled: thirdPartyAdsEnabled(),
   frameOrigins: embedFrameOrigins(),
 });
 

@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Orbitron } from "next/font/google";
+import Script from "next/script";
 import { ThemeProvider } from "@/components/theme/theme-provider";
+import { monetagEnabled, monetagInPagePush } from "@/lib/ads/config";
 import { defaultOgImage } from "@/lib/seo/metadata";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
@@ -65,6 +67,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col">
         <ThemeProvider>{children}</ThemeProvider>
+        {monetagEnabled() && (
+          <Script id="monetag-in-page-push" src={monetagInPagePush.src} data-zone={monetagInPagePush.zone} strategy="lazyOnload" />
+        )}
       </body>
     </html>
   );

@@ -40,8 +40,16 @@ services:
       # REQUIRED secret, min 16 characters. Protects POST /api/revalidate (returns 404 when unset).
       - key: REVALIDATE_SECRET
         sync: false
+      # Managed in the Render dashboard ("true"/"false"); Blueprint syncs never overwrite it.
+      # Read at BUILD time (it renders the Adsterra banner slots and opens the CSP to https:
+      # origins): change it, then redeploy. Unset means disabled.
       - key: ADSTERRA_ENABLED
-        value: "false"
+        sync: false
+      # Managed in the Render dashboard ("true"/"false"); Blueprint syncs never overwrite it.
+      # Read at BUILD time (it loads the Monetag tag and opens the CSP to https: origins):
+      # change it, then redeploy. Unset means disabled.
+      - key: MONETAG_ENABLED
+        sync: false
       - key: GAMEMONETIZE_API_KEY
         sync: false
       - key: GAMEDISTRIBUTION_API_KEY
