@@ -54,5 +54,8 @@ services:
         sync: false
       - key: GAMEDISTRIBUTION_API_KEY
         sync: false
+      # Managed in the Render dashboard (a GA4 measurement ID such as G-XXXXXXXXXX); Blueprint
+      # syncs never overwrite it. Read at BUILD time (it loads gtag.js and adds the Google
+      # Analytics origins to the CSP): change it, then redeploy. Unset or malformed means disabled.
       - key: NEXT_PUBLIC_GA_ID
-        value: ""
+        sync: false

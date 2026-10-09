@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { gaMeasurementId } from "./lib/analytics/config";
 import { thirdPartyAdsEnabled } from "./lib/ads/config";
 import { appRedirects } from "./lib/apps/redirects";
 import { embedFrameOrigins } from "./lib/providers/embed";
@@ -10,6 +11,7 @@ const securityHeaders = buildSecurityHeaders({
   embedsEnabled: process.env.GAME_EMBEDS_ENABLED === "true",
   indexingEnabled: process.env.NEXT_PUBLIC_INDEXING_ENABLED === "true",
   adsEnabled: thirdPartyAdsEnabled(),
+  analyticsEnabled: gaMeasurementId() !== null,
   frameOrigins: embedFrameOrigins(),
 });
 

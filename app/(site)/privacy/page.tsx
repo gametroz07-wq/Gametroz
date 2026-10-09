@@ -1,4 +1,5 @@
 import { LegalDocument } from "@/components/shared/legal-document";
+import { gaMeasurementId } from "@/lib/analytics/config";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { siteConfig } from "@/lib/site";
 import type { GuideBlock } from "@/types/content";
@@ -8,6 +9,25 @@ export const metadata = pageMetadata({
   description: "How Gametroz handles browsing data, cookies, analytics, advertising and third-party services.",
   path: "/privacy",
 });
+
+// Decided at build time, like the analytics script itself (lib/analytics/config.ts).
+const analyticsActive = gaMeasurementId() !== null;
+
+const analyticsBlocks: GuideBlock[] = analyticsActive
+  ? [
+      { type: "h2", text: "Analytics" },
+      {
+        type: "p",
+        text: "We use Google Analytics 4, a service provided by Google, to understand how the site is used, for example which pages are visited and how people find them. It sets cookies in your browser and processes data such as approximate location, device and browser information, pages viewed and the page you came from. Google processes this data on our behalf and under its own privacy policy. We do not use it to identify you personally.",
+      },
+    ]
+  : [
+      { type: "h2", text: "Analytics (future)" },
+      {
+        type: "p",
+        text: "We may use analytics services in the future to understand how the site is used, for example which pages are visited and how people find them. These services may set cookies or use similar technologies and process data such as approximate location, device information and pages viewed. We will describe the services we use on this page once they are active.",
+      },
+    ];
 
 const blocks: GuideBlock[] = [
   { type: "h2", text: "Features that are not active yet" },
@@ -29,11 +49,7 @@ const blocks: GuideBlock[] = [
     type: "p",
     text: "Where possible, our online tools run directly in your browser. When a tool works this way, the text or files you use with it are processed on your device and are not uploaded to our servers. If a future tool needs server-side processing, its page will say so clearly.",
   },
-  { type: "h2", text: "Analytics (future)" },
-  {
-    type: "p",
-    text: "We may use analytics services in the future to understand how the site is used, for example which pages are visited and how people find them. These services may set cookies or use similar technologies and process data such as approximate location, device information and pages viewed. We will describe the services we use on this page once they are active.",
-  },
+  ...analyticsBlocks,
   { type: "h2", text: "Advertising (future)" },
   {
     type: "p",
@@ -42,7 +58,11 @@ const blocks: GuideBlock[] = [
   { type: "h2", text: "Cookies and local storage" },
   {
     type: "p",
-    text: "We use your browser's local storage to remember preferences such as your light or dark theme. This information stays on your device. Additional cookies may be used in the future by analytics or advertising services, as described above.",
+    text: `We use your browser's local storage to remember preferences such as your light or dark theme. This information stays on your device. ${
+      analyticsActive
+        ? "Analytics and advertising services may also set cookies, as described above."
+        : "Additional cookies may be used in the future by analytics or advertising services, as described above."
+    }`,
   },
   {
     type: "p",
