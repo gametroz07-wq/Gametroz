@@ -66,6 +66,35 @@ describe("Content-Security-Policy", () => {
   });
 });
 
+describe("Content-Security-Policy with Google Analytics", () => {
+  const off = buildContentSecurityPolicy({ ...base, embedsEnabled: true });
+
+  it("is unchanged when analytics is off", () => {
+    assert.equal(buildContentSecurityPolicy({ ...base, embedsEnabled: true, analyticsEnabled: false }), off);
+    assert.ok(!off.includes("google"));
+  });
+
+  it("allows only the Google Analytics origins in script, img and connect", () => {
+    const csp = buildContentSecurityPolicy({ ...base, embedsEnabled: true, analyticsEnabled: true });
+    for (const directive of [
+      "script-src 'self' 'unsafe-inline' https://*.googletagmanager.com",
+      "img-src 'self' blob: data: https://*.google-analytics.com https://*.googletagmanager.com",
+      "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
+    ]) {
+      assert.ok(csp.includes(`${directive};`), directive);
+    }
+    for (const directive of ["default-src 'self'", "font-src 'self'", "media-src 'self'", "frame-src https://html5.gamemonetize.co", "object-src 'none'"]) {
+      assert.ok(csp.includes(directive), directive);
+    }
+    assert.ok(!/https:[ ;]/.test(csp),"no blanket https:");
+  });
+
+  it("adds nothing when ads already accept any https origin", () => {
+    const ads = buildContentSecurityPolicy({ ...base, embedsEnabled: true, adsEnabled: true });
+    assert.equal(buildContentSecurityPolicy({ ...base, embedsEnabled: true, adsEnabled: true, analyticsEnabled: true }), ads);
+  });
+});
+
 describe("Permissions-Policy", () => {
   it("delegates fullscreen, autoplay and gamepad only to game origins when enabled", () => {
     const policy = buildPermissionsPolicy({ ...base, embedsEnabled: true });

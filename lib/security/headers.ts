@@ -7,6 +7,8 @@ export type SecurityHeaderOptions = {
   indexingEnabled: boolean;
   /** Any ad network on (lib/ads/config.ts). */
   adsEnabled: boolean;
+  /** Google Analytics 4 on (lib/analytics/config.ts). Optional: off when omitted. */
+  analyticsEnabled?: boolean;
   /** Exact https origins of allowlisted game providers (no wildcards). */
   frameOrigins: string[];
 };
@@ -20,20 +22,28 @@ export type SecurityHeaderOptions = {
  * Ad networks serve scripts, creatives and beacons from rotating domains, so an exact allowlist
  * cannot hold: with ads on, the directives an ad needs accept any https origin (this also governs
  * importScripts in public/sw.js). The rest of the policy stays locked either way.
+ *
+ * Google Analytics 4 adds only its own origins to script-src, img-src and connect-src (regional
+ * collection hosts such as region1.google-analytics.com need the subdomain wildcard). The inline
+ * gtag bootstrap is already covered by 'unsafe-inline'. Ads on already accept any https origin.
  */
-export function buildContentSecurityPolicy({ isDev, embedsEnabled, adsEnabled, frameOrigins }: SecurityHeaderOptions) {
+export function buildContentSecurityPolicy({ isDev, embedsEnabled, adsEnabled, analyticsEnabled = false, frameOrigins }: SecurityHeaderOptions) {
   const ads = adsEnabled ? " https:" : "";
+  const ga = analyticsEnabled && !adsEnabled;
+  const gaScript = ga ? " https://*.googletagmanager.com" : "";
+  const gaImg = ga ? " https://*.google-analytics.com https://*.googletagmanager.com" : "";
+  const gaConnect = ga ? " https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com" : "";
   const gameFrames = embedsEnabled && frameOrigins.length ? frameOrigins.join(" ") : "'none'";
   // https: already covers the game origins.
   const frames = adsEnabled ? "https:" : gameFrames;
   return [
     "default-src 'self'",
-    `script-src 'self' 'unsafe-inline'${ads}${isDev ? " 'unsafe-eval'" : ""}`,
+    `script-src 'self' 'unsafe-inline'${ads}${gaScript}${isDev ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' blob: data:${ads}`,
+    `img-src 'self' blob: data:${ads}${gaImg}`,
     "font-src 'self'",
     `media-src 'self'${ads}`,
-    `connect-src 'self'${ads}${isDev ? " ws:" : ""}`,
+    `connect-src 'self'${ads}${gaConnect}${isDev ? " ws:" : ""}`,
     `frame-src ${frames}`,
     "object-src 'none'",
     "base-uri 'self'",

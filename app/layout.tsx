@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Orbitron } from "next/font/google";
 import Script from "next/script";
 import { ThemeProvider } from "@/components/theme/theme-provider";
+import { gaMeasurementId, gtagBootstrapScript, gtagSrc } from "@/lib/analytics/config";
 import { monetagEnabled, monetagInPagePush } from "@/lib/ads/config";
 import { defaultOgImage } from "@/lib/seo/metadata";
 import { siteConfig } from "@/lib/site";
@@ -57,6 +58,7 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  const gaId = gaMeasurementId();
   return (
     // "dark" is the server default; next-themes swaps it to the stored preference before paint,
     // which is why the class attribute may differ from the server markup.
@@ -67,6 +69,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col">
         <ThemeProvider>{children}</ThemeProvider>
+        {gaId && (
+          <>
+            <Script id="ga4-src" src={gtagSrc(gaId)} strategy="afterInteractive" />
+            <Script id="ga4-config" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: gtagBootstrapScript(gaId) }} />
+          </>
+        )}
         {monetagEnabled() && (
           <Script id="monetag-in-page-push" src={monetagInPagePush.src} data-zone={monetagInPagePush.zone} strategy="lazyOnload" />
         )}

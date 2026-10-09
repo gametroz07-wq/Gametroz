@@ -59,7 +59,7 @@ Why: Prisma 7 recommends routing app traffic through Neon's pooler and running m
 | `SEED_ON_DEPLOY` | `true` on the first deploy, then `false` | no |
 | `GAMEMONETIZE_API_KEY` | empty | yes |
 | `GAMEDISTRIBUTION_API_KEY` | empty | yes |
-| `NEXT_PUBLIC_GA_ID` | empty | no |
+| `NEXT_PUBLIC_GA_ID` | A GA4 measurement ID (`G-` plus uppercase letters/digits), set in the Render dashboard (`sync: false`). **Build-time:** loads gtag.js after the page is interactive on every page and adds the Google Analytics origins to the CSP (section 4); redeploy after changing it. Unset, empty or malformed = off (no script, CSP unchanged). | no |
 | `NODE_VERSION` | `22` | no |
 | `DATABASE_POOL_MAX` | **Optional.** Connections per process. Default: 2 during `next build` (4 workers), 5 at runtime; this keeps the total under a session-mode pooler limit (Supabase: 15 clients). | no |
 
@@ -101,6 +101,8 @@ URL resolution lives in `lib/db/database-url.ts`: the Prisma CLI uses `DIRECT_UR
 - `'unsafe-inline'` follows the Next.js "CSP without nonces" guide and keeps every page static. A nonce-based CSP would make every page dynamic.
 - `frame-src` only lists provider hosts when `GAME_EMBEDS_ENABLED=true` (`https://html5.gamemonetize.co`); otherwise it is `'none'`. With embeds on, `Permissions-Policy` also delegates `fullscreen`, `autoplay` and `gamepad` to that host. Details: `docs/12_GAME_PROVIDERS.md`.
 - With any ad network on (`MONETAG_ENABLED=true` or `ADSTERRA_ENABLED=true`), `script-src`, `img-src`, `media-src` and `connect-src` also accept `https:` and `frame-src` becomes `https:`. Ad networks rotate their serving domains, so an exact allowlist cannot hold. `default-src`, `font-src`, `object-src`, `base-uri`, `form-action` and `frame-ancestors` do not change. Turning both variables off restores the strict policy above.
+- With `NEXT_PUBLIC_GA_ID` set to a valid GA4 ID, `script-src` adds `https://*.googletagmanager.com`, `img-src` adds `https://*.google-analytics.com https://*.googletagmanager.com`, and `connect-src` adds `https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com` (the wildcards cover regional collection hosts). The inline gtag bootstrap relies on the existing `'unsafe-inline'`. With an ad network on, `https:` already covers these origins and the policy does not change further.
+- Page views: the first load is sent by `gtag("config")`; client-side navigations are reported by GA4 enhanced measurement ("Page changes based on browser history events", on by default for web streams). Keep that setting enabled in the GA4 property. No manual `page_view` is sent, so nothing is counted twice.
 - `public/sw.js` is the Monetag service worker and verification file. Monetag requires it to stay at the site root.
 
 # 5. Health check
@@ -126,7 +128,7 @@ URL resolution lives in `lib/db/database-url.ts`: the Prisma CLI uses `DIRECT_UR
 
 # 7. Not in this phase
 
-Indexing, sitemap submission, Adsterra, analytics, mass import, cron jobs, GameDistribution, Famobi, Supabase.
+Indexing, sitemap submission, Adsterra, mass import, cron jobs, GameDistribution, Famobi, Supabase.
 
 # 8. ISR and on-demand revalidation
 
