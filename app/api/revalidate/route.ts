@@ -1,5 +1,5 @@
 import { revalidatePath } from "next/cache";
-import { gamePathsToRevalidate, isAuthorizedRevalidation, parseRevalidateSlugs } from "@/lib/revalidate";
+import { gameCategoryPattern, gamePathsToRevalidate, isAuthorizedRevalidation, parseRevalidateSlugs } from "@/lib/revalidate";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
   const paths = gamePathsToRevalidate(slugs);
   for (const path of paths) revalidatePath(path);
-  revalidatePath("/games/[category]", "page");
+  revalidatePath(gameCategoryPattern, "page");
 
-  return Response.json({ revalidated: [...paths, "/games/[category]"] }, { headers: { "Cache-Control": "no-store" } });
+  return Response.json({ revalidated: [...paths, gameCategoryPattern] }, { headers: { "Cache-Control": "no-store" } });
 }

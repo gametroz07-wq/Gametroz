@@ -60,6 +60,7 @@ Why: Prisma 7 recommends routing app traffic through Neon's pooler and running m
 | `GAMEMONETIZE_API_KEY` | empty | yes |
 | `GAMEDISTRIBUTION_API_KEY` | empty | yes |
 | `NEXT_PUBLIC_GA_ID` | A GA4 measurement ID (`G-` plus uppercase letters/digits), set in the Render dashboard (`sync: false`). **Build-time:** loads gtag.js after the page is interactive on every page and adds the Google Analytics origins to the CSP (section 4); redeploy after changing it. Unset, empty or malformed = off (no script, CSP unchanged). | no |
+| `NEXT_PUBLIC_SPANISH_ENABLED` | `true` to serve the Spanish site under `/es`, set in the Render dashboard (`sync: false`). **Build-time:** the `/es` pages are only built when it is exactly `true`; the proxy also checks it at request time. Unset or any other value = every `/es` URL returns 404 and nothing extra is built. Keep it off until the translation work is complete; redeploy after changing it. | no |
 | `NODE_VERSION` | `22` | no |
 | `DATABASE_POOL_MAX` | **Optional.** Connections per process. Default: 2 during `next build` (4 workers), 5 at runtime; this keeps the total under a session-mode pooler limit (Supabase: 15 clients). | no |
 
@@ -139,7 +140,7 @@ Indexing, sitemap submission, Adsterra, mass import, cron jobs, GameDistribution
 
 New slugs render on demand (`dynamicParams`).
 
-`POST /api/revalidate` with header `Authorization: Bearer <REVALIDATE_SECRET>` and JSON body `{"slugs":["a","b"]}` revalidates `/`, `/games`, `/games/[category]` and `/game/<slug>` for each slug.
+`POST /api/revalidate` with header `Authorization: Bearer <REVALIDATE_SECRET>` and JSON body `{"slugs":["a","b"]}` revalidates `/`, `/games`, `/games/[category]` and `/game/<slug>` for each slug. English pages are served from `app/[lang]` with `lang` = `en` (section 9), and `revalidatePath` takes the route file path rather than the public URL, so the endpoint revalidates `/en`, `/en/games`, `/en/game/<slug>` and the `/[lang]/games/[category]` pattern.
 
 Flow: `provider:publish` or `provider:archive` → the CLI calls the endpoint → the change is visible on the next visit, with no redeploy. Verified locally: archive → 404 and the game disappears from `/games` and search; publish → 200 and it is listed again.
 
@@ -150,3 +151,14 @@ Caveats:
 # 9. Testing a production build locally
 
 `next build` and `next start` load `.env.production.local` with priority over `.env`, while Prisma CLI and the scripts (dotenv) load only `.env`. To test against the Docker database, export `DATABASE_URL` explicitly in the shell for both `next build` and `next start`: process environment wins over every env file.
+
+# 9. Locale routing
+
+All pages live under `app/[lang]` (locales: `en`, `es`; policy in `lib/i18n/`). The public English URLs are unchanged and unprefixed: `proxy.ts` rewrites `/games` to `/en/games` internally. The proxy only runs for localized pages; `/api`, `/_next`, `/og` and anything with a file extension (`sitemap.xml`, `robots.txt`, `llms.txt`, `sw.js`, the rest of `public/`) skip it.
+
+- `/en` and `/en/...` redirect permanently (308) to the unprefixed URL, so English has a single public URL.
+- `/es` and `/es/...` return 404 unless `NEXT_PUBLIC_SPANISH_ENABLED` is exactly `true`. Any other first segment (`/fr`, `/xx`) is an ordinary unknown URL and returns 404.
+- With the switch on, `/es` pages still render English copy, are `noindex`, and are not listed in the sitemap. Canonical URLs and `hreflang` come with the SEO slice.
+- `next.config` `redirects()` and `headers()` run before the proxy, so the www redirect, `appRedirects` and the security headers apply to every response, rewritten or not.
+- Revalidation addresses the route file path (`/en/...`), as described in section 8.
+- Build cost: the `es` pages double the prerendered page count (276 to 545 at the time of writing), so builds with the switch on take about twice as long.
