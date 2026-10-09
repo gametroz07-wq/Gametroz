@@ -71,8 +71,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ThemeProvider>{children}</ThemeProvider>
         {gaId && (
           <>
-            <Script id="ga4-src" src={gtagSrc(gaId)} strategy="lazyOnload" />
-            <Script id="ga4-config" strategy="lazyOnload" dangerouslySetInnerHTML={{ __html: gtagBootstrapScript(gaId) }} />
+            <Script id="ga4-src" src={gtagSrc(gaId)} strategy="afterInteractive" />
+            <Script id="ga4-config" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: gtagBootstrapScript(gaId) }} />
           </>
         )}
         {monetagEnabled() && (
