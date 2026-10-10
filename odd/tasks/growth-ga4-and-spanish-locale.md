@@ -36,15 +36,32 @@ Out of scope: tag landing pages, per-game editorial content, PWA, favorites pers
   - Route: delegated direct (writer trigger: config module, CSP headers, layout, docs, tests).
   - Acceptance: no GA script and unchanged CSP when the ID is unset or malformed; with a valid `G-` ID the gtag script loads after interactive and the CSP allows only the Google Analytics origins it needs; privacy page discloses Google Analytics; deployment doc updated.
   - Checks: `npm test`, `npm run lint`, `npm run typecheck`.
-- [ ] T2 Spanish locale with `hreflang`
-  - Blocked on a product decision: how far provider game descriptions get translated.
-  - To be split into slices (routing, UI dictionary, metadata and sitemap alternates, content) once decided.
+- T2 Spanish locale with `hreflang`, delivered as slices. Decisions (owner, 2026-10-09): provider game descriptions are translated too; slices are stacked pull requests to `main`, with `/es` hidden behind a build-time switch until complete.
+  - Design: all pages move under `app/[lang]`. `proxy.ts` rewrites unprefixed paths to the `en` segment internally so English URLs stay unchanged, redirects an explicit `/en/...` to the unprefixed URL, and serves `/es/...` only when `NEXT_PUBLIC_SPANISH_ENABLED` is exactly `true` (otherwise 404).
+  - [x] T2.1 Locale routing foundation (`feat/es-locale-routing`, commits `a194304`, `468c78c`): locale config and path helpers with tests, `proxy.ts`, pages under `app/[lang]`, `<html lang>` per locale, switch documented. No copy translated.
+    - Evidence (writer): observed RED then GREEN; `npm test` 673 pass, lint and typecheck clean; 36-URL before/after comparison with the switch off, 31 identical including a byte-identical 698-URL sitemap; the 5 differences are 404 pages that keep status 404 but lose `<html lang>` (and `<title>` for `/api/nope` and `/foo.js`); switch-on build serves `/es/...` with `lang="es"` and `noindex, nofollow`; on-demand revalidation checked on a running server with the `/en/...` destination paths.
+    - Evidence (parent, production build with the switch off): `npm test` 673 pass; 13 English pages return 200 with `lang="en"`, `index, follow` and unprefixed canonicals; no `/en/` in hrefs, canonicals, JSON-LD or flight payloads; `/en...` returns 308 to the unprefixed URL with the query kept; `/es`, `/es/games`, `/fr/games`, `/ES/games`, `/esports` and unknown URLs return 404; navigation data requests resolve to a 200 `text/x-component` response; security headers present on pages, proxy redirects and 404s; sitemap has 698 URLs and none under `/en/` or `/es`.
+    - Risk tier: unassessable, treated as high. The independent verifier stalled without a verdict, so the parent ran the runtime checks above instead. Not re-verified by the parent: the switch-on build and the revalidation endpoint.
+    - Decisions: no `dynamicParams = false` on the layout (it made non-prerendered games 404); a catch-all `app/[lang]/[...rest]` keeps the branded 404; the proxy matcher skips any path whose last segment has a dot (no sitemap URL has one). `/es` pages canonicalize to the English URL until T2.4.
+    - Rollback: reverting `468c78c` restores the previous `app/` tree and removes `proxy.ts`; `a194304` is inert alone.
+    - Route: delegated direct (writer trigger: routing tree, proxy, config, docs, tests).
+    - Acceptance: with the switch off, every English URL returns the same status, title and canonical as before and `/es/...` returns 404; with it on, `/es/...` renders with `lang="es"`.
+    - Checks: `npm test`, `npm run lint`, `npm run typecheck`, `npm run build`, before/after comparison of a sample of English URLs.
+  - [ ] T2.2 Locale-aware internal links and navigation (central href helper, nav, breadcrumbs, search form, `usePathname` checks).
+  - [ ] T2.3 UI dictionary: shared chrome, page-level copy, not-found.
+  - [ ] T2.4 SEO: localized templates, metadata `alternates.languages`, sitemap alternates, robots rule for `/es/search`, JSON-LD `inLanguage`, `llms.txt`.
+  - [ ] T2.5 Legal and static pages in Spanish.
+  - [ ] T2.6 Tools in Spanish (30 definitions and workspace labels); may need more than one pull request.
+  - [ ] T2.7 Apps in Spanish (105 definitions); may need more than one pull request.
+  - [ ] T2.8 Guides in Spanish (29 guides); may need more than one pull request.
+  - [ ] T2.9 Game translations: schema migration, one-off translation script, localized reads and search. Open decision: translation service and credentials.
+  - [ ] T2.10 Enable the switch, revalidation paths for `/es`, live verification.
 
 ## Delivery
 
-- Strategy: `ask-on-risk`.
-- T1 forecast: about 200 authored changed lines, one pull request from `feat/ga4-analytics`.
-- T2 forecast: well above 400 lines; chain strategy to be chosen before its first commit.
+- Strategy: `ask-on-risk`. Chain strategy: `stacked-to-main` (owner, 2026-10-09).
+- T1: one pull request from `feat/ga4-analytics`, merged as #1 (`975b5dc`). Commits `8a05b96`, `2979ebc`, `bac6a08`.
+- T2: one pull request per slice, each branched from updated `main`. Content slices (T2.6 to T2.8) are mostly translated text and will exceed 400 lines; they are split by content group and any remaining overage is reported as a `size:exception`.
 
 ## Progress
 
@@ -67,6 +84,8 @@ Open notes from T1:
 - The CSP wildcards do not match the bare apex hosts `google-analytics.com` and `analytics.google.com`; this follows Google's own CSP guidance.
 - `render.yaml` now declares `NEXT_PUBLIC_GA_ID` with `sync: false`; the value must be set in the Render dashboard, followed by a redeploy.
 
+- 2026-10-09: T1 live. Pull request #1 merged; the production home page loads gtag with the owner's measurement ID and `/privacy` shows the Google Analytics disclosure. Data arrival in the GA4 property is the owner's to confirm.
+
 ## Next step
 
-Owner sets `NEXT_PUBLIC_GA_ID` in Render and redeploys. T2 waits for the content-scope decision.
+Owner opens and merges the T2.1 pull request, then T2.2 starts from updated `main`.
