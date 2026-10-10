@@ -35,7 +35,11 @@ describe("parseRevalidateSlugs", () => {
 });
 
 describe("gamePathsToRevalidate", () => {
-  it("refreshes listings and each game page", () => {
-    assert.deepEqual(gamePathsToRevalidate(["halloween-fighters"]), ["/", "/games", "/game/halloween-fighters"]);
+  it("refreshes listings and each game page, addressed by route file path under the default locale", () => {
+    assert.deepEqual(gamePathsToRevalidate(["halloween-fighters"]), ["/en", "/en/games", "/en/game/halloween-fighters"]);
+  });
+
+  it("refreshes only the listings when no slugs are given", () => {
+    assert.deepEqual(gamePathsToRevalidate([]), ["/en", "/en/games"]);
   });
 });

@@ -39,7 +39,7 @@ Every phase must pass `lint`, `typecheck` and `build` before it is accepted.
 ## Project layout
 
 ```text
-app/             Routes (App Router). Public pages live in the (site) group.
+app/             Routes (App Router). Pages live in app/[lang]/(site); proxy.ts maps public URLs to the locale segment.
 components/      UI by domain: layout, games, tools, apps, guides, search, ads, ui
 lib/             Site config, data access (catalog.ts, db/) and domain libraries
 prisma/          Schema, migrations, seed and seed data

@@ -1,4 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
+import { defaultLocale } from "./i18n/config";
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const MAX_SLUGS = 500;
@@ -20,7 +21,15 @@ export function parseRevalidateSlugs(body: unknown): string[] | null {
   return slugs.every((slug) => typeof slug === "string" && SLUG.test(slug)) ? (slugs as string[]) : null;
 }
 
-/** Literal paths to refresh after games are published or archived. Category pages use a pattern. */
+/**
+ * Literal paths to refresh after games are published or archived. Category pages use a pattern.
+ * revalidatePath takes the route file path, not the public URL: the proxy serves `/games` from
+ * `app/[lang]/games` with lang "en", so the cache entry lives under `/en/games`.
+ */
 export function gamePathsToRevalidate(slugs: string[]) {
-  return ["/", "/games", ...slugs.map((slug) => `/game/${slug}`)];
+  const root = `/${defaultLocale}`;
+  return [root, `${root}/games`, ...slugs.map((slug) => `${root}/game/${slug}`)];
 }
+
+/** Pattern for every category page, in any locale (route file path, see gamePathsToRevalidate). */
+export const gameCategoryPattern = "/[lang]/games/[category]";

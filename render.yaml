@@ -59,3 +59,8 @@ services:
       # Analytics origins to the CSP): change it, then redeploy. Unset or malformed means disabled.
       - key: NEXT_PUBLIC_GA_ID
         sync: false
+      # Managed in the Render dashboard ("true"/"false"); Blueprint syncs never overwrite it.
+      # Read at BUILD time (it builds and serves the Spanish site under /es): change it, then
+      # redeploy. Unset means every /es URL returns 404. Keep it off until translations are complete.
+      - key: NEXT_PUBLIC_SPANISH_ENABLED
+        sync: false
